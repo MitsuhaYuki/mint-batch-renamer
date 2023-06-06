@@ -1,0 +1,18 @@
+$baseCls: 'dev-modal';
+
+.#{$baseCls} {
+  &-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    &-item {
+      display: flex;
+      gap: 4px;
+
+      &-title {
+        width: 60px;
+      }
+    }
+  }
+}

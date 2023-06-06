@@ -1,0 +1,90 @@
+$baseCls:'output';
+@import '@/common/styles/mixin.scss';
+
+.#{$baseCls} {
+  --log-area-height: 100px;
+
+  &-extra {
+    $area-gap: 6px;
+    display: flex;
+    align-items: center;
+    gap: $area-gap;
+
+    &-btns {
+      display: flex;
+      gap: $area-gap;
+
+      .ant-btn {
+        & > span {
+          font-size: 12px;
+          line-height: 14px;
+        }
+      }
+    }
+
+    &-count {
+      color: #8c8c8c;
+      font-size: 12px;
+      line-height: 14px;
+      height: 14px;
+    }
+  }
+
+  &-collapse {
+    .ant-collapse-item {
+      border-top: 1px solid #dedede;
+
+      .ant-collapse-header {
+        border-bottom: 1px solid #dedede;
+        align-items: center;
+        &-text {
+          user-select: none;
+        }
+      }
+
+      .ant-collapse-content {
+        font-family: 'Consolas', 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        font-size: 12px;
+        line-height: 14px;
+
+        &-box {
+          @include scrollbar;
+          height: var(--log-area-height);
+          overflow: auto;
+        }
+      }
+    }
+  }
+
+  &-log {
+    display: flex;
+    width: 100%;
+
+    &-level {
+      flex: 0 0 auto;
+      text-align: center;
+      width: 42px;
+      height: 14px;
+
+      &-debug {
+        background-color: #73d13d;
+      }
+
+      &-info {
+        background-color: #d9d9d9;
+      }
+
+      &-warn {
+        background-color: #ffa940;
+      }
+
+      &-error {
+        background-color: #ff4d4f;
+      }
+    }
+
+    &-content {
+      flex: 1 1 auto;
+    }
+  }
+}

@@ -1,6 +1,8 @@
-# Tauri + React + Typescript
+# Mint File Batch Renamer
 
-This template should help get you started developing with Tauri, React and Typescript in Vite.
+> 此项目使用[Tauri](https://tauri.app/)构建(Tauri v1.3)
+
+> This project is still in experiment stage!
 
 ## Recommended IDE Setup
 

@@ -4,11 +4,43 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tauri + React + TS</title>
+    <title>Mint Batch Renamer</title>
+    <style>
+      #root-loading-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 10000;
+        width: 100vw;
+        height: 100vh;
+        background-color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+        pointer-events: none;
+      }
+
+      #root-loading-screen video {
+        opacity: 0.75;
+      }
+    
+      #root-loading-screen.elem-fade-out {
+        opacity: 0;
+      }
+    
+      #root-loading-screen.elem-hidden {
+        display: none;
+      }
+    </style>
   </head>
 
   <body>
     <div id="root"></div>
+    <div id="root-loading-screen">
+      <video src="/loading.webm" autoplay loop muted width="300" crossorigin="anonymous"></video>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

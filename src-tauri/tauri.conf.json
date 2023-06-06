@@ -8,7 +8,7 @@
   },
   "package": {
     "productName": "mint-batch-renamer",
-    "version": "0.0.0"
+    "version": "../package.json"
   },
   "tauri": {
     "allowlist": {
@@ -27,7 +27,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.tihus.renamer",
       "targets": "all"
     },
     "security": {
@@ -39,10 +39,11 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": true,
-        "title": "mint-batch-renamer",
+        "resizable": false,
+        "title": "Mint Batch Renamer",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "alwaysOnTop": false
       }
     ]
   }
