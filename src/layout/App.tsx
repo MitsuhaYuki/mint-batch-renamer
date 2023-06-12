@@ -26,9 +26,9 @@ const App: FC = () => {
   useConfigLoader(globalState, globalDispatch)
 
   // hide loading screen
-  useMount(()=>{
+  useMount(() => {
     document.querySelector('#root-loading-screen')?.classList.add('elem-fade-out')
-    setTimeout(()=>{
+    setTimeout(() => {
       document.querySelector('#root-loading-screen')?.classList.add('elem-hidden')
     }, 500)
   })

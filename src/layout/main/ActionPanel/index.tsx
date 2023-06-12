@@ -57,8 +57,7 @@ const Content: FC<ContentProps> = (props) => {
         data: res
       }
     } catch (e) {
-      console.log('I: selectFolder failed', e)
-      if (e === 'Canceled') {
+      if (e === 'No folder selected') {
         message.info('取消选择文件夹')
         logger.info('Canceled select folder')
         return {
@@ -80,7 +79,6 @@ const Content: FC<ContentProps> = (props) => {
   const selectSourceFolder = async (clear = false) => {
     setInOperation(true)
     if (clear) {
-      setInOperation(false)
       if (globalData.sourceFolders.length > 0) {
         setGlobalData('d_source')
         message.success('源文件夹设定已清空')
@@ -113,14 +111,13 @@ const Content: FC<ContentProps> = (props) => {
           setGlobalData('u_source', [...globalData.sourceFolders, folderInfo.data])
         }
       }
-      setInOperation(false)
     }
+    setInOperation(false)
   }
 
   const selectTargetFolder = async (clear = false) => {
     setInOperation(true)
     if (clear) {
-      setInOperation(false)
       if (globalData.sourceFolders.length > 0) {
         setGlobalData('d_target')
         message.success('目标文件夹设定已清空')
@@ -135,8 +132,8 @@ const Content: FC<ContentProps> = (props) => {
         message.success('选择目标文件夹成功')
         setGlobalData('u_target', folderInfo.data)
       }
-      setInOperation(false)
     }
+    setInOperation(false)
   }
 
   const refreshFileList = async () => {
