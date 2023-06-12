@@ -49,7 +49,7 @@ const Content: FC<ContentProps> = (props) => {
         default: renamerInst.id,
       },
     ]
-    newFormItems.push(...renamerInst.params)
+    newFormItems.push(...cloneDeep(renamerInst.params))
 
     const overrideValKeys = Object.keys(overrideVals)
     const extractedFormItem = newFormItems.reduce((prev, item) => {
@@ -107,16 +107,14 @@ const Content: FC<ContentProps> = (props) => {
     }
   }
 
-  useEffect(() => {
-    console.log('I: renamer form rerendered, new form items =', formItems)
-    form.resetFields()
-  }, [formItems])
-
   useMount(() => {
-    console.log('I: renamer item mount, props =', props)
     extractFormItems()
     setConfigModalVisible(true)
   })
+
+  useEffect(() => {
+    if (formItems.length) form.resetFields()
+  }, [formItems])
 
   useUpdateEffect(() => {
     if (configModalVisible) setTimeout(() => form.resetFields(), 0)
