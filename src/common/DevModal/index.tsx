@@ -4,6 +4,8 @@ import { Button, ButtonProps, Col, Modal, Row, Space } from 'antd'
 import useLogger from '@/utils/logger'
 import './index.scss'
 import { uuid } from '@/utils/common'
+import { invoke } from '@tauri-apps/api/tauri'
+import { useControllableValue } from 'ahooks'
 
 type ContentRef = {
   toggle: (visible?: boolean) => void
@@ -23,6 +25,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
   const { globalData, setGlobalData } = useGlobalData()
   const { logs, logger, clear } = useLogger()
   const [visible, setVisible] = useState(false)
+  const [] = useControllableValue()
 
   useImperativeHandle(ref, () => ({
     toggle: toggleModalVisible
@@ -50,6 +53,45 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     }
   }
 
+  const testInvoke = (type: 'read_file' | 'write_file' | 'is_file_exist' | 'select_folders') => {
+    switch (type) {
+      case 'read_file': {
+        (async function () {
+          const res = await invoke('read_file', { filePath: 'E:\\test.json' })
+          console.log('I: invoke read_file', res)
+        })()
+        break
+      }
+      case 'write_file': {
+        (async function () {
+          const res = await invoke('write_file', {
+            filePath: 'E:\\test2.json', content: JSON.stringify({
+              "segment1": Date.now()
+            }, undefined, 4)
+          })
+          console.log('I: invoke write_file', res)
+        })()
+        break
+      }
+      case 'is_file_exist': {
+        (async function () {
+          const res = await invoke('is_file_exist', { filePath: 'config.json' })
+          console.log('I: invoke is_file_exist', res)
+        })()
+        break
+      }
+      case 'select_folders': {
+        (async function () {
+          const res = await invoke('select_folders')
+          console.log('I: invoke select_folders', res)
+        })()
+        break
+      }
+      default:
+        break
+    }
+  }
+
   // life cycle
   useEffect(() => {
     if (visible) {
@@ -66,6 +108,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
       title='Develop'
       focusTriggerAfterClose={false}
       footer={null}
+      maskClosable={false}
       open={visible}
       width={640}
       wrapClassName={baseCls}
@@ -81,6 +124,13 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
           <div className={`${baseCls}-content-item-title`}>日志</div>
           <DevBtn onClick={() => testLogger('logs')}>logs</DevBtn>
           <DevBtn onClick={() => testLogger('test')}>logger</DevBtn>
+        </div>
+        <div className={`${baseCls}-content-item`}>
+          <div className={`${baseCls}-content-item-title`}>Invoke</div>
+          <DevBtn onClick={() => testInvoke('read_file')}>read_file</DevBtn>
+          <DevBtn onClick={() => testInvoke('write_file')}>write_file</DevBtn>
+          <DevBtn onClick={() => testInvoke('is_file_exist')}>is_file_exist</DevBtn>
+          <DevBtn onClick={() => testInvoke('select_folders')}>select_folders</DevBtn>
         </div>
       </div>
     </Modal>

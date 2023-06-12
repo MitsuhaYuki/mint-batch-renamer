@@ -5,8 +5,8 @@ pub fn is_config_exist() -> bool {
     Path::new("config.json").exists()
 }
 
-use std::fs;
 use serde_json;
+use std::fs;
 
 #[tauri::command]
 pub fn read_config() -> Result<serde_json::Value, String> {
@@ -19,4 +19,3 @@ pub fn write_config(config: serde_json::Value) -> Result<(), String> {
     let config_str = serde_json::to_string_pretty(&config).map_err(|e| e.to_string())?;
     fs::write("config.json", config_str).map_err(|e| e.to_string())
 }
-
