@@ -45,15 +45,33 @@ const Content: FC<ContentProps> = props => {
   }
 
   const handleRunRenamer = () => {
-    message.info('重命名文件列表...')
+    if (globalData.filesOriginal.length === 0) {
+      message.info('请先加载文件列表')
+      return
+    }
+    if (state.renamers.length === 0) {
+      message.info('请先添加重命名规则')
+      return
+    }
+    // acquire file list
+    let filesToRename = globalData.filesFiltered
+    if (globalData.filesFiltered.length === 0) {
+      message.warning('未执行过滤，使用源文件列表执行操作')
+      filesToRename = globalData.filesOriginal
+    } else {
+      message.info('重命名文件列表...')
+    }
+    filesToRename = cloneDeep(filesToRename)
+    // reassemble renamer list
     const renamerArr = state.renamers.map(cfg => {
       return {
         func: globalData.sysRenamers[cfg.renamerId].func,
         params: cfg.renamerParams
       }
     })
-    const totalFileCount = globalData.filesFiltered.length
-    const newFileList = globalData.filesFiltered.reduce((prev, item, index, list) => {
+    // run renamer
+    const totalFileCount = filesToRename.length
+    const newFileList = filesToRename.reduce((prev, item, index, list) => {
       const newFileItem = renamerArr.reduce((prevFileItem, renamer) => {
         const res = renamer.func({
           fileItem: prevFileItem,

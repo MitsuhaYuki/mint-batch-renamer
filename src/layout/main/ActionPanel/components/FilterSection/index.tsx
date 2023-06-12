@@ -36,7 +36,7 @@ const Content: FC<ContentProps> = props => {
   }, [state])
 
   const handleAddFilter = () => {
-    const newFilters = [...state.filters, cloneDeep(getDefaultFilter(uuid()))]
+    const newFilters = [...state.filters, getDefaultFilter(uuid())]
     console.log('I: added filters list', newFilters)
     dispatch({
       filters: newFilters
@@ -97,19 +97,17 @@ const Content: FC<ContentProps> = props => {
   }
 
   const renderFilters = useMemo(() => {
-    return state.filters.map((item, index) => {
-      return (
-        <div className={`${baseCls}-filters-item`} key={index}>
-          <FilterSectionItem
-            filterConfig={item}
-            globalData={globalData}
-            logger={logger}
-            onChange={handleUpdateFilter}
-            onRemove={handleRemoveFilter}
-          />
-        </div>
-      )
-    })
+    return state.filters.map((item, index) => (
+      <div className={`${baseCls}-filters-item`} key={index}>
+        <FilterSectionItem
+          filterConfig={item}
+          globalData={globalData}
+          logger={logger}
+          onChange={handleUpdateFilter}
+          onRemove={handleRemoveFilter}
+        />
+      </div>
+    ))
   }, [state.filters])
 
   return (<div className={baseCls}>

@@ -1,5 +1,5 @@
 import { FC, useMemo, useRef, useState } from 'react'
-import { Button, ButtonProps, Collapse, Modal, Space, message } from 'antd'
+import { Button, ButtonProps, Collapse, Modal, message } from 'antd'
 import { invoke } from '@tauri-apps/api/tauri'
 import useLogger from '@/utils/logger'
 import useGlobalData from '@/utils/hooks/useGlobalData'
@@ -193,13 +193,17 @@ const Content: FC<ContentProps> = (props) => {
   }
 
   const warningForFinalRename = () => {
-    Modal.confirm({
-      title: '注意',
-      content: '此操作不可撤销, 确定要重命名这些文件吗?',
-      onOk: () => {
-        copySourceFilesToTarget()
-      }
-    })
+    if (globalData.filesRenamed.length === 0) {
+      message.info('请先重命名文件')
+    } else {
+      Modal.confirm({
+        title: '注意',
+        content: '此操作不可撤销, 确定要重命名这些文件吗?',
+        onOk: () => {
+          copySourceFilesToTarget()
+        }
+      })
+    }
   }
 
   const copySourceFilesToTarget = async () => {

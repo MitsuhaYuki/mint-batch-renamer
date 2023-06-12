@@ -1,4 +1,5 @@
 import { EFilterScope, IFilterConfig, IFilters } from '@/types/filter'
+import { cloneDeep } from 'lodash'
 
 /**
  * 过滤器作用域选项列表
@@ -98,7 +99,7 @@ export const sysFilterList: IFilters = {
 }
 
 /** 默认过滤器 */
-export const getDefaultFilter = (id: string): IFilterConfig => ({
+export const getDefaultFilter = (id: string): IFilterConfig => cloneDeep({
   label: sysFilterList['contains'].label,
   id,
   filterLabel: sysFilterList['contains'].label,
