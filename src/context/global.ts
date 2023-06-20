@@ -1,30 +1,32 @@
 import React, { Reducer } from 'react'
 import { IFileItem } from '@/types/file'
 import { defaultConfig, IConfig } from '@/types/config'
-import { IFilters } from '@/types/filter'
+import { IExtFilters, IFilters } from '@/types/filter'
 import { sysFilterList } from '@/utils/filter'
 import { IRenamers } from '@/types/renamer'
 import { sysRenamerList } from '@/utils/renamer'
 
-export interface IState {
+interface IState {
   config: IConfig
   filesOriginal: IFileItem[]
-  filesFiltered: IFileItem[]
-  filesRenamed: IFileItem[]
+  filesFiltered?: IFileItem[]
+  filesRenamed?: IFileItem[]
   loading?: boolean
   sysFilters: IFilters
+  sysFiltersExt: IExtFilters
   sysRenamers: IRenamers
   sourceFolders: string[]
   targetFolder: string
 }
-export interface IOptionalState extends Partial<IState> {}
+interface IOptionalState extends Partial<IState> {}
 
-export const initState: IState = {
+const initState: IState = {
   config: defaultConfig,
   filesOriginal: [],
-  filesFiltered: [],
-  filesRenamed: [],
+  // filesFiltered: [],
+  // filesRenamed: [],
   sysFilters: sysFilterList,
+  sysFiltersExt: {},
   sysRenamers: sysRenamerList,
   sourceFolders: [],
   targetFolder: ''
@@ -35,7 +37,7 @@ export const initState: IState = {
  * @description internal: for internal use only. reset: reset all state to initial state
  * @description naming: c_ for create, r_ for read, u_ for update, d_ for delete, after the prefix is the state name
  */
-export type IReducerActionType = 'internal'
+type IReducerActionType = 'internal'
   | 'u_source'
   | 'd_source'
   | 'u_target'
@@ -45,12 +47,12 @@ export type IReducerActionType = 'internal'
   | 'u_renamed_files'
   | 'reset'
 
-export type IReducerAction = {
+type IReducerAction = {
   type: IReducerActionType,
   payload?: any
 }
 
-export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
+const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   if (action.type !== 'internal') {
     switch (action.type) {
       case 'u_source':
@@ -74,10 +76,23 @@ export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   return Object.assign({}, state, action.payload)
 }
 
-export const Context = React.createContext<{
+const Context = React.createContext<{
   state: IState
   dispatch: (value: any) => void
 }>({
   state: initState,
   dispatch: () => ({ error: 'Reducer is not defined' })
 })
+
+export {
+  Context as GlobalContext,
+  reducer as globalReducer,
+  initState as globalInitState,
+}
+
+export type {
+  IState as IGlobalState,
+  IOptionalState as IOptionalGlobalState,
+  IReducerAction as IGlobalReducerAction,
+  IReducerActionType as IGlobalReducerActionType,
+}

@@ -1,0 +1,13 @@
+$baseCls: 'quick-access';
+
+.#{$baseCls} {
+  &-bar {
+    display: flex;
+    justify-content: space-evenly;
+    padding: 2px 0;
+
+    &-icon {
+      color: #8c8c8c;
+    }
+  }
+}

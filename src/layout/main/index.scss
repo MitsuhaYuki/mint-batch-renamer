@@ -9,7 +9,21 @@ $baseCls: 'entrance';
 
     &-inner {
       & &-sider {
-        background: transparent;
+        background: #fafafa;
+        border-right: 1px solid #dedede;
+
+        .ant-layout-sider-children {
+          display: flex;
+          flex-direction: column;
+
+          & > div {
+            flex: 1 1 auto;
+
+            &:last-child {
+              flex: 0 0 auto;
+            }
+          }
+        }
       }
     }
 

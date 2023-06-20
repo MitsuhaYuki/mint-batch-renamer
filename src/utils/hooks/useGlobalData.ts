@@ -1,14 +1,21 @@
-import { useCallback, useContext, useState } from 'react'
-import { Context, IOptionalState, IReducerActionType, IState } from '@/context/global'
+import { useCallback, useContext } from 'react'
 import { message } from 'antd'
+import {
+  GlobalContext,
+  IGlobalReducerActionType,
+  IGlobalState,
+  IOptionalGlobalState,
+} from '@/context/global'
+
+type IGlobalSetter = (type: Exclude<IGlobalReducerActionType, 'internal'> | IOptionalGlobalState, payload?: any) => void
 
 const useGlobalData = (): {
-  globalData: IState,
-  setGlobalData: (type: Exclude<IReducerActionType, 'internal'> | IOptionalState, payload?: any) => void
+  globalData: IGlobalState,
+  setGlobalData: IGlobalSetter
 } => {
-  const { state, dispatch } = useContext(Context)
+  const { state, dispatch } = useContext(GlobalContext)
 
-  const setGlobalData = useCallback((arg1: Exclude<IReducerActionType, 'internal'> | IOptionalState, arg2?: IOptionalState) => {
+  const setGlobalData = useCallback((arg1: Exclude<IGlobalReducerActionType, 'internal'> | IOptionalGlobalState, arg2?: IOptionalGlobalState) => {
     if (typeof arg1 === 'string') {
       dispatch({ type: arg1, payload: arg2 })
     } else {
@@ -27,3 +34,6 @@ const useGlobalData = (): {
 }
 
 export default useGlobalData
+export type {
+  IGlobalSetter
+}

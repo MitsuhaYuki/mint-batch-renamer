@@ -6,10 +6,10 @@ interface IOutputItem {
   timestamp: number
   content: string
 }
-export type IState = IOutputItem[]
-export type IOptionalState = Partial<IState>
+type IState = IOutputItem[]
+type IOptionalState = Partial<IState>
 
-export const initState: IState = [
+const initState: IState = [
   {
     level: 1,
     levelText: 'INFO',
@@ -20,7 +20,7 @@ export const initState: IState = [
 
 interface IReducerAction { type: string; payload: IOutputItem }
 
-export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
+const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   switch (action.type) {
     case 'add':
       return [action.payload, ...state]
@@ -36,10 +36,22 @@ export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   }
 }
 
-export const Context = React.createContext<{
+const Context = React.createContext<{
   state: IState
   dispatch: (value: any) => void
 }>({
   state: initState,
   dispatch: () => ({ error: 'Reducer is not defined' })
 })
+
+export {
+  Context as ConsoleContext,
+  reducer as consoleReducer,
+  initState as consoleInitState,
+}
+
+export type {
+  IState as IConsoleState,
+  IOptionalState as IOptionalConsoleState,
+  IReducerAction as IConsoleReducerAction
+}

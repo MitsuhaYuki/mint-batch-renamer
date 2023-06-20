@@ -3,7 +3,7 @@ import './index.scss'
 import { Button, message } from 'antd'
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import FilterSectionItem from '../FilterSectionItem'
-import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterConfig, IGeneralFilterFunction } from '@/types/filter'
+import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterConfig, ICommonFilterFunction } from '@/types/filter'
 import cloneDeep from 'lodash/cloneDeep'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
@@ -48,18 +48,19 @@ const Content: FC<ContentProps> = props => {
       message.info('请先加载文件列表')
     } else {
       message.info('过滤文件列表...')
+      const filterSet = { ...globalData.sysFilters, ...globalData.sysFiltersExt }
       let copiedFileList = cloneDeep(globalData.filesOriginal)
       const filterArr = state.filters.map(cfg => {
         return {
-          scope: globalData.sysFilters[cfg.filterId].scope,
-          func: globalData.sysFilters[cfg.filterId].func,
+          scope: filterSet[cfg.filterId].scope,
+          func: filterSet[cfg.filterId].func,
           params: cfg.filterParams
         }
       })
       filterArr.forEach(item => {
         switch (item.scope) {
           case EFilterScope.fileName: {
-            const filterFunc = item.func as IGeneralFilterFunction<IFileNameScopeFilterArgs>
+            const filterFunc = item.func as ICommonFilterFunction<IFileNameScopeFilterArgs>
             copiedFileList = copiedFileList.filter(i => filterFunc({
               fullName: i.full_name,
               fileName: i.name,
@@ -68,7 +69,7 @@ const Content: FC<ContentProps> = props => {
             break
           }
           case EFilterScope.fileList: {
-            const filterFunc = item.func as IGeneralFilterFunction<IFileListScopeFilterArgs, IFileItem[]>
+            const filterFunc = item.func as ICommonFilterFunction<IFileListScopeFilterArgs, IFileItem[]>
             copiedFileList = filterFunc({ fileList: copiedFileList }, item.params)
           }
           default:

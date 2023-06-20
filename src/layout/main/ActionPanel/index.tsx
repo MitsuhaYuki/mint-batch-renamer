@@ -1,21 +1,15 @@
-import { FC, useMemo, useRef, useState } from 'react'
-import { Button, ButtonProps, Collapse, Modal, message } from 'antd'
-import { invoke } from '@tauri-apps/api/tauri'
-import useLogger from '@/utils/logger'
-import useGlobalData from '@/utils/hooks/useGlobalData'
-import type { IFileItem } from '@/types/file'
-import {
-  CloseOutlined,
-  SettingOutlined
-} from '@ant-design/icons'
-import './index.scss'
-import SettingsModal, { SettingsModalRef } from '@/common/SettingsModal'
-import DevModal, { DevModalRef } from '@/common/DevModal'
+import { FC, useMemo, useState } from 'react'
 import FilterSection from './components/FilterSection'
-import RenamerSection from './components/RenamerSection'
-import { useLongPress } from 'ahooks'
 import OperableList from '@/common/OperableList'
-import { cloneDeep } from 'lodash'
+import RenamerSection from './components/RenamerSection'
+import type { IFileItem } from '@/types/file'
+import useGlobalData from '@/utils/hooks/useGlobalData'
+import useLogger from '@/utils/logger'
+import { Button, ButtonProps, Collapse, Modal, message } from 'antd'
+import { CloseOutlined } from '@ant-design/icons'
+import { cloneDeep, isEmpty } from 'lodash'
+import { invoke } from '@tauri-apps/api/tauri'
+import './index.scss'
 
 const { Panel } = Collapse
 
@@ -29,23 +23,8 @@ const Content: FC<ContentProps> = (props) => {
   const { logger } = useLogger()
   // is currently in operation
   const [inOperation, setInOperation] = useState(false)
-  // settings modal
-  const settingsModalRef = useRef<SettingsModalRef>(null)
-  // settings button
-  const settingsBtnRef = useRef<any>(null)
-  // develop test modal
-  const devModalRef = useRef<DevModalRef>(null)
   // system config
   const { config } = globalData
-
-  // dev panel access method
-  useLongPress(() => {
-    logger.warn('Open dev panel')
-    devModalRef.current?.toggle(true)
-  }, settingsBtnRef, {
-    delay: 1000,
-    moveThreshold: { x: 20, y: 20 }
-  })
 
   const selectFolder = async (): Promise<{ success: boolean; status: string; data?: string | undefined }> => {
     try {
@@ -190,7 +169,7 @@ const Content: FC<ContentProps> = (props) => {
   }
 
   const warningForFinalRename = () => {
-    if (globalData.filesRenamed.length === 0) {
+    if (isEmpty(globalData.filesRenamed)) {
       message.info('请先重命名文件')
     } else {
       Modal.confirm({
@@ -206,8 +185,9 @@ const Content: FC<ContentProps> = (props) => {
   const copySourceFilesToTarget = async () => {
     setInOperation(true)
     try {
-      if (globalData.targetFolder && globalData.filesRenamed.length > 0) {
-        for (const file of globalData.filesRenamed) {
+      const isFilesRenamed = globalData.filesRenamed && globalData.filesRenamed.length > 0
+      if (globalData.targetFolder && isFilesRenamed) {
+        for (const file of globalData.filesRenamed!) {
           const res = await invoke("copy_single_file", {
             sourcePath: file.path,
             targetPath: `${globalData.targetFolder}\\${file.rename_full_name}`
@@ -219,7 +199,7 @@ const Content: FC<ContentProps> = (props) => {
         if (!globalData.targetFolder) {
           message.info('请先选择输出文件夹')
           logger.info('Copy failed: target folder not selected')
-        } else if (globalData.filesRenamed.length === 0) {
+        } else if (!isFilesRenamed) {
           message.info('请先重命名文件')
           logger.info('Copy failed: no files renamed')
         }
@@ -316,17 +296,6 @@ const Content: FC<ContentProps> = (props) => {
         </div>
       </Panel>
     </Collapse>
-    <div className={`${baseCls}-settings`}>
-      <Button
-        ref={settingsBtnRef}
-        icon={<SettingOutlined className={`${baseCls}-settings-icon`} title='Settings' />}
-        shape='circle'
-        type='text'
-        onClick={() => settingsModalRef.current?.toggle(true)}
-      />
-    </div>
-    <DevModal ref={devModalRef} />
-    <SettingsModal ref={settingsModalRef} />
   </div>)
 }
 

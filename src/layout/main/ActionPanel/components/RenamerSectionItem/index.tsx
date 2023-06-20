@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from 'react'
-import { IState as IGlobalState } from '@/context/global'
+import { IGlobalState } from '@/context/global'
 import './index.scss'
 import { IRenamerConfig, IRenamerParam } from '@/types/renamer'
 import { ILogger } from '@/utils/logger'

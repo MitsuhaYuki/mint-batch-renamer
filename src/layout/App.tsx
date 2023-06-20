@@ -1,20 +1,13 @@
-import { FC, useReducer } from 'react'
-import {
-  initState as globalInitState,
-  reducer as globalReducer,
-  Context as GlobalContext
-} from '@/context/global'
-import {
-  initState as consoleInitState,
-  reducer as consoleReducer,
-  Context as ConsoleContext
-} from '@/context/console'
-import { useConfigLoader } from '@/utils/config'
-import zhCN from 'antd/locale/zh_CN'
 import MainPage from './main'
-import './App.scss'
+import zhCN from 'antd/locale/zh_CN'
 import { ConfigProvider } from 'antd'
+import { ConsoleContext, consoleInitState, consoleReducer } from '@/context/console'
+import { FC, useReducer } from 'react'
+import { GlobalContext, globalInitState, globalReducer } from '@/context/global'
+import { useConfigLoader } from '@/utils/config'
+import { useExternalScriptLoader } from '@/utils/extension'
 import { useMount } from 'ahooks'
+import './App.scss'
 
 const baseCls = 'app'
 const App: FC = () => {
@@ -24,6 +17,7 @@ const App: FC = () => {
 
   // check & load config file
   useConfigLoader(globalState, globalDispatch)
+  useExternalScriptLoader(globalState, globalDispatch, consoleState, consoleDispatch)
 
   // hide loading screen
   useMount(() => {

@@ -1,5 +1,5 @@
 import { useCallback, useContext } from 'react'
-import { Context, IState } from '@/context/console'
+import { ConsoleContext, IConsoleState } from '@/context/console'
 
 function makeRecord (level: 'debug' | 'info' | 'warn' | 'error', content: string) {
   const record: any = { type: 'add', payload: { timestamp: Date.now(), content } }
@@ -42,11 +42,11 @@ export interface ILogger {
  * @returns Console management methods
  */
 const useLogger = (): {
-  logs: IState
+  logs: IConsoleState
   logger: ILogger
   clear: () => void
 } => {
-  const { state, dispatch } = useContext(Context)
+  const { state, dispatch } = useContext(ConsoleContext)
   return useWrappedLogger(state, dispatch)
 }
 
@@ -57,10 +57,10 @@ const useLogger = (): {
  * @returns 
  */
 const useWrappedLogger = (
-  consoleState: IState,
+  consoleState: IConsoleState,
   consoleDispatch: (data: any) => void
 ): {
-  logs: IState
+  logs: IConsoleState
   logger: ILogger
   clear: () => void
 } => {

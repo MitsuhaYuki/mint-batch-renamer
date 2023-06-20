@@ -2,7 +2,7 @@ import { IFilterConfig, IFilterParam } from '@/types/filter'
 import { Button, Form, Input, InputNumber, Modal, Select, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { ArrowDownOutlined, ArrowUpOutlined, EllipsisOutlined } from '@ant-design/icons'
-import { IState as IGlobalState } from '@/context/global'
+import { IGlobalState } from '@/context/global'
 import { useMount, useUpdateEffect } from 'ahooks'
 import { ILogger } from '@/utils/logger'
 import './index.scss'
@@ -21,6 +21,7 @@ export type ContentProps = {
 const baseCls = 'filter-item'
 const Content: FC<ContentProps> = (props) => {
   const { filterConfig, globalData, logger, onChange } = props
+  const filterSet = { ...globalData.sysFilters, ...globalData.sysFiltersExt }
   const [configModalVisible, setConfigModalVisible] = useState(true)
   const [formItems, setFormItems] = useState<IFilterParam[]>([])
   const [form] = Form.useForm()
@@ -28,11 +29,11 @@ const Content: FC<ContentProps> = (props) => {
   const extractFormItems = (override: Record<string, any> = {}) => {
     const overrideVals = { ...override, ...filterConfig.filterParams }
     const filterId = overrideVals['filter_id'] ?? filterConfig.filterId
-    let filterInst = globalData.sysFilters[filterId]
+    let filterInst = filterSet[filterId]
     if (!filterInst) {
       message.error(`没有找到 ${filterId} 过滤器, 已重置为默认值!`)
       logger.error(`Filter ${filterId} not found`)
-      filterInst = globalData.sysFilters['contains']
+      filterInst = filterSet['contains']
     }
 
     const newFormItems: IFilterParam[] = [
@@ -46,7 +47,7 @@ const Content: FC<ContentProps> = (props) => {
         name: 'filter_id',
         label: '过滤器',
         type: 'select',
-        range: Object.keys(globalData.sysFilters).map(key => ({ label: globalData.sysFilters[key].label, value: key })),
+        range: Object.keys(filterSet).map(key => ({ label: filterSet[key].label, value: key })),
         default: filterInst.id,
       },
       {
@@ -112,7 +113,7 @@ const Content: FC<ContentProps> = (props) => {
     if (changedKeys.includes('filter_id')) {
       extractFormItems({
         filter_id: changedValues.filter_id,
-        filter_label: globalData.sysFilters[changedValues.filter_id].label,
+        filter_label: filterSet[changedValues.filter_id].label,
       })
     }
   }

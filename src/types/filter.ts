@@ -44,7 +44,7 @@ export type IFileListScopeFilterArgs = {
 }
 
 /** 通用过滤器方法 */
-export type IGeneralFilterFunction<T, K = boolean> = (
+export type ICommonFilterFunction<T, K = boolean> = (
   sysArgs: T,
   extra?: Record<string, any>
 ) => K
@@ -86,7 +86,7 @@ export type IFilterParam = {
 }
 
 /** 通用过滤器 */
-export type IGeneralFilter<IScope, IArgs, IResp = boolean> = {
+export type ICommonFilter<IScope, IArgs, IResp = boolean> = {
   /**
    * 过滤器显示名
    */
@@ -102,7 +102,7 @@ export type IGeneralFilter<IScope, IArgs, IResp = boolean> = {
   /**
    * 过滤器方法
    */
-  func: IGeneralFilterFunction<IArgs, IResp>
+  func: ICommonFilterFunction<IArgs, IResp>
   /**
    * 过滤器参数
    */
@@ -119,8 +119,48 @@ export enum EFilterScope {
 
 /** 过滤器 */
 export type IFilter = |
-  IGeneralFilter<EFilterScope.fileName, IFileNameScopeFilterArgs> |
-  IGeneralFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
+  ICommonFilter<EFilterScope.fileName, IFileNameScopeFilterArgs> |
+  ICommonFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
 
 /** 过滤器列表 */
 export type IFilters = Record<string, IFilter>
+
+/**
+ * 第三方过滤器脚本类型定义
+ */
+
+/** 从外部加载的过滤器 */
+export interface ICommonExtFilter<IScope, IArgs, IResp = boolean> extends ICommonFilter<IScope, IArgs, IResp> {
+  /**
+   * 功能描述
+   */
+  desc: string
+  /**
+   * 过滤器加载状态
+   */
+  error: boolean
+}
+
+/** 外部过滤器 */
+export type IExtFilter = |
+  ICommonExtFilter<EFilterScope.fileName, IFileNameScopeFilterArgs> |
+  ICommonExtFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
+
+/** 外部过滤器(From file) */
+export type IExtFilterRaw = IExtFilter & {
+  /**
+   * 过滤器作用域(Override)
+   */
+  scope: EFilterScope
+  /**
+   * 过滤器方法(Override)
+   */
+  func: string
+  /**
+   * 过滤器加载状态
+   */
+  error: boolean
+}
+
+/** 外部Filter列表 */
+export type IExtFilters = Record<string, IExtFilter>

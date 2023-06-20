@@ -1,9 +1,9 @@
-import { FC, useCallback, useMemo, useRef } from 'react'
-import { Table } from 'antd'
 import type { ColumnsType } from 'antd/es/table'
-import './index.scss'
 import useGlobalData from '@/utils/hooks/useGlobalData'
+import { FC, useCallback, useMemo, useRef } from 'react'
 import { IFileItem } from '@/types/file'
+import { Table } from 'antd'
+import './index.scss'
 
 export type ContentProps = {
   example?: any
@@ -50,7 +50,7 @@ const Content: FC<ContentProps> = (props) => {
       },
     ]
 
-    if (globalData.filesRenamed.length > 0) {
+    if (globalData.filesRenamed) {
       resColumns.splice(0, 3, {
         title: 'From',
         dataIndex: 'full_name',
@@ -71,7 +71,7 @@ const Content: FC<ContentProps> = (props) => {
     <div className={`${baseCls}-table`} ref={wrapperRef}>
       <Table
         columns={columns}
-        dataSource={globalData.filesRenamed.length > 0 ? globalData.filesRenamed : globalData.filesFiltered.length > 0 ? globalData.filesFiltered : globalData.filesOriginal}
+        dataSource={globalData.filesRenamed ?? globalData.filesFiltered ?? globalData.filesOriginal}
         bordered={false}
         rowKey={'path'}
         pagination={false}

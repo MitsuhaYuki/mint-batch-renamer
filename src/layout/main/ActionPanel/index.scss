@@ -3,10 +3,7 @@ $baseCls:'action-panel';
 
 .#{$baseCls} {
   --collapse-header-space: calc(2 * 38px);
-  height: 100%;
-  background-color: #fafafa;
   overflow: hidden;
-  border-right: 1px solid #dedede;
   display: flex;
   flex-direction: column;
 

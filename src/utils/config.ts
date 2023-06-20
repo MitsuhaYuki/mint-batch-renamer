@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api/tauri'
-import { IReducerAction, IState } from '@/context/global'
+import { IGlobalReducerAction, IGlobalState } from '@/context/global'
 import { defaultConfig, IConfig } from '@/types/config'
 import { Modal, message } from 'antd'
 import { useAsyncEffect } from 'ahooks'
@@ -9,7 +9,7 @@ import { useAsyncEffect } from 'ahooks'
  * @param globalDispatch global state setter
  * @returns config load status, ok=success, not_found=config not found, error_fs=error in file system, error_read=error in read file
  */
-export async function loadConfig (globalDispatch: (data: IReducerAction) => void): Promise<'ok' | 'not_found' | 'error_fs' | 'error_read'> {
+export async function loadConfig (globalDispatch: (data: IGlobalReducerAction) => void): Promise<'ok' | 'not_found' | 'error_fs' | 'error_read'> {
   let isConfigExist = false
   try {
     isConfigExist = await invoke('is_config_exist')
@@ -48,7 +48,7 @@ export async function saveConfig (config: IConfig): Promise<'ok' | 'error_fs'> {
  * @param globalDispatch global state setter
  * @returns reset config status, ok=success, error_fs=error in file system
  */
-export async function resetConfig (globalDispatch: (data: IReducerAction) => void): Promise<'ok' | 'error_fs'> {
+export async function resetConfig (globalDispatch: (data: IGlobalReducerAction) => void): Promise<'ok' | 'error_fs'> {
   const copyConfig = JSON.parse(JSON.stringify(defaultConfig))
   try {
     await invoke("write_config", { config: copyConfig })
@@ -64,7 +64,7 @@ export async function resetConfig (globalDispatch: (data: IReducerAction) => voi
  * @param globalDispatch global state setter
  * @param modal which modal will be destroyed, undefined if no modal
  */
-const resetConfigWithPrompt = async (globalDispatch: (data: IReducerAction) => void, modal?: any) => {
+const resetConfigWithPrompt = async (globalDispatch: (data: IGlobalReducerAction) => void, modal?: any) => {
   if (modal) modal.destroy()
   const resetConfigStatus = await resetConfig(globalDispatch)
   if (resetConfigStatus === 'ok') {
@@ -86,8 +86,8 @@ const resetConfigWithPrompt = async (globalDispatch: (data: IReducerAction) => v
  * @param globalDispatch global state setter
  */
 const useConfigLoader = (
-  globalData: IState,
-  globalDispatch: (data: IReducerAction) => void,
+  globalData: IGlobalState,
+  globalDispatch: (data: IGlobalReducerAction) => void,
 ) => {
   useAsyncEffect(async () => {
     Modal.destroyAll()

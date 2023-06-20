@@ -1,6 +1,6 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import useGlobalData from '@/utils/hooks/useGlobalData'
-import { Form, InputNumber, Modal, message } from 'antd'
+import { Form, InputNumber, Modal, Radio, message } from 'antd'
 import { saveConfig } from '@/utils/config'
 import './index.scss'
 
@@ -68,6 +68,17 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     setVisible(false)
   }
 
+  const handleModifyDangerousSettings = (key: string) => {
+    Modal.confirm({
+      title: '注意',
+      content: '修改此项可能导致您的系统遭受攻击! 请务必确认脚本可信后再启用此项!',
+      autoFocusButton: null,
+      focusTriggerAfterClose: false,
+      okButtonProps: { danger: true },
+      onCancel () { form.setFieldsValue({ [key]: false }) }
+    })
+  }
+
   // life cycle
   useEffect(() => {
     if (visible) {
@@ -92,15 +103,40 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
       <div className={`${baseCls}-content`}>
         <Form
           form={form}
-          autoComplete="off"
+          autoComplete='off'
+          colon={false}
+          labelCol={{ span: 6 }}
+          requiredMark={false}
         >
           <Form.Item
-            label="最大处理文件数"
-            name="max_file_limit"
-            tooltip="设置最大处理文件数，过大可能导致系统无响应。"
+            label='最大处理文件数'
+            name='max_file_limit'
+            tooltip='设置最大处理文件数，过大可能导致系统无响应。'
             rules={[{ required: true, message: '请输入此项!' }]}
           >
             <InputNumber controls={false} min={2000} step={100} />
+          </Form.Item>
+          <Form.Item
+            label='外部筛选器'
+            name='allow_external_filters'
+            tooltip='启用此项可允许程序加载第三方筛选脚本，提供更多的筛选功能'
+            rules={[{ required: true, message: '请输入此项!' }]}
+          >
+            <Radio.Group onChange={e => { if (e.target.value) handleModifyDangerousSettings('allow_external_filters') }}>
+              <Radio value={true}>是</Radio>
+              <Radio value={false}>否</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            label='外部重命名器'
+            name='allow_external_renamers'
+            tooltip='启用此项可允许程序加载第三方重命名脚本，提供更多的重命名功能'
+            rules={[{ required: true, message: '请输入此项!' }]}
+          >
+            <Radio.Group onChange={e => { if (e.target.value) handleModifyDangerousSettings('allow_external_renamers') }}>
+              <Radio value={true}>是</Radio>
+              <Radio value={false}>否</Radio>
+            </Radio.Group>
           </Form.Item>
         </Form>
       </div>

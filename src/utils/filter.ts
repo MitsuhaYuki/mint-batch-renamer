@@ -84,16 +84,19 @@ export const sysFilterList: IFilters = {
     func: (sysArgs, extra: any) => {
       console.log('I: running "equals" filter, sysArgs =', sysArgs, 'extra =', extra)
       const filterRange = extra?.filter_range ?? 'file'
+      let res=false
       switch (filterRange) {
         case 'file':
-          return sysArgs.fileName === extra?.equals_text
+          res= sysArgs.fileName === extra?.equals_text
         case 'ext':
-          return sysArgs.extName === extra?.equals_text
+          res= sysArgs.extName === extra?.equals_text
         case 'full':
-          return sysArgs.fullName === extra?.equals_text
+          res= sysArgs.fullName === extra?.equals_text
         default:
-          return false
+          res= false
       }
+      console.log('I: message errerrrer', res)
+      return res
     }
   }
 }

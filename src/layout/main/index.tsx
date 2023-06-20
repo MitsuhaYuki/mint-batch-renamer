@@ -1,8 +1,9 @@
 import { FC } from 'react'
-import { Layout } from 'antd'
 import ActionPanel from './ActionPanel'
 import DataTable from './DataTable'
 import LoggerPanel from './LoggerPanel'
+import QuickPanel from './QuickPanel'
+import { Layout } from 'antd'
 import './index.scss'
 
 const { Header, Sider, Content, Footer } = Layout
@@ -14,6 +15,7 @@ const EntrancePage: FC = () => {
       <Layout className={`${baseCls}-layout-inner`}>
         <Sider className={`${baseCls}-layout-inner-sider`} collapsible={false} width={200}>
           <ActionPanel />
+          <QuickPanel />
         </Sider>
         <Content className={`${baseCls}-layout-inner-content`}>
           <DataTable />
