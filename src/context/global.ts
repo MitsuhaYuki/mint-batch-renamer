@@ -56,17 +56,17 @@ const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   if (action.type !== 'internal') {
     switch (action.type) {
       case 'u_source':
-        return Object.assign({}, state, { sourceFolders: action.payload, filesOriginal: [], filesFiltered: [], filesRenamed: [] })
+        return Object.assign({}, state, { sourceFolders: action.payload, filesOriginal: [], filesFiltered: undefined, filesRenamed: undefined })
       case 'd_source':
-        return Object.assign({}, state, { sourceFolders: [], filesOriginal: [], filesFiltered: [], filesRenamed: [] })
+        return Object.assign({}, state, { sourceFolders: [], filesOriginal: undefined, filesFiltered: undefined, filesRenamed: undefined })
       case 'u_target':
         return Object.assign({}, state, { targetFolder: action.payload })
       case 'd_target':
         return Object.assign({}, state, { targetFolder: '' })
       case 'u_original_files':
-        return Object.assign({}, state, { filesOriginal: action.payload, filesFiltered: [], filesRenamed: [] })
+        return Object.assign({}, state, { filesOriginal: action.payload, filesFiltered: undefined, filesRenamed: undefined })
       case 'u_filtered_files':
-        return Object.assign({}, state, { filesFiltered: action.payload, filesRenamed: [] })
+        return Object.assign({}, state, { filesFiltered: action.payload, filesRenamed: undefined })
       case 'u_renamed_files':
         return Object.assign({}, state, { filesRenamed: action.payload })
       case 'reset':
