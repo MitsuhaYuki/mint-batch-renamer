@@ -44,6 +44,7 @@ async function loadScript (
       prev[key] = {
         ...rawScript[key],
         error: false,
+        modified: false,
         func: deserializedFunc,
       }
     } catch (e) {
@@ -51,11 +52,13 @@ async function loadScript (
       prev[key] = {
         ...rawScript[key],
         error: true,
+        modified: false,
         func: undefined,
       }
     }
     return prev
   }, {} as IExtFilters)
+  console.log('I: loadScript', finalScript)
   logger.info(`Load ${Object.keys(finalScript).length} ${type}(s) complete`)
   globalDispatch({ type: 'internal', payload: { sysFiltersExt: finalScript } })
 }
@@ -88,4 +91,7 @@ const useExternalScriptLoader = (
   }, [globalData.config])
 }
 
-export { useExternalScriptLoader }
+export {
+  loadScript,
+  useExternalScriptLoader
+}

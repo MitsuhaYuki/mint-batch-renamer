@@ -1,6 +1,6 @@
 import { FC, useMemo, useRef } from 'react'
 import DevModal, { DevModalRef } from '@/common/DevModal'
-import ScriptBrowser, { ScriptBrowserRef } from '@/common/ScriptBrowser'
+import { ScriptBrowser, ScriptBrowserRef } from '@/common/ScriptBrowser'
 import SettingsModal, { SettingsModalRef } from '@/common/SettingsModal'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
@@ -55,7 +55,12 @@ const Content: FC<ContentProps> = (props) => {
     }</div>
     <DevModal ref={devModalRef} />
     <SettingsModal ref={settingsModalRef} />
-    <ScriptBrowser ref={scriptBrowserRef} globalData={globalData} />
+    <ScriptBrowser
+      ref={scriptBrowserRef}
+      logger={logger}
+      globalData={globalData}
+      setGlobalData={setGlobalData}
+    />
   </div>)
 }
 

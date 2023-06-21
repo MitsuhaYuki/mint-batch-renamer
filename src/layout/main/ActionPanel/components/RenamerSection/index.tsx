@@ -54,10 +54,9 @@ const Content: FC<ContentProps> = props => {
       return
     }
     // acquire file list
-    let filesToRename = globalData.filesFiltered
-    if (globalData.filesFiltered.length === 0) {
+    let filesToRename = globalData.filesFiltered ?? globalData.filesOriginal
+    if (!globalData.filesFiltered) {
       message.warning('未执行过滤，使用源文件列表执行操作')
-      filesToRename = globalData.filesOriginal
     } else {
       message.info('重命名文件列表...')
     }

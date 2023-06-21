@@ -139,6 +139,10 @@ export interface ICommonExtFilter<IScope, IArgs, IResp = boolean> extends ICommo
    * 过滤器加载状态
    */
   error: boolean
+  /**
+   * 过滤器是否被更改
+   */
+  modified: boolean
 }
 
 /** 外部过滤器 */
@@ -147,7 +151,7 @@ export type IExtFilter = |
   ICommonExtFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
 
 /** 外部过滤器(From file) */
-export type IExtFilterRaw = IExtFilter & {
+export type IExtFilterRaw = Omit<IExtFilter, 'error' | 'modified'> & {
   /**
    * 过滤器作用域(Override)
    */
@@ -156,10 +160,6 @@ export type IExtFilterRaw = IExtFilter & {
    * 过滤器方法(Override)
    */
   func: string
-  /**
-   * 过滤器加载状态
-   */
-  error: boolean
 }
 
 /** 外部Filter列表 */

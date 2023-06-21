@@ -56,7 +56,9 @@ $baseCls: 'script-browser';
   }
 
   &-content {
+    @include scrollbar;
     flex: 1 1 auto;
+    overflow-y: auto;
   }
 
   &-item {
@@ -70,11 +72,21 @@ $baseCls: 'script-browser';
       flex-direction: column;
       flex: 1 1 auto;
       padding: 8px;
+      overflow: hidden;
 
       &-title {
         padding-bottom: 8px;
         flex: 0 0 auto;
         font-size: 14px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        &-error {
+          color: #ff7a45;
+          text-align: center;
+          font-weight: 600;
+        }
       }
 
       &-desc {
