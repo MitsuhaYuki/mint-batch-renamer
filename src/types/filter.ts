@@ -140,9 +140,30 @@ export interface ICommonExtFilter<IScope, IArgs, IResp = boolean> extends ICommo
    */
   error: boolean
   /**
-   * 过滤器是否被更改
+   * 过滤器状态(脚本编辑器使用的字段)
    */
-  modified: boolean
+  status: {
+    /**
+     * 脚本被创建
+     */
+    created: boolean
+    /**
+     * 脚本被删除
+     */
+    deleted: boolean
+    /**
+     * 脚本被禁用
+     */
+    disabled: boolean
+    /**
+     * 该脚本存在加载错误
+     */
+    error: boolean
+    /**
+     * 脚本被修改
+     */
+    modified: boolean
+  }
 }
 
 /** 外部过滤器 */

@@ -39,21 +39,27 @@ async function loadScript (
     return
   }
   const finalScript = Object.keys(rawScript).reduce((prev, key) => {
+    // FIXME: notice, if script id collusion, the later script need add a random suffix and set disabled!
+    // TODO: should use spefic pattern to identify if script is disabled by user or load error
     try {
       const deserializedFunc = new Function('return ' + atob(rawScript[key].func))()
       prev[key] = {
         ...rawScript[key],
-        error: false,
-        modified: false,
         func: deserializedFunc,
+        status: {
+          ...rawScript[key].status,
+          error: false,
+        }
       }
     } catch (e) {
       logger.error(`Deserialize external ${type} ${key} failed, err=${e}`)
       prev[key] = {
         ...rawScript[key],
-        error: true,
-        modified: false,
         func: undefined,
+        status: {
+          ...rawScript[key].status,
+          error: false,
+        }
       }
     }
     return prev

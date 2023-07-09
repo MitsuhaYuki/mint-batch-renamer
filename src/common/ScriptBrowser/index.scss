@@ -78,14 +78,18 @@ $baseCls: 'script-browser';
         padding-bottom: 8px;
         flex: 0 0 auto;
         font-size: 14px;
+        line-height: 22px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
 
-        &-error {
-          color: #ff7a45;
-          text-align: center;
-          font-weight: 600;
+        span.disabled {
+          text-decoration: line-through;
+          color: #8c8c8c;
+        }
+
+        .ant-tag {
+          margin-inline-end: 4px;
         }
       }
 
@@ -102,7 +106,7 @@ $baseCls: 'script-browser';
       width: 100px;
       flex: 0 0 auto;
       justify-content: space-evenly;
-      padding: 0 4px;
+      padding: 0 8px 0 4px;
     }
 
     &.add-script {

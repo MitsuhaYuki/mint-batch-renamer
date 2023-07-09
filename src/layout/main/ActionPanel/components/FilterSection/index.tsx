@@ -8,7 +8,7 @@ import cloneDeep from 'lodash/cloneDeep'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { uuid } from '@/utils/common'
-import { getDefaultFilter } from '@/utils/filter'
+import { getDefaultFilter, getFilters } from '@/utils/filter'
 import { IFileItem } from '@/types/file'
 
 export type ContentProps = {
@@ -48,7 +48,7 @@ const Content: FC<ContentProps> = props => {
       message.info('请先加载文件列表')
     } else {
       message.info('过滤文件列表...')
-      const filterSet = { ...globalData.sysFilters, ...globalData.sysFiltersExt }
+      const filterSet = getFilters(globalData.sysFilters, globalData.sysFiltersExt)
       let copiedFileList = cloneDeep(globalData.filesOriginal)
       const filterArr = state.filters.map(cfg => {
         return {

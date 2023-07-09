@@ -1,4 +1,4 @@
-import { EFilterScope, IFilterConfig, IFilters } from '@/types/filter'
+import { EFilterScope, IExtFilters, IFilterConfig, IFilters } from '@/types/filter'
 import { cloneDeep } from 'lodash'
 
 /**
@@ -84,16 +84,16 @@ export const sysFilterList: IFilters = {
     func: (sysArgs, extra: any) => {
       console.log('I: running "equals" filter, sysArgs =', sysArgs, 'extra =', extra)
       const filterRange = extra?.filter_range ?? 'file'
-      let res=false
+      let res = false
       switch (filterRange) {
         case 'file':
-          res= sysArgs.fileName === extra?.equals_text
+          res = sysArgs.fileName === extra?.equals_text
         case 'ext':
-          res= sysArgs.extName === extra?.equals_text
+          res = sysArgs.extName === extra?.equals_text
         case 'full':
-          res= sysArgs.fullName === extra?.equals_text
+          res = sysArgs.fullName === extra?.equals_text
         default:
-          res= false
+          res = false
       }
       console.log('I: message errerrrer', res)
       return res
@@ -108,3 +108,13 @@ export const getDefaultFilter = (id: string): IFilterConfig => cloneDeep({
   filterLabel: sysFilterList['contains'].label,
   filterId: 'contains',
 })
+
+export const getFilters = (sysFilters: IFilters, extFilters: IExtFilters): IFilters => {
+  const enabledExtFilters = Object.keys(extFilters).reduce((prev, i) => {
+    if (!extFilters[i].status.disabled) {
+      prev[i] = extFilters[i]
+    }
+    return prev
+  }, {} as IFilters)
+  return Object.assign({}, sysFilters, enabledExtFilters)
+}

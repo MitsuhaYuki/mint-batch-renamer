@@ -1,8 +1,9 @@
-import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import { Form, Input, Modal, Select, message } from 'antd'
-import { EFilterScope, IExtFilter } from '@/types/filter'
-import { cloneDeep, isEmpty, isEqual } from 'lodash'
 import CodeMirror from '@uiw/react-codemirror'
+import { EFilterScope, IExtFilter } from '@/types/filter'
+import { EScriptAction, EScriptType } from '@/types/extension'
+import { Form, Input, Modal, Select, Space, message } from 'antd'
+import { cloneDeep, isEmpty, isEqual } from 'lodash'
+import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { javascript } from '@codemirror/lang-javascript'
 import { js as beautify } from 'js-beautify'
 import './index.scss'
@@ -13,25 +14,23 @@ type Content = {
 
 type ContentProps = {
   script?: IExtFilter
-  scriptType: 'filter' | 'renamer'
-  onOk?: (script: IExtFilter, scriptType: 'filter' | 'renamer') => void
+  scriptType: EScriptType
+  onOk?: (script: IExtFilter, scriptType: EScriptType, actionType: EScriptAction) => void
 }
+
 const baseCls = 'script-editor'
 const Content = forwardRef<Content, ContentProps>((props, ref) => {
   const { script, scriptType, onOk } = props
   const [visible, setVisible] = useState(false)
   const [form] = Form.useForm()
   const originalScript = useRef<any>({})
-  const scriptTypeChs = scriptType === 'filter' ? '过滤器' : '重命名器'
   const editor = useRef<any>(null)
 
   useImperativeHandle(ref, () => ({
-    toggle: toggleModalVisible
+    toggle: (visible?: boolean) => {
+      setVisible(s => visible ?? !s)
+    }
   }))
-
-  const toggleModalVisible = (visible?: boolean) => {
-    setVisible(s => visible ?? !s)
-  }
 
   const formatOptions = useMemo(() => ({
     indent_size: 2,
@@ -53,12 +52,12 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
       ...formVals,
       func: beautify(formVals.func, formatOptions),
       error: script?.error,
-      modified: script?.modified
+      status: script?.status
     }
 
     if (isEqual(allFieldsValue, originalScript.current)) {
       message.info('未修改任何内容')
-      toggleModalVisible(false)
+      setVisible(false)
       return
     }
 
@@ -79,16 +78,16 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
 
     if (newFieldsValue.id !== script?.id) {
       Modal.confirm({
-        title: 'Script ID Changed!',
-        content: 'Are you sure to change script\'s ID? This will copy this to a new script rather than edit current one!',
+        title: '发现脚本ID变化!',
+        content: '确定要修改脚本ID吗? 这将会复制一个新的脚本, 而不是修改当前脚本!',
         onOk: () => {
-          onOk?.(newFieldsValue, scriptType)
-          toggleModalVisible(false)
+          onOk?.(newFieldsValue, scriptType, EScriptAction.Create)
+          setVisible(false)
         }
       })
     } else {
-      onOk?.(newFieldsValue, scriptType)
-      toggleModalVisible(false)
+      onOk?.(newFieldsValue, scriptType, EScriptAction.Update)
+      setVisible(false)
     }
   }
 
@@ -181,6 +180,7 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
             rules={[{ required: true, message: '请输入此项!' }]}
           >
             <CodeMirror
+              // FIXME: if creating new script or empty, should provide default function placeholder.
               extensions={[javascript({ jsx: false })]}
               ref={editor}
               basicSetup={{

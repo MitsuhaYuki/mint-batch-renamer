@@ -7,7 +7,7 @@ import { useMount, useUpdateEffect } from 'ahooks'
 import { ILogger } from '@/utils/logger'
 import './index.scss'
 import { cloneDeep } from 'lodash'
-import { filterScopeOptions } from '@/utils/filter'
+import { filterScopeOptions, getFilters } from '@/utils/filter'
 
 export type ContentProps = {
   filterConfig: IFilterConfig
@@ -21,7 +21,7 @@ export type ContentProps = {
 const baseCls = 'filter-item'
 const Content: FC<ContentProps> = (props) => {
   const { filterConfig, globalData, logger, onChange } = props
-  const filterSet = { ...globalData.sysFilters, ...globalData.sysFiltersExt }
+  const filterSet = getFilters(globalData.sysFilters, globalData.sysFiltersExt)
   const [configModalVisible, setConfigModalVisible] = useState(true)
   const [formItems, setFormItems] = useState<IFilterParam[]>([])
   const [form] = Form.useForm()
