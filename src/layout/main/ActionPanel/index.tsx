@@ -188,9 +188,9 @@ const Content: FC<ContentProps> = (props) => {
       const isFilesRenamed = globalData.filesRenamed && globalData.filesRenamed.length > 0
       if (globalData.targetFolder && isFilesRenamed) {
         for (const file of globalData.filesRenamed!) {
-          const res = await invoke("copy_single_file", {
-            sourcePath: file.path,
-            targetPath: `${globalData.targetFolder}\\${file.rename_full_name}`
+          const res = await invoke("copy_file", {
+            source: file.path,
+            destination: `${globalData.targetFolder}\\${file.rename_full_name}`
           })
         }
         message.success('复制文件成功')
