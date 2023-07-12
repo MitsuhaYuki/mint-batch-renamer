@@ -1,5 +1,6 @@
-import React, { FC } from 'react'
 import OperableListItem, { OperableListItemProps } from '@/common/OperableListItem'
+import { FC } from 'react'
+import { isEmpty } from 'lodash'
 import './index.scss'
 
 export interface OperationListProps extends Partial<HTMLDivElement> {
@@ -8,7 +9,7 @@ export interface OperationListProps extends Partial<HTMLDivElement> {
 const baseCls = 'operable-list'
 const Content: FC<OperationListProps> = (props) => {
   const { className, dataSource } = props
-  return (<div className={`${baseCls}${className ? ` ${className}` : ''}`}>
+  return (<div className={className ? `${baseCls} ${className}` : baseCls} hidden={isEmpty(dataSource)}>
     {dataSource?.map((item, index) => (
       <OperableListItem key={index} {...item} className={`${className}-item`} />
     ))}

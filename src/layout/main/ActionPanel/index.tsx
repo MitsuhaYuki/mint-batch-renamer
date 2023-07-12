@@ -308,12 +308,12 @@ const Content: FC<ContentProps> = () => {
     {
       key: '2',
       label: '过滤',
-      children: <FilterSection />,
+      children: <div className={`${baseCls}-content`}><FilterSection /></div>,
     },
     {
       key: '3',
       label: '命名',
-      children: <RenamerSection />,
+      children: <div className={`${baseCls}-content`}><RenamerSection /></div>,
     },
     {
       key: '4',
