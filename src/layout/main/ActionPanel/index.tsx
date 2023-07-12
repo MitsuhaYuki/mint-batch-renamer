@@ -6,7 +6,7 @@ import type { IFileItem } from '@/types/file'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { Button, ButtonProps, Collapse, Modal, message } from 'antd'
-import { CloseOutlined } from '@ant-design/icons'
+import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { cloneDeep, isEmpty } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
 import './index.scss'
@@ -69,25 +69,29 @@ const Content: FC<ContentProps> = (props) => {
     } else {
       const folderInfo = await selectFolder()
       if (folderInfo.success) {
+        const path = folderInfo.data!
         const conflictSourceFolders = globalData.sourceFolders.filter(i => {
           let conflict = false
-          if (folderInfo.data!.length === i.length) {
-            conflict = folderInfo.data === i
-            if (conflict) message.error('不能重复添加源文件夹!')
+          if (path.length === i.length) {
+            conflict = path === i
+          } else if (path.length > i.length) {
+            conflict = path.startsWith(i + '\\') || path.startsWith(i + '/')
           } else {
-            if (folderInfo.data!.length > i.length) {
-              conflict = folderInfo.data!.startsWith(i)
-              if (conflict) message.error('不能选择已有文件夹的子文件夹作为源!')
-            } else {
-              conflict = i.startsWith(folderInfo.data!)
-              if (conflict) message.error('不能选择已有文件夹的父文件夹作为源!')
-            }
+            conflict = i.startsWith(path + '\\') || i.startsWith(path + '/')
           }
           return conflict
         })
-        if (!conflictSourceFolders.length) {
-          message.success('选择源文件夹成功')
-          setGlobalData('u_source', [...globalData.sourceFolders, folderInfo.data])
+        if (conflictSourceFolders.length) {
+          message.error('不要选择重复的文件夹、子文件夹或父文件夹作为源!')
+        } else {
+          const sourceFolders = [...globalData.sourceFolders, folderInfo.data!]
+          try {
+            await getFileList(sourceFolders)
+            setGlobalData('u_source', sourceFolders)
+            message.success('选择源文件夹成功')
+          } catch (err) {
+            message.error(err as string)
+          }
         }
       }
     }
@@ -115,56 +119,50 @@ const Content: FC<ContentProps> = (props) => {
     setInOperation(false)
   }
 
-  const refreshFileList = async () => {
-    if (globalData.sourceFolders.length > 0) {
-      setInOperation(true)
-      // check file count
-      let isTooManyFiles = false
-      for (const sourcePath of globalData.sourceFolders) {
+  const getFileList = async (sourceFolders: string[]) => {
+    // Check if source folders exist.
+    if (sourceFolders.length > 0) {
+      // Check file limit
+      let totalFiles = 0
+      for (const sourcePath of sourceFolders) {
         try {
-          const fileCount: number = await invoke("count_folder_files", { folderPath: sourcePath, maxCount: config.max_file_limit })
-          if (fileCount > 2000) {
-            isTooManyFiles = true
-            logger.warn(`Folder ${sourcePath} has too many files, find ${fileCount} files.`)
+          const count: number = await invoke("count_folder_files", { folderPath: sourcePath, maxCount: config.max_file_limit })
+          if (count === -1 || (totalFiles += count) > config.max_file_limit) {
+            logger.error(`Exceed max file limit, limit is ${config.max_file_limit}`)
+            throw `最大处理文件数限制${config.max_file_limit}`
+          } else {
+            if (totalFiles > 2000) {
+              message.warning({
+                content: '当前源文件夹下文件数量过多，可能会导致加载时间过长，请耐心等待',
+                duration: 0,
+                key: 'FILE_MAX_COUNT_WARNING'
+              })
+            }
           }
         } catch (e) {
-          if (e === 'MAX_FILE_COUNT') {
-            logger.error(`Exceed max file limit, limit is ${config.max_file_limit}, code ${e}`)
-            message.error(`最大处理文件数限制${config.max_file_limit}`)
-          } else {
-            logger.error(`Error when loading file counts, code ${e}`)
-            message.error(`加载文件列表失败, ${e}`)
-          }
-          setInOperation(false)
-          return
+          logger.error(`Error when loading file counts, code ${e}`)
+          throw `文件数统计失败, ${e}`
         }
       }
-      if (isTooManyFiles) {
-        message.warning({
-          content: '当前源文件夹下文件数量过多，可能会导致加载时间过长，请耐心等待',
-          duration: 0,
-          key: 'FILE_MAX_COUNT_WARNING'
-        })
-      }
-      // load file list
+      // Actually load file list
       try {
         let fileList: IFileItem[] = []
-        for (const sourcePath of globalData.sourceFolders) {
+        for (const sourcePath of sourceFolders) {
           const res: IFileItem[] = await invoke("get_folder_files", { path: sourcePath })
           fileList.push(...res)
-          message.success(`加载文件列表成功, 共${res.length}个文件`)
           logger.info(`From ${sourcePath} add ${res.length} files.`)
         }
+        logger.info(`File list updated, total ${fileList.length} files.`)
         setGlobalData('u_original_files', fileList)
       } catch (e) {
-        message.error(`加载文件列表失败, ${e}`)
         logger.error(`Unknown error, code ${e}`)
+        throw `加载文件列表失败, ${e}`
       } finally {
         message.destroy('FILE_MAX_COUNT_WARNING')
-        setInOperation(false)
       }
     } else {
-      message.info('请先选择源文件夹')
+      logger.error('No source folder selected.')
+      throw '请先选择源文件夹'
     }
   }
 
@@ -212,9 +210,7 @@ const Content: FC<ContentProps> = (props) => {
     }
   }
 
-  const ActionBtn = (props: ButtonProps) => (
-    <Button type='text' size='small' disabled={inOperation} {...props} />
-  )
+  const ActionBtn = (props: ButtonProps) => <Button type='text' size='small' disabled={inOperation} {...props} />
 
   // source folder
   const renderSourceList = useMemo(() => {
@@ -223,11 +219,12 @@ const Content: FC<ContentProps> = (props) => {
         content: item,
         operations: [{
           icon: <CloseOutlined />,
-          onClick () {
+          onClick: async () => {
             // remove source folder
             const idx = globalData.sourceFolders.indexOf(item)
             const newSourceFolders = cloneDeep(globalData.sourceFolders)
             newSourceFolders.splice(idx, 1)
+            await getFileList(newSourceFolders)
             setGlobalData('u_source', newSourceFolders)
             message.success('已移除选定的源文件夹')
             logger.info(`Source folder '${item}' has been deleted.`)
@@ -257,6 +254,45 @@ const Content: FC<ContentProps> = (props) => {
     return <OperableList dataSource={opsList} />
   }, [globalData.targetFolder])
 
+  const renderSourceControl = useMemo(() => {
+    return (
+      <div className={`${baseCls}-content-btns`}>
+        <ActionBtn
+          icon={<FolderOpenOutlined />}
+          onClick={() => selectSourceFolder()}
+        >选择源文件夹</ActionBtn>
+        <ActionBtn title='清空所有源' onClick={() => selectSourceFolder(true)}>
+          <DeleteOutlined />
+        </ActionBtn>
+        <ActionBtn title='刷新文件列表' onClick={async () => {
+          try {
+            await getFileList(globalData.sourceFolders)
+            message.success(`文件列表更新完成`)
+          } catch (err) {
+            message.error(err as string)
+          }
+        }}>
+          <ReloadOutlined />
+        </ActionBtn>
+      </div>
+    )
+  }, [globalData.sourceFolders])
+
+  const renderTargetControl = useMemo(() => {
+    return (
+      <div className={`${baseCls}-content-btns`}>
+        <ActionBtn
+          icon={<FolderOpenOutlined />}
+          onClick={() => selectTargetFolder()}
+        >选择输出目录</ActionBtn>
+        <ActionBtn
+          icon={<PlayCircleOutlined />}
+          onClick={() => warningForFinalRename()}
+        >运行</ActionBtn>
+      </div>
+    )
+  }, [globalData.sourceFolders])
+
   return (<div className={baseCls}>
     <Collapse
       accordion={true}
@@ -268,11 +304,7 @@ const Content: FC<ContentProps> = (props) => {
     >
       <Panel header="获取" key="1">
         <div className={`${baseCls}-content`}>
-          <div className={`${baseCls}-content-btns`}>
-            <ActionBtn onClick={() => selectSourceFolder()}>选择源文件夹</ActionBtn>
-            <ActionBtn onClick={() => selectSourceFolder(true)}>清空所有源</ActionBtn>
-            <ActionBtn onClick={refreshFileList}>刷新所有文件列表</ActionBtn>
-          </div>
+          {renderSourceControl}
           {renderSourceList}
         </div>
       </Panel>
@@ -288,10 +320,7 @@ const Content: FC<ContentProps> = (props) => {
       </Panel>
       <Panel header="输出" key="4">
         <div className={`${baseCls}-content`}>
-          <div className={`${baseCls}-content-btns`}>
-            <ActionBtn onClick={() => selectTargetFolder()}>选择输出文件夹</ActionBtn>
-            <ActionBtn onClick={() => warningForFinalRename()}>输出文件</ActionBtn>
-          </div>
+          {renderTargetControl}
           {renderTargetList}
         </div>
       </Panel>

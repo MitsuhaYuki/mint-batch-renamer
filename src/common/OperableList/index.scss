@@ -1,11 +1,7 @@
 $baseCls: 'operable-list';
 
 .#{$baseCls} {
-  &-item {
-    margin-top: 4px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-  }
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }

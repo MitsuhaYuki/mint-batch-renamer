@@ -44,14 +44,26 @@ $baseCls:'action-panel';
 
   &-content {
     padding: 4px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 
     &-btns {
       display: flex;
       gap: 4px;
       flex-wrap: wrap;
 
-      .ant-btn span {
-        font-size: 12px;
+      .ant-btn {
+        display: flex;
+        align-items: center;
+
+        span {
+          font-size: 12px;
+
+          &.anticon {
+            font-size: 12px;
+          }
+        }
       }
     }
 
