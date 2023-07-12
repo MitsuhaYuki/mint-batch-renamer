@@ -32,13 +32,8 @@ const Content: FC<ContentProps> = props => {
   const { logger } = useLogger()
   const [state, dispatch] = useReducer(reducer, initState) as [IState, Dispatch<IOptionalState>]
 
-  useEffect(() => {
-    console.log('I: renamer-section state changed,', state)
-  }, [state])
-
   const handleAddRenamer = () => {
     const newRenamers = [...state.renamers, cloneDeep(getDefaultRenamer(uuid()))]
-    console.log('I: added filters list', newRenamers)
     dispatch({
       renamers: newRenamers
     })
@@ -94,7 +89,6 @@ const Content: FC<ContentProps> = props => {
   }
 
   const handleUpdateRenamer = (renamerConfig: IRenamerConfig) => {
-    console.log('I: handleUpdateRenamer', renamerConfig)
     const copiedRenamers = cloneDeep(state.renamers)
     const renamerIndex = copiedRenamers.findIndex(item => item.id === renamerConfig.id)
     copiedRenamers[renamerIndex] = renamerConfig
@@ -102,7 +96,6 @@ const Content: FC<ContentProps> = props => {
   }
 
   const handleRemoveRenamer = (renamerConfig: IRenamerConfig) => {
-    console.log('I: handleRemoveRenamer', renamerConfig)
     const copiedRenamers = cloneDeep(state.renamers)
     const renamerIndex = copiedRenamers.findIndex(item => item.id === renamerConfig.id)
     copiedRenamers.splice(renamerIndex, 1)

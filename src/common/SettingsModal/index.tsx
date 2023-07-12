@@ -64,7 +64,6 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
   const handleCancel = () => {
     // if has changed settings, prompt user to confirm ignore changes
     // reload content from globalData
-    console.log('I: message')
     setVisible(false)
   }
 

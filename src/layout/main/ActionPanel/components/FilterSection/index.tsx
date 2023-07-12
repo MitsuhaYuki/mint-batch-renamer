@@ -31,13 +31,8 @@ const Content: FC<ContentProps> = props => {
   const { logger } = useLogger()
   const [state, dispatch] = useReducer(reducer, initState) as [IState, React.Dispatch<IOptionalState>]
 
-  useEffect(() => {
-    console.log('I: filter-section state changed,', state)
-  }, [state])
-
   const handleAddFilter = () => {
     const newFilters = [...state.filters, getDefaultFilter(uuid())]
-    console.log('I: added filters list', newFilters)
     dispatch({
       filters: newFilters
     })
@@ -82,7 +77,6 @@ const Content: FC<ContentProps> = props => {
   }
 
   const handleUpdateFilter = (filterConfig: IFilterConfig) => {
-    console.log('I: handleUpdateFilter', filterConfig)
     const copiedFilters = cloneDeep(state.filters)
     const filterIndex = copiedFilters.findIndex(item => item.id === filterConfig.id)
     copiedFilters[filterIndex] = filterConfig
@@ -90,7 +84,6 @@ const Content: FC<ContentProps> = props => {
   }
 
   const handleRemoveFilter = (filterConfig: IFilterConfig) => {
-    console.log('I: handleRemoveFilter', filterConfig)
     const copiedFilters = cloneDeep(state.filters)
     const filterIndex = copiedFilters.findIndex(item => item.id === filterConfig.id)
     copiedFilters.splice(filterIndex, 1)

@@ -64,7 +64,6 @@ async function loadScript (
     }
     return prev
   }, {} as IExtFilters)
-  console.log('I: loadScript', finalScript)
   logger.info(`Load ${Object.keys(finalScript).length} ${type}(s) complete`)
   globalDispatch({ type: 'internal', payload: { sysFiltersExt: finalScript } })
 }
