@@ -5,7 +5,7 @@ import type { IFileItem } from '@/types/file'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons'
-import { Collapse, Modal, message } from 'antd'
+import { Collapse, CollapseProps, Modal, message } from 'antd'
 import { ControlButton, ControlButtonProps } from '@/common/ControlButton'
 import { FC, useMemo, useState } from 'react'
 import { cloneDeep, isEmpty } from 'lodash'
@@ -170,6 +170,8 @@ const Content: FC<ContentProps> = () => {
   const warningForFinalRename = () => {
     if (isEmpty(globalData.filesRenamed)) {
       message.info('请先重命名文件')
+    } else if (isEmpty(globalData.targetFolder)) {
+      message.info('请选择最终输出目录')
     } else {
       Modal.confirm({
         title: '注意',
@@ -295,34 +297,41 @@ const Content: FC<ContentProps> = () => {
         <OperableList dataSource={opsList} />
       </div>
     )
-  }, [globalData.targetFolder])
+  }, [globalData.targetFolder, globalData.filesRenamed])
+
+  const contents: CollapseProps['items'] = [
+    {
+      key: '1',
+      label: '获取',
+      children: renderSourceControl,
+    },
+    {
+      key: '2',
+      label: '过滤',
+      children: <FilterSection />,
+    },
+    {
+      key: '3',
+      label: '命名',
+      children: <RenamerSection />,
+    },
+    {
+      key: '4',
+      label: '输出',
+      children: renderTargetControl,
+    },
+  ]
 
   return (<div className={baseCls}>
     <Collapse
       accordion={true}
-      className={`${baseCls}-collapse`}
       bordered={false}
-      size='small'
-      ghost
+      className={`${baseCls}-collapse`}
       defaultActiveKey={['1']}
-    >
-      <Panel header="获取" key="1">
-        {renderSourceControl}
-      </Panel>
-      <Panel header="过滤" key="2">
-        <div className={`${baseCls}-content`}>
-          <FilterSection />
-        </div>
-      </Panel>
-      <Panel header="命名" key="3">
-        <div className={`${baseCls}-content`}>
-          <RenamerSection />
-        </div>
-      </Panel>
-      <Panel header="输出" key="4">
-        {renderTargetControl}
-      </Panel>
-    </Collapse>
+      ghost
+      items={contents}
+      size='small'
+    />
   </div>)
 }
 
