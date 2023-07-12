@@ -1,0 +1,12 @@
+$baseCls: 'control-button';
+
+.#{$baseCls} {
+  &.ant-btn {
+    display: flex;
+    align-items: center;
+
+    span, span.anticon {
+      font-size: 12px;
+    }
+  }
+}

@@ -1,18 +1,18 @@
-import React, { FC, useEffect, useMemo, useReducer } from 'react'
-import './index.scss'
-import { Button, message } from 'antd'
-import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import FilterSectionItem from '../FilterSectionItem'
-import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterConfig, ICommonFilterFunction } from '@/types/filter'
+import React, { FC, useMemo, useReducer } from 'react'
 import cloneDeep from 'lodash/cloneDeep'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
-import { uuid } from '@/utils/common'
-import { getDefaultFilter, getFilters } from '@/utils/filter'
+import { ControlButton } from '@/common/ControlButton'
+import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterConfig, ICommonFilterFunction } from '@/types/filter'
 import { IFileItem } from '@/types/file'
+import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
+import { getDefaultFilter, getFilters } from '@/utils/filter'
+import { message } from 'antd'
+import { uuid } from '@/utils/common'
+import './index.scss'
 
-export type ContentProps = {
-}
+export type ContentProps = {}
 
 interface IState {
   filters: IFilterConfig[]
@@ -26,7 +26,7 @@ const initState: IState = {
 const reducer = (state: IState, payload: IOptionalState) => Object.assign({}, state, payload)
 
 const baseCls = 'filter-section'
-const Content: FC<ContentProps> = props => {
+const Content: FC<ContentProps> = () => {
   const { globalData, setGlobalData } = useGlobalData()
   const { logger } = useLogger()
   const [state, dispatch] = useReducer(reducer, initState) as [IState, React.Dispatch<IOptionalState>]
@@ -109,18 +109,14 @@ const Content: FC<ContentProps> = props => {
       {renderFilters}
     </div>
     <div className={`${baseCls}-controls`}>
-      <Button
-        icon={<PlusOutlined style={{ fontSize: '12px' }} title='新增过滤器' />}
-        size='small'
-        type='text'
+      <ControlButton
+        icon={<PlusOutlined />}
         onClick={handleAddFilter}
-      >新增过滤器</Button>
-      <Button
-        icon={<SyncOutlined style={{ fontSize: '12px' }} title='过滤' />}
-        size='small'
-        type='text'
+      >新增规则</ControlButton>
+      <ControlButton
+        icon={<SyncOutlined />}
         onClick={handleRunFilter}
-      >过滤</Button>
+      >过滤</ControlButton>
     </div>
   </div>)
 }

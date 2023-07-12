@@ -52,19 +52,6 @@ $baseCls:'action-panel';
       display: flex;
       gap: 4px;
       flex-wrap: wrap;
-
-      .ant-btn {
-        display: flex;
-        align-items: center;
-
-        span {
-          font-size: 12px;
-
-          &.anticon {
-            font-size: 12px;
-          }
-        }
-      }
     }
 
     &-list {
@@ -77,14 +64,6 @@ $baseCls:'action-panel';
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-      }
-    }
-
-    &-dev {
-      &-btns {
-        display: flex;
-        gap: 4px;
-        flex-wrap: wrap;
       }
     }
   }

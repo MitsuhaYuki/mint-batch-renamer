@@ -1,12 +1,13 @@
-import { FC, useMemo, useState } from 'react'
 import FilterSection from './components/FilterSection'
 import OperableList from '@/common/OperableList'
 import RenamerSection from './components/RenamerSection'
 import type { IFileItem } from '@/types/file'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
-import { Button, ButtonProps, Collapse, Modal, message } from 'antd'
 import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons'
+import { Collapse, Modal, message } from 'antd'
+import { ControlButton, ControlButtonProps } from '@/common/ControlButton'
+import { FC, useMemo, useState } from 'react'
 import { cloneDeep, isEmpty } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
 import './index.scss'
@@ -16,7 +17,7 @@ const { Panel } = Collapse
 export type ContentProps = {}
 
 const baseCls = 'action-panel'
-const Content: FC<ContentProps> = (props) => {
+const Content: FC<ContentProps> = () => {
   // global data
   const { globalData, setGlobalData } = useGlobalData()
   // logger
@@ -174,13 +175,13 @@ const Content: FC<ContentProps> = (props) => {
         title: '注意',
         content: '此操作不可撤销, 确定要重命名这些文件吗?',
         onOk: () => {
-          copySourceFilesToTarget()
+          finalRename()
         }
       })
     }
   }
 
-  const copySourceFilesToTarget = async () => {
+  const finalRename = async () => {
     setInOperation(true)
     try {
       const isFilesRenamed = globalData.filesRenamed && globalData.filesRenamed.length > 0
@@ -210,10 +211,10 @@ const Content: FC<ContentProps> = (props) => {
     }
   }
 
-  const ActionBtn = (props: ButtonProps) => <Button type='text' size='small' disabled={inOperation} {...props} />
+  const ActionBtn = (props: ControlButtonProps) => <ControlButton disabled={inOperation} {...props} />
 
-  // source folder
-  const renderSourceList = useMemo(() => {
+  // source folder control
+  const renderSourceControl = useMemo(() => {
     const opsList = globalData.sourceFolders.map(item => {
       return {
         content: item,
@@ -224,19 +225,46 @@ const Content: FC<ContentProps> = (props) => {
             const idx = globalData.sourceFolders.indexOf(item)
             const newSourceFolders = cloneDeep(globalData.sourceFolders)
             newSourceFolders.splice(idx, 1)
-            await getFileList(newSourceFolders)
-            setGlobalData('u_source', newSourceFolders)
-            message.success('已移除选定的源文件夹')
-            logger.info(`Source folder '${item}' has been deleted.`)
+            if (newSourceFolders.length) {
+              await getFileList(newSourceFolders)
+              setGlobalData('u_source', newSourceFolders)
+              message.success('已移除选定的源文件夹')
+              logger.info(`Source folder '${item}' has been deleted.`)
+            } else {
+              selectSourceFolder(true)
+            }
           }
         }]
       }
     })
-    return <OperableList dataSource={opsList} />
+    return (
+      <div className={`${baseCls}-content`}>
+        <div className={`${baseCls}-content-btns`}>
+          <ActionBtn
+            icon={<FolderOpenOutlined />}
+            onClick={() => selectSourceFolder()}
+          >选择源文件夹</ActionBtn>
+          <ActionBtn title='清空所有源' onClick={() => selectSourceFolder(true)}>
+            <DeleteOutlined />
+          </ActionBtn>
+          <ActionBtn title='刷新文件列表' onClick={async () => {
+            try {
+              await getFileList(globalData.sourceFolders)
+              message.success(`文件列表更新完成`)
+            } catch (err) {
+              message.error(err as string)
+            }
+          }}>
+            <ReloadOutlined />
+          </ActionBtn>
+        </div>
+        <OperableList dataSource={opsList} />
+      </div>
+    )
   }, [globalData.sourceFolders])
 
-  // target folder
-  const renderTargetList = useMemo(() => {
+  // target folder control
+  const renderTargetControl = useMemo(() => {
     const folders = globalData.targetFolder ? [globalData.targetFolder] : []
     const opsList = folders.map(item => {
       return {
@@ -251,47 +279,23 @@ const Content: FC<ContentProps> = (props) => {
         }]
       }
     })
-    return <OperableList dataSource={opsList} />
+
+    return (
+      <div className={`${baseCls}-content`}>
+        <div className={`${baseCls}-content-btns`}>
+          <ActionBtn
+            icon={<FolderOpenOutlined />}
+            onClick={() => selectTargetFolder()}
+          >选择输出目录</ActionBtn>
+          <ActionBtn
+            icon={<PlayCircleOutlined />}
+            onClick={() => warningForFinalRename()}
+          >运行</ActionBtn>
+        </div>
+        <OperableList dataSource={opsList} />
+      </div>
+    )
   }, [globalData.targetFolder])
-
-  const renderSourceControl = useMemo(() => {
-    return (
-      <div className={`${baseCls}-content-btns`}>
-        <ActionBtn
-          icon={<FolderOpenOutlined />}
-          onClick={() => selectSourceFolder()}
-        >选择源文件夹</ActionBtn>
-        <ActionBtn title='清空所有源' onClick={() => selectSourceFolder(true)}>
-          <DeleteOutlined />
-        </ActionBtn>
-        <ActionBtn title='刷新文件列表' onClick={async () => {
-          try {
-            await getFileList(globalData.sourceFolders)
-            message.success(`文件列表更新完成`)
-          } catch (err) {
-            message.error(err as string)
-          }
-        }}>
-          <ReloadOutlined />
-        </ActionBtn>
-      </div>
-    )
-  }, [globalData.sourceFolders])
-
-  const renderTargetControl = useMemo(() => {
-    return (
-      <div className={`${baseCls}-content-btns`}>
-        <ActionBtn
-          icon={<FolderOpenOutlined />}
-          onClick={() => selectTargetFolder()}
-        >选择输出目录</ActionBtn>
-        <ActionBtn
-          icon={<PlayCircleOutlined />}
-          onClick={() => warningForFinalRename()}
-        >运行</ActionBtn>
-      </div>
-    )
-  }, [globalData.sourceFolders])
 
   return (<div className={baseCls}>
     <Collapse
@@ -303,10 +307,7 @@ const Content: FC<ContentProps> = (props) => {
       defaultActiveKey={['1']}
     >
       <Panel header="获取" key="1">
-        <div className={`${baseCls}-content`}>
-          {renderSourceControl}
-          {renderSourceList}
-        </div>
+        {renderSourceControl}
       </Panel>
       <Panel header="过滤" key="2">
         <div className={`${baseCls}-content`}>
@@ -319,10 +320,7 @@ const Content: FC<ContentProps> = (props) => {
         </div>
       </Panel>
       <Panel header="输出" key="4">
-        <div className={`${baseCls}-content`}>
-          {renderTargetControl}
-          {renderTargetList}
-        </div>
+        {renderTargetControl}
       </Panel>
     </Collapse>
   </div>)

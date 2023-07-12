@@ -1,19 +1,18 @@
-import { Dispatch, FC, useEffect, useMemo, useReducer } from 'react'
-import './index.scss'
-import { IRenamerConfig } from '@/types/renamer'
+import RenamerSectionItem from '../RenamerSectionItem'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
-import RenamerSectionItem from '../RenamerSectionItem'
-import { Button, message } from 'antd'
+import { ControlButton } from '@/common/ControlButton'
+import { Dispatch, FC, useMemo, useReducer } from 'react'
+import { IFileItem } from '@/types/file'
+import { IRenamerConfig } from '@/types/renamer'
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 import { getDefaultRenamer } from '@/utils/renamer'
+import { message } from 'antd'
 import { uuid } from '@/utils/common'
-import { IFileItem } from '@/types/file'
+import './index.scss'
 
-export type ContentProps = {
-  example?: any
-}
+export type ContentProps = {}
 
 interface IState {
   renamers: IRenamerConfig[]
@@ -27,7 +26,7 @@ const initState: IState = {
 const reducer = (state: IState, payload: IOptionalState) => Object.assign({}, state, payload)
 
 const baseCls = 'renamer-section'
-const Content: FC<ContentProps> = props => {
+const Content: FC<ContentProps> = () => {
   const { globalData, setGlobalData } = useGlobalData()
   const { logger } = useLogger()
   const [state, dispatch] = useReducer(reducer, initState) as [IState, Dispatch<IOptionalState>]
@@ -45,7 +44,7 @@ const Content: FC<ContentProps> = props => {
       return
     }
     if (state.renamers.length === 0) {
-      message.info('请先添加重命名规则')
+      message.info('请先添加重命名步骤')
       return
     }
     // acquire file list
@@ -123,18 +122,14 @@ const Content: FC<ContentProps> = props => {
       {renderRenamers}
     </div>
     <div className={`${baseCls}-controls`}>
-      <Button
-        icon={<PlusOutlined style={{ fontSize: '12px' }} title='新增步骤' />}
-        size='small'
-        type='text'
+      <ControlButton
+        icon={<PlusOutlined />}
         onClick={handleAddRenamer}
-      >新增步骤</Button>
-      <Button
-        icon={<SyncOutlined style={{ fontSize: '12px' }} title='重命名' />}
-        size='small'
-        type='text'
+      >新增步骤</ControlButton>
+      <ControlButton
+        icon={<SyncOutlined />}
         onClick={handleRunRenamer}
-      >重命名</Button>
+      >重命名</ControlButton>
     </div>
   </div>)
 }
