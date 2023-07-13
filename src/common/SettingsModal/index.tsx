@@ -131,6 +131,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
             name='allow_external_renamers'
             tooltip='启用此项可允许程序加载第三方重命名脚本，提供更多的重命名功能'
             rules={[{ required: true, message: '请输入此项!' }]}
+            hidden={true} // FIXME: Feature not implemented yet.
           >
             <Radio.Group onChange={e => { if (e.target.value) handleModifyDangerousSettings('allow_external_renamers') }}>
               <Radio value={true}>是</Radio>
