@@ -25,7 +25,6 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
   const [visible, setVisible] = useState(false)
   const [form] = Form.useForm()
   const originalScript = useRef<any>({})
-  const editor = useRef<any>(null)
 
   useImperativeHandle(ref, () => ({
     toggle: (visible?: boolean) => {
@@ -185,8 +184,7 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
           >
             <CodeMirror
               // FIXME: if creating new script or empty, should provide default function placeholder.
-              extensions={[javascript({ jsx: false })]}
-              ref={editor}
+              extensions={[javascript({ jsx: false, typescript: true })]}
               basicSetup={{
                 lineNumbers: false,
                 indentOnInput: true,

@@ -4,7 +4,7 @@ import { IConsoleState } from '@/context/console'
 import { useAsyncEffect } from 'ahooks'
 import { ILogger, useWrappedLogger } from './logger'
 import { IExtFilterRaw, IExtFilters } from '@/types/filter'
-import { defaultExtFilter, defaultExtRenamer } from './constant'
+import filterTemplate from '@/utils/templates/ext_filter.json'
 
 /**
  * Load external script
@@ -21,7 +21,7 @@ async function loadScript (
   try {
     const isFileExist = await invoke("is_file_exist", { filePath: fileName })
     if (!isFileExist) {
-      await invoke("write_file", { filePath: fileName, content: type === 'filter' ? defaultExtFilter : defaultExtRenamer })
+      await invoke("write_file", { filePath: fileName, content: JSON.stringify(type === 'filter' ? filterTemplate : {}, null, 2) })
       logger.info(`External ${type} ${fileName} not exist, recreating file`)
       return
     }
@@ -43,7 +43,7 @@ async function loadScript (
     // FIXME: notice, if script id collusion, the later script need add a random suffix and set disabled!
     // TODO: should use spefic pattern to identify if script is disabled by user or load error
     try {
-      const deserializedFunc = new Function('return ' + atob(rawScript[key].func))()
+      const deserializedFunc = new Function('return ' + decodeURIComponent(atob(rawScript[key].func)))()
       prev[key] = {
         ...rawScript[key],
         func: deserializedFunc,
