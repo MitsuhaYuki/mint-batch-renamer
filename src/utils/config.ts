@@ -72,8 +72,8 @@ const resetConfigWithPrompt = async (globalDispatch: (data: IGlobalReducerAction
     return
   }
   Modal.error({
-    title: 'Failed to create config!',
-    content: 'Please try delete config.json and retry open.',
+    title: '配置文件创建失败!',
+    content: '请尝试手动删除config.json后重试!',
     centered: true,
     closable: false,
     footer: null,
@@ -97,10 +97,18 @@ const useConfigLoader = (
         return
       case 'not_found':
         resetConfigWithPrompt(globalDispatch)
+        Modal.success({
+          title: '首次启动准备已完成!',
+          content: '这似乎是第一次启动, 已尝试重新创建配置文件, 请关闭本窗口后重新打开!',
+          centered: true,
+          closable: false,
+          footer: null,
+        })
+        break
       case 'error_fs':
         Modal.error({
-          title: 'Failed to load config!',
-          content: 'Please try delete config.json and retry open.',
+          title: '配置文件加载失败!',
+          content: '发现文件系统错误, 可能是权限不足或配置文件有错误! 不要在C盘或桌面上运行此程序, 或删除配置文件后再次尝试!',
           centered: true,
           closable: false,
           footer: null,
@@ -108,13 +116,13 @@ const useConfigLoader = (
         break
       case 'error_read':
         const modal = Modal.error({
-          title: 'Read config file failed!',
-          content: 'Please reset config file to continue! Or close this window, backup config file and restart.',
+          title: '配置文件读取错误!',
+          content: '配置文件读取错误, 请重置配置文件以继续! 或关闭本窗口, 备份配置文件后重启程序.',
           autoFocusButton: null,
           centered: true,
           closable: false,
           okButtonProps: { danger: true },
-          okText: 'Reset config',
+          okText: '重置配置文件',
           onOk: async () => await resetConfigWithPrompt(globalDispatch, modal),
         })
         break
