@@ -1,4 +1,5 @@
 import { IFileItem } from './file'
+import { IScriptParamItemType } from './script'
 
 /** 过滤器实例配置 */
 export type IFilterConfig = {
@@ -70,7 +71,7 @@ export type IFilterParam = {
   /**
    * 参数类型
    */
-  type: 'string' | 'number' | 'select'
+  type: IScriptParamItemType
   /**
    * 参数范围
    */

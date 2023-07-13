@@ -1,12 +1,12 @@
 $baseCls: 'data-table';
-@import '@/common/styles/mixin.scss';
+@import '@/styles/common.scss';
 
 .#{$baseCls} {
   height: 100%;
   background: #fff;
 
   &-table {
-    @include scrollbar;
+    @include customScrollbar();
     height: inherit;
     overflow: auto;
 

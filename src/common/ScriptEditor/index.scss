@@ -1,32 +1,5 @@
 $baseCls: 'script-editor';
-@import '@/common/styles/mixin.scss';
-
-@mixin editor-scrollbar {
-  $scrollbar-size: 10px;
-
-  &::-webkit-scrollbar {
-    width: $scrollbar-size;
-    height: $scrollbar-size;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    // border-radius: 10px;
-    background-color: #d9d9d9;
-    transition: background-color 0.3s ease-in-out;
-  }
-
-  &::-webkit-scrollbar-thumb:hover,
-  &::-webkit-scrollbar-thumb:active {
-    background-color: #bfbfbf;
-  }
-
-  &::-webkit-scrollbar-track,
-  &::-webkit-scrollbar-track:hover,
-  &::-webkit-scrollbar-track:active {
-    background-color: #f0f0f0;
-    box-shadow: none;
-  }
-}
+@import '@/styles/common.scss';
 
 .#{$baseCls} {
   .ant-modal {
@@ -49,7 +22,7 @@ $baseCls: 'script-editor';
     }
 
     &-body {
-      @include scrollbar;
+      @include customScrollbar();
       flex: 1 1 auto;
       overflow: auto;
       padding-right: $padding-r-total - $padding-r;
@@ -60,7 +33,7 @@ $baseCls: 'script-editor';
     border: 1px solid #ddd;
 
     .cm-scroller {
-      @include editor-scrollbar;
+      @include customScrollbar(10px, none);
     }
 
     &.cm-focused {

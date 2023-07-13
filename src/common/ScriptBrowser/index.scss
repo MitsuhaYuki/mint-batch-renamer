@@ -1,5 +1,5 @@
 $baseCls: 'script-browser';
-@import '@/common/styles/mixin.scss';
+@import '@/styles/common.scss';
 
 .#{$baseCls} {
   .ant-drawer {
@@ -56,7 +56,7 @@ $baseCls: 'script-browser';
   }
 
   &-content {
-    @include scrollbar;
+    @include customScrollbar();
     flex: 1 1 auto;
     overflow-y: auto;
   }

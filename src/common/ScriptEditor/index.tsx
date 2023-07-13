@@ -1,7 +1,8 @@
 import CodeMirror from '@uiw/react-codemirror'
 import { EFilterScope, IExtFilter } from '@/types/filter'
 import { EScriptAction, EScriptType } from '@/types/extension'
-import { Form, Input, Modal, Select, Space, message } from 'antd'
+import { Form, Input, Modal, Select, message } from 'antd'
+import { ParamEditor } from './ParamEditor'
 import { cloneDeep, isEmpty, isEqual } from 'lodash'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { javascript } from '@codemirror/lang-javascript'
@@ -72,7 +73,7 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
     const newFieldsValue: IExtFilter = {
       ...allFieldsValue,
       modified: true,
-      params: JSON.parse(allFieldsValue.params),
+      params: allFieldsValue.params ? JSON.parse(allFieldsValue.params) : [],
       func: transformedFunc
     }
 
@@ -92,10 +93,13 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
   }
 
   useEffect(() => {
-    if (!isEmpty(script)) {
+    if (isEmpty(script)) {
+      originalScript.current = {}
+      form.resetFields()
+    } else {
       const formVal = {
         ...script,
-        params: script.params ? JSON.stringify(script.params) : undefined,
+        params: script.params ? JSON.stringify(script.params) : '[]',
         func: script.func ? beautify(script.func.toString(), formatOptions) : ''
       }
       originalScript.current = cloneDeep(formVal)
@@ -111,8 +115,8 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
       focusTriggerAfterClose={false}
       maskClosable={false}
       open={visible}
-      title='Edit Script'
-      width={'85%'}
+      title='修改脚本项'
+      width={'90%'}
       wrapClassName={baseCls}
       onOk={handleOk}
       onCancel={() => setVisible(false)}
@@ -168,9 +172,9 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
             label='参数列表'
             name='params'
             tooltip='Param list'
-            rules={[{ required: true, message: '请输入此项!' }]}
+          // rules={[{ required: true, message: '请输入此项!' }]}
           >
-            <Input />
+            <ParamEditor />
           </Form.Item>
           <Form.Item
             label='脚本'

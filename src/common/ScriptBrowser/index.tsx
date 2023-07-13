@@ -229,7 +229,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
                       updateScripts(script, scriptType, actionType)
                       break
                     case EScriptAction.Update:
-                      setCurrentScript(script)
+                      setCurrentScript(Object.assign({}, script))
                       scriptEditorRef.current?.toggle(true)
                       break
                   }
@@ -259,10 +259,11 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
       title={'脚本管理'}
       placement="right"
       width='100vw'
+      height='100vh'
       className={baseCls}
       open={visible}
       closable={false}
-      extra={<Space>
+      extra={<Space size={4}>
         <Button
           size='small'
           icon={<ReloadOutlined />}

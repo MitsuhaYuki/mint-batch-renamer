@@ -4,6 +4,7 @@ import { IConsoleState } from '@/context/console'
 import { useAsyncEffect } from 'ahooks'
 import { ILogger, useWrappedLogger } from './logger'
 import { IExtFilterRaw, IExtFilters } from '@/types/filter'
+import { defaultExtFilter, defaultExtRenamer } from './constant'
 
 /**
  * Load external script
@@ -20,7 +21,7 @@ async function loadScript (
   try {
     const isFileExist = await invoke("is_file_exist", { filePath: fileName })
     if (!isFileExist) {
-      await invoke("write_file", { filePath: fileName, content: '{}' })
+      await invoke("write_file", { filePath: fileName, content: type === 'filter' ? defaultExtFilter : defaultExtRenamer })
       logger.info(`External ${type} ${fileName} not exist, recreating file`)
       return
     }

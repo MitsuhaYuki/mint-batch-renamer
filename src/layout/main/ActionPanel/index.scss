@@ -1,5 +1,5 @@
 $baseCls:'action-panel';
-@import '@/common/styles/mixin.scss';
+@import '@/styles/common.scss';
 
 .#{$baseCls} {
   --collapse-header-space: calc(2 * 38px);
@@ -8,7 +8,7 @@ $baseCls:'action-panel';
   flex-direction: column;
 
   &-collapse {
-    @include scrollbar;
+    @include customScrollbar();
     height: inherit;
     overflow: auto;
 

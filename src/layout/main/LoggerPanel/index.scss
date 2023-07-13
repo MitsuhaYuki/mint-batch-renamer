@@ -1,5 +1,5 @@
 $baseCls:'output';
-@import '@/common/styles/mixin.scss';
+@import '@/styles/common.scss';
 
 .#{$baseCls} {
   --log-area-height: 100px;
@@ -37,6 +37,7 @@ $baseCls:'output';
       .ant-collapse-header {
         border-bottom: 1px solid #dedede;
         align-items: center;
+
         &-text {
           user-select: none;
         }
@@ -48,7 +49,7 @@ $baseCls:'output';
         line-height: 14px;
 
         &-box {
-          @include scrollbar;
+          @include customScrollbar();
           height: var(--log-area-height);
           overflow: auto;
         }

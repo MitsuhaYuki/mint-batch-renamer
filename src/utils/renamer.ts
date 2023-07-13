@@ -84,7 +84,7 @@ export const sysRenamerList: IRenamers = {
   },
   'regex_match': {
     label: '原始文件名(正则匹配)',
-    id: 'origin_name_slice',
+    id: 'regex_match',
     params: [{
       name: 'regex',
       label: '正则表达式',

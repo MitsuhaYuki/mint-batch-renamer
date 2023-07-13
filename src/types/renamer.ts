@@ -1,4 +1,5 @@
 import { IFileItem } from './file'
+import { IScriptParamItemType } from './script'
 
 export type IRenamerConfig = {
   label: string
@@ -42,7 +43,7 @@ export type IRenamerParam = {
   /**
    * 参数类型
    */
-  type: 'string' | 'number' | 'select'
+  type: IScriptParamItemType
   /**
    * 参数范围
    */
