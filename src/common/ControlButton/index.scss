@@ -3,9 +3,10 @@ $baseCls: 'control-button';
 .#{$baseCls} {
   &.ant-btn {
     display: flex;
+    justify-content: center;
     align-items: center;
 
-    span, span.anticon {
+    span, span.anticon, span.ant-btn-icon > span.anticon {
       font-size: 12px;
     }
   }

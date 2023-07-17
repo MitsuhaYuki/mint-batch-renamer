@@ -1,5 +1,5 @@
-import OperableListItem, { OperableListItemProps } from '@/common/OperableListItem'
 import { FC } from 'react'
+import { OperableListItem, OperableListItemProps } from './Item'
 import { isEmpty } from 'lodash'
 import './index.scss'
 

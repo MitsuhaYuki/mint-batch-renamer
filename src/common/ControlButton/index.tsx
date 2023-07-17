@@ -2,7 +2,7 @@ import { Button, ButtonProps } from 'antd'
 import { FC } from 'react'
 import './index.scss'
 
-interface IProps extends Omit<ButtonProps, 'type' | 'text'> {}
+interface IProps extends Omit<ButtonProps, 'type' | 'size'> {}
 
 const baseCls = 'control-button'
 const Content: FC<IProps> = (props) => {

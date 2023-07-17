@@ -1,13 +1,13 @@
+import { ControlButton, ControlButtonProps } from '@/common/ControlButton'
 import { FC, ReactNode, useMemo } from 'react'
-import { Button, ButtonProps } from 'antd'
 import './index.scss'
 
-export interface OperableListItemProps extends Partial<HTMLDivElement> {
+interface IProps extends Partial<HTMLDivElement> {
   content: string | ReactNode
-  operations: Omit<ButtonProps, 'size' | 'type'>[]
+  operations: ControlButtonProps[]
 }
 const baseCls = 'operable-list-item'
-const Content: FC<OperableListItemProps> = (props) => {
+const Content: FC<IProps> = (props) => {
   const { content, operations, title } = props
 
   const renderContent = useMemo(() => (
@@ -19,7 +19,7 @@ const Content: FC<OperableListItemProps> = (props) => {
   const renderButtons = useMemo(() => (
     <div className={`${baseCls}-btns`}>
       {operations.map((item, index) => (
-        <Button key={index} size='small' type='text' {...item} />
+        <ControlButton key={index} {...item} />
       ))}
     </div>
   ), [operations])
@@ -32,4 +32,9 @@ const Content: FC<OperableListItemProps> = (props) => {
 
 Content.defaultProps = {}
 Content.displayName = baseCls
-export default Content
+export {
+  Content as OperableListItem
+}
+export type {
+  IProps as OperableListItemProps
+}
