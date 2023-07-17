@@ -1,32 +1,5 @@
 import { IFileItem } from './file'
-import { IScriptParamItemType } from './script'
-
-/** 过滤器实例配置 */
-export type IFilterConfig = {
-  /**
-   * 过滤项显示名
-   */
-  label: string
-  /**
-   * 过滤项ID
-   */
-  id: string
-  /**
-   * 使用的过滤器名称
-   */
-  filterLabel: string
-  /**
-   * 使用的过滤器ID
-   */
-  filterId: string
-  /**
-   * 过滤器调用参数列表
-   */
-  filterParams?: Record<string, any>
-}
-
-/** 过滤器实例配置列表 */
-export type IFilterConfigs = IFilterConfig[]
+import { IScriptInstance, IScriptParam, IScriptParamItemType } from './script'
 
 /** 文件名型过滤器系统参数列表 */
 export type IFileNameScopeFilterArgs = {
@@ -45,57 +18,13 @@ export type IFileListScopeFilterArgs = {
 }
 
 /** 通用过滤器方法 */
-export type ICommonFilterFunction<T, K = boolean> = (
+export type IFilterFunction<T, K = boolean> = (
   sysArgs: T,
   extra?: Record<string, any>
 ) => K
 
-/** 过滤器拓展参数 */
-export type IFilterParam = {
-  /**
-   * 参数名称
-   */
-  name: string
-  /**
-   * 参数标签
-   */
-  label: string
-  /**
-   * 参数描述
-   */
-  desc?: string
-  /**
-   * 参数提示
-   */
-  tips?: string
-  /**
-   * 参数类型
-   */
-  type: IScriptParamItemType
-  /**
-   * 参数范围
-   */
-  range?: any[]
-  /**
-   * 参数默认值
-   */
-  default: any
-  /**
-   * 只读
-   */
-  readonly?: boolean
-}
-
 /** 通用过滤器 */
-export type ICommonFilter<IScope, IArgs, IResp = boolean> = {
-  /**
-   * 过滤器显示名
-   */
-  label: string
-  /**
-   * 过滤器标识
-   */
-  id: string
+export interface ICommonFilterInstance<IScope, IArgs, IResp = boolean> extends Omit<IScriptInstance<IFilterFunction<IArgs, IResp>, IScriptParam>, 'func'> {
   /**
    * 过滤器作用域
    */
@@ -103,11 +32,7 @@ export type ICommonFilter<IScope, IArgs, IResp = boolean> = {
   /**
    * 过滤器方法
    */
-  func: ICommonFilterFunction<IArgs, IResp>
-  /**
-   * 过滤器参数
-   */
-  params: IFilterParam[]
+  func: IFilterFunction<IArgs, IResp>
 }
 
 /** 过滤器作用域 */
@@ -119,19 +44,14 @@ export enum EFilterScope {
 }
 
 /** 过滤器 */
-export type IFilter = |
-  ICommonFilter<EFilterScope.fileName, IFileNameScopeFilterArgs> |
-  ICommonFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
+export type IFilterInstance = |
+  ICommonFilterInstance<EFilterScope.fileName, IFileNameScopeFilterArgs> |
+  ICommonFilterInstance<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
 
-/** 过滤器列表 */
-export type IFilters = Record<string, IFilter>
-
-/**
- * 第三方过滤器脚本类型定义
- */
+/** --- 外部过滤器相关定义 --- */
 
 /** 从外部加载的过滤器 */
-export interface ICommonExtFilter<IScope, IArgs, IResp = boolean> extends ICommonFilter<IScope, IArgs, IResp> {
+export interface ICommonExtFilterInstance<IScope, IArgs, IResp = boolean> extends ICommonFilterInstance<IScope, IArgs, IResp> {
   /**
    * 功能描述
    */
@@ -168,12 +88,12 @@ export interface ICommonExtFilter<IScope, IArgs, IResp = boolean> extends ICommo
 }
 
 /** 外部过滤器 */
-export type IExtFilter = |
-  ICommonExtFilter<EFilterScope.fileName, IFileNameScopeFilterArgs> |
-  ICommonExtFilter<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
+export type IExtFilterInstance = |
+  ICommonExtFilterInstance<EFilterScope.fileName, IFileNameScopeFilterArgs> |
+  ICommonExtFilterInstance<EFilterScope.fileList, IFileListScopeFilterArgs, IFileItem[]>
 
 /** 外部过滤器(From file) */
-export type IExtFilterRaw = Omit<IExtFilter, 'error' | 'modified'> & {
+export type IExtFilterRaw = Omit<IExtFilterInstance, 'error' | 'modified'> & {
   /**
    * 过滤器作用域(Override)
    */
@@ -183,6 +103,3 @@ export type IExtFilterRaw = Omit<IExtFilter, 'error' | 'modified'> & {
    */
   func: string
 }
-
-/** 外部Filter列表 */
-export type IExtFilters = Record<string, IExtFilter>

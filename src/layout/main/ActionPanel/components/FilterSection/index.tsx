@@ -4,18 +4,19 @@ import cloneDeep from 'lodash/cloneDeep'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { ControlButton } from '@/common/ControlButton'
-import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterConfig, ICommonFilterFunction } from '@/types/filter'
+import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterFunction } from '@/types/filter'
 import { IFileItem } from '@/types/file'
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import { getDefaultFilter, getFilters } from '@/utils/filter'
 import { message } from 'antd'
 import { uuid } from '@/utils/common'
 import './index.scss'
+import { IScriptConfig } from '@/types/script'
 
 export type ContentProps = {}
 
 interface IState {
-  filters: IFilterConfig[]
+  filters: IScriptConfig[]
 }
 type IOptionalState = Partial<IState>
 
@@ -47,15 +48,15 @@ const Content: FC<ContentProps> = () => {
       let copiedFileList = cloneDeep(globalData.filesOriginal)
       const filterArr = state.filters.map(cfg => {
         return {
-          scope: filterSet[cfg.filterId].scope,
-          func: filterSet[cfg.filterId].func,
-          params: cfg.filterParams
+          scope: filterSet[cfg.cfgId].scope,
+          func: filterSet[cfg.cfgId].func,
+          params: cfg.cfgParam
         }
       })
       filterArr.forEach(item => {
         switch (item.scope) {
           case EFilterScope.fileName: {
-            const filterFunc = item.func as ICommonFilterFunction<IFileNameScopeFilterArgs>
+            const filterFunc = item.func as IFilterFunction<IFileNameScopeFilterArgs>
             copiedFileList = copiedFileList.filter(i => filterFunc({
               fullName: i.full_name,
               fileName: i.name,
@@ -64,7 +65,7 @@ const Content: FC<ContentProps> = () => {
             break
           }
           case EFilterScope.fileList: {
-            const filterFunc = item.func as ICommonFilterFunction<IFileListScopeFilterArgs, IFileItem[]>
+            const filterFunc = item.func as IFilterFunction<IFileListScopeFilterArgs, IFileItem[]>
             copiedFileList = filterFunc({ fileList: copiedFileList }, item.params)
           }
           default:
@@ -76,14 +77,14 @@ const Content: FC<ContentProps> = () => {
     }
   }
 
-  const handleUpdateFilter = (filterConfig: IFilterConfig) => {
+  const handleUpdateFilter = (filterConfig: IScriptConfig) => {
     const copiedFilters = cloneDeep(state.filters)
     const filterIndex = copiedFilters.findIndex(item => item.id === filterConfig.id)
     copiedFilters[filterIndex] = filterConfig
     dispatch({ filters: copiedFilters })
   }
 
-  const handleRemoveFilter = (filterConfig: IFilterConfig) => {
+  const handleRemoveFilter = (filterConfig: IScriptConfig) => {
     const copiedFilters = cloneDeep(state.filters)
     const filterIndex = copiedFilters.findIndex(item => item.id === filterConfig.id)
     copiedFilters.splice(filterIndex, 1)

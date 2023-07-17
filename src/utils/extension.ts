@@ -3,7 +3,7 @@ import { IGlobalReducerAction, IGlobalState } from '@/context/global'
 import { IConsoleState } from '@/context/console'
 import { useAsyncEffect } from 'ahooks'
 import { ILogger, useWrappedLogger } from './logger'
-import { IExtFilterRaw, IExtFilters } from '@/types/filter'
+import { IExtFilterRaw, IExtFilterInstance } from '@/types/filter'
 import filterTemplate from '@/utils/templates/ext_filter.json'
 
 /**
@@ -64,7 +64,7 @@ async function loadScript (
       }
     }
     return prev
-  }, {} as IExtFilters)
+  }, {} as Record<string, IExtFilterInstance>)
   logger.info(`Load ${Object.keys(finalScript).length} ${type}(s) complete`)
   globalDispatch({ type: 'internal', payload: { sysFiltersExt: finalScript } })
 }

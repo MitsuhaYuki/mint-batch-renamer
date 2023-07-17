@@ -1,4 +1,5 @@
-import { EFilterScope, IExtFilters, IFilterConfig, IFilters } from '@/types/filter'
+import { EFilterScope, IExtFilterInstance, IFilterInstance } from '@/types/filter'
+import { IScriptConfig } from '@/types/script'
 import { cloneDeep } from 'lodash'
 
 /**
@@ -13,7 +14,7 @@ export const filterScopeOptions = [{
 }]
 
 /** 默认过滤器列表 */
-export const sysFilterList: IFilters = {
+export const sysFilterList: Record<string, IFilterInstance> = {
   'contains': {
     label: '包含关键词',
     id: 'contains',
@@ -33,12 +34,14 @@ export const sysFilterList: IFilters = {
         label: '仅限拓展名',
         value: 'ext',
       }],
-      default: 'file'
+      default: 'file',
+      readonly: false,
     }, {
       name: 'contains_text',
       label: '包含',
       type: 'string',
-      default: ''
+      default: '',
+      readonly: false,
     }],
     func: (sysArgs, extra: any) => {
       console.log('I: running "contains" filter, sysArgs =', sysArgs, 'extra =', extra)
@@ -74,12 +77,14 @@ export const sysFilterList: IFilters = {
         label: '仅限拓展名',
         value: 'ext',
       }],
-      default: 'file'
+      default: 'file',
+      readonly: false,
     }, {
       name: 'equals_text',
       label: '等于',
       type: 'string',
-      default: ''
+      default: '',
+      readonly: false,
     }],
     func: (sysArgs, extra: any) => {
       console.log('I: running "equals" filter, sysArgs =', sysArgs, 'extra =', extra)
@@ -102,19 +107,18 @@ export const sysFilterList: IFilters = {
 }
 
 /** 默认过滤器 */
-export const getDefaultFilter = (id: string): IFilterConfig => cloneDeep({
+export const getDefaultFilter = (id: string): IScriptConfig => cloneDeep({
   label: sysFilterList['contains'].label,
   id,
-  filterLabel: sysFilterList['contains'].label,
-  filterId: 'contains',
+  cfgId: 'contains',
 })
 
-export const getFilters = (sysFilters: IFilters, extFilters: IExtFilters): IFilters => {
+export const getFilters = (sysFilters: Record<string, IFilterInstance>, extFilters: Record<string, IExtFilterInstance>): Record<string, IFilterInstance> => {
   const enabledExtFilters = Object.keys(extFilters).reduce((prev, i) => {
     if (!extFilters[i].status.disabled) {
       prev[i] = extFilters[i]
     }
     return prev
-  }, {} as IFilters)
+  }, {} as Record<string, IFilterInstance>)
   return Object.assign({}, sysFilters, enabledExtFilters)
 }

@@ -1,4 +1,4 @@
-import { IFilterConfig, IFilterParam } from '@/types/filter'
+import {} from '@/types/filter'
 import { Button, Form, Input, InputNumber, Modal, Select, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { ArrowDownOutlined, ArrowUpOutlined, EllipsisOutlined } from '@ant-design/icons'
@@ -8,27 +8,28 @@ import { ILogger } from '@/utils/logger'
 import './index.scss'
 import { cloneDeep } from 'lodash'
 import { filterScopeOptions, getFilters } from '@/utils/filter'
+import { IScriptConfig, IScriptParam } from '@/types/script'
 
 export type ContentProps = {
-  filterConfig: IFilterConfig
+  filterConfig: IScriptConfig
   globalData: IGlobalState
   logger: ILogger
-  onChange?: (filterConfig: IFilterConfig) => void
+  onChange?: (filterConfig: IScriptConfig) => void
   onMoveUp?: () => void
   onMoveDown?: () => void
-  onRemove?: (filterConfig: IFilterConfig) => void
+  onRemove?: (filterConfig: IScriptConfig) => void
 }
 const baseCls = 'filter-item'
 const Content: FC<ContentProps> = (props) => {
   const { filterConfig, globalData, logger, onChange } = props
   const filterSet = getFilters(globalData.sysFilters, globalData.sysFiltersExt)
   const [configModalVisible, setConfigModalVisible] = useState(true)
-  const [formItems, setFormItems] = useState<IFilterParam[]>([])
+  const [formItems, setFormItems] = useState<IScriptParam[]>([])
   const [form] = Form.useForm()
 
   const extractFormItems = (override: Record<string, any> = {}) => {
-    const overrideVals = { ...override, ...filterConfig.filterParams }
-    const filterId = overrideVals['filter_id'] ?? filterConfig.filterId
+    const overrideVals = { ...override, ...filterConfig.cfgParam }
+    const filterId = overrideVals['filter_id'] ?? filterConfig.cfgId
     let filterInst = filterSet[filterId]
     if (!filterInst) {
       message.error(`没有找到 ${filterId} 过滤器, 已重置为默认值!`)
@@ -36,12 +37,13 @@ const Content: FC<ContentProps> = (props) => {
       filterInst = filterSet['contains']
     }
 
-    const newFormItems: IFilterParam[] = [
+    const newFormItems: IScriptParam[] = [
       {
         name: 'filter_label',
         label: '过滤器名',
         type: 'string',
         default: override['filter_label'] ?? filterConfig.label,
+        readonly: false,
       },
       {
         name: 'filter_id',
@@ -49,6 +51,7 @@ const Content: FC<ContentProps> = (props) => {
         type: 'select',
         range: Object.keys(filterSet).map(key => ({ label: filterSet[key].label, value: key })),
         default: filterInst.id,
+        readonly: false,
       },
       {
         name: 'filter_scope',
@@ -68,7 +71,7 @@ const Content: FC<ContentProps> = (props) => {
       }
       prev.push(item)
       return prev
-    }, [] as IFilterParam[])
+    }, [] as IScriptParam[])
 
     setFormItems(extractedFormItem)
   }
@@ -85,13 +88,13 @@ const Content: FC<ContentProps> = (props) => {
     const newFilterConfig = cloneDeep(filterConfig)
     // assign sys args
     newFilterConfig.label = formVals.filter_label
-    newFilterConfig.filterId = formVals.filter_id
+    newFilterConfig.cfgId = formVals.filter_id
     // delete unused args
     delete formVals.filter_label
     delete formVals.filter_id
     delete formVals.filter_scope
     // assign filter args
-    newFilterConfig.filterParams = formVals
+    newFilterConfig.cfgParam = formVals
     // must close modal first, otherwise form will flash blank
     setConfigModalVisible(false)
     onChange?.(newFilterConfig)
@@ -111,10 +114,16 @@ const Content: FC<ContentProps> = (props) => {
   const handleFormValuesChange = (changedValues: Record<string, any>, currentValues: Record<string, any>) => {
     const changedKeys = Object.keys(changedValues)
     if (changedKeys.includes('filter_id')) {
-      extractFormItems({
-        filter_id: changedValues.filter_id,
-        filter_label: filterSet[changedValues.filter_id].label,
-      })
+      if (filterConfig.label === filterSet[filterConfig.cfgId].label) {
+        extractFormItems({
+          filter_id: changedValues.filter_id,
+          filter_label: filterSet[changedValues.filter_id].label,
+        })
+      } else {
+        extractFormItems({
+          filter_id: changedValues.filter_id,
+        })
+      }
     }
   }
 
@@ -135,7 +144,7 @@ const Content: FC<ContentProps> = (props) => {
     if (filterConfig) extractFormItems()
   }, [filterConfig])
 
-  const formItemRender = (item: IFilterParam, index: number) => {
+  const formItemRender = (item: IScriptParam, index: number) => {
     if (item.readonly) {
       switch (item.type) {
         case 'string':
@@ -144,7 +153,7 @@ const Content: FC<ContentProps> = (props) => {
         case 'select': {
           if (Array.isArray(item.range)) {
             const res = item.range.find(rangeItem => rangeItem.value === item.default)
-            return <div className={`${baseCls}-form-view`}>{res.label}</div>
+            return <div className={`${baseCls}-form-view`}>{res?.label}</div>
           } else {
             return <div className={`${baseCls}-form-error`}>选项格式错误</div>
           }

@@ -1,3 +1,4 @@
+/** UUID generator */
 export function uuid () {
   const s: string[] = [];
   const hexDigits = '0123456789abcdef'.split('');
