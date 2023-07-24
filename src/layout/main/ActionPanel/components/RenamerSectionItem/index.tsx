@@ -1,52 +1,56 @@
+import { ArrowDownOutlined, ArrowUpOutlined, EllipsisOutlined } from '@ant-design/icons'
+import { Button, Form, Input, InputNumber, Modal, Select, message } from 'antd'
 import { FC, useEffect, useState } from 'react'
 import { IGlobalState } from '@/context/global'
-import './index.scss'
-import { IRenamerConfig, IRenamerParam } from '@/types/renamer'
 import { ILogger } from '@/utils/logger'
-import { Button, Form, Input, InputNumber, Modal, Select, message } from 'antd'
-import { useMount, useUpdateEffect } from 'ahooks'
-import { ArrowDownOutlined, ArrowUpOutlined, EllipsisOutlined } from '@ant-design/icons'
+import { IScriptConfig, IScriptParam } from '@/types/script'
 import { cloneDeep } from 'lodash'
+import { getRenamers } from '@/utils/renamer'
+import { useMount, useUpdateEffect } from 'ahooks'
+import './index.scss'
 
 export type ContentProps = {
-  renamerConfig: IRenamerConfig
+  renamerConfig: IScriptConfig
   globalData: IGlobalState
   logger: ILogger
-  onChange?: (renamerConfig: IRenamerConfig) => void
+  onChange?: (renamerConfig: IScriptConfig) => void
   onMoveUp?: () => void
   onMoveDown?: () => void
-  onRemove?: (renamerConfig: IRenamerConfig) => void
+  onRemove?: (renamerConfig: IScriptConfig) => void
 }
 const baseCls = 'renamer-item'
 const Content: FC<ContentProps> = (props) => {
   const { renamerConfig, globalData, logger, onChange } = props
+  const renamerSet = getRenamers(globalData.sysRenamers, globalData.sysRenamersExt)
   const [configModalVisible, setConfigModalVisible] = useState(true)
-  const [formItems, setFormItems] = useState<IRenamerParam[]>([])
+  const [formItems, setFormItems] = useState<IScriptParam[]>([])
   const [form] = Form.useForm()
 
   const extractFormItems = (override: Record<string, any> = {}) => {
-    const overrideVals = { ...override, ...renamerConfig.renamerParams }
-    const renamerId = overrideVals['renamer_id'] ?? renamerConfig.renamerId
-    let renamerInst = globalData.sysRenamers[renamerId]
+    const overrideVals = { ...override, ...renamerConfig.scriptParam }
+    const renamerId = overrideVals['renamer_id'] ?? renamerConfig.scriptId
+    let renamerInst = renamerSet[renamerId]
     if (!renamerInst) {
       message.error(`没有找到 ${renamerId} 步骤方法, 已重置为默认值!`)
       logger.error(`Renamer ${renamerId} not found`)
-      renamerInst = globalData.sysRenamers['contains']
+      renamerInst = renamerSet['contains']
     }
 
-    const newFormItems: IRenamerParam[] = [
+    const newFormItems: IScriptParam[] = [
       {
         name: 'renamer_label',
         label: '步骤名称',
         type: 'string',
         default: override['renamer_label'] ?? renamerConfig.label,
+        readonly: true,
       },
       {
         name: 'renamer_id',
         label: '此步骤使用',
         type: 'select',
-        range: Object.keys(globalData.sysRenamers).map(key => ({ label: globalData.sysRenamers[key].label, value: key })),
+        range: Object.keys(renamerSet).map(key => ({ label: renamerSet[key].label, value: key })),
         default: renamerInst.id,
+        readonly: true,
       },
     ]
     newFormItems.push(...cloneDeep(renamerInst.params))
@@ -58,7 +62,7 @@ const Content: FC<ContentProps> = (props) => {
       }
       prev.push(item)
       return prev
-    }, [] as IRenamerParam[])
+    }, [] as IScriptParam[])
 
     setFormItems(extractedFormItem)
   }
@@ -75,12 +79,12 @@ const Content: FC<ContentProps> = (props) => {
     const newRenamerConfig = cloneDeep(renamerConfig)
     // assign sys args
     newRenamerConfig.label = formVals.renamer_label
-    newRenamerConfig.renamerId = formVals.renamer_id
+    newRenamerConfig.scriptId = formVals.renamer_id
     // delete unused args
     delete formVals.renamer_label
     delete formVals.renamer_id
     // assign filter args
-    newRenamerConfig.renamerParams = formVals
+    newRenamerConfig.scriptParam = formVals
     // must close modal first, otherwise form will flash blank
     setConfigModalVisible(false)
     onChange?.(newRenamerConfig)
@@ -102,7 +106,7 @@ const Content: FC<ContentProps> = (props) => {
     if (changedKeys.includes('renamer_id')) {
       extractFormItems({
         renamer_id: changedValues.renamer_id,
-        renamer_label: globalData.sysRenamers[changedValues.renamer_id].label,
+        renamer_label: renamerSet[changedValues.renamer_id].label,
       })
     }
   }
@@ -124,7 +128,7 @@ const Content: FC<ContentProps> = (props) => {
     if (renamerConfig) extractFormItems()
   }, [renamerConfig])
 
-  const formItemRender = (item: IRenamerParam, index: number) => {
+  const formItemRender = (item: IScriptParam, index: number) => {
     if (item.readonly) {
       switch (item.type) {
         case 'string':
@@ -133,7 +137,7 @@ const Content: FC<ContentProps> = (props) => {
         case 'select': {
           if (Array.isArray(item.range)) {
             const res = item.range.find(rangeItem => rangeItem.value === item.default)
-            return <div className={`${baseCls}-form-view`}>{res.label}</div>
+            return <div className={`${baseCls}-form-view`}>{res?.label}</div>
           } else {
             return <div className={`${baseCls}-form-error`}>Form item option range error</div>
           }

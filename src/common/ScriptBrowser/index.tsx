@@ -1,7 +1,7 @@
 import { Button, Drawer, Modal, Space, Tabs, TabsProps, message } from 'antd'
 import { CloseOutlined, PlusOutlined, ReloadOutlined, SaveFilled } from '@ant-design/icons'
 import { EScriptAction, EScriptType } from '@/types/extension'
-import { IExtFilter, IExtFilterRaw } from '@/types/filter'
+import { IExtFilterInstance, IExtFilterRaw } from '@/types/filter'
 import { IGlobalSetter } from '@/utils/hooks/useGlobalData'
 import { IGlobalState } from '@/context/global'
 import { ILogger } from '@/utils/logger'
@@ -31,7 +31,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
   /** current active tab & current active script type */
   const [activeTab, setActiveTab] = useState<EScriptType>(EScriptType.Filter)
   /** current modifing script */
-  const [currentScript, setCurrentScript] = useState<IExtFilter>()
+  const [currentScript, setCurrentScript] = useState<IExtFilterInstance>()
   /** control if save changes button visible */
   const [isModified, setIsModified] = useState<boolean>(false)
   /** external script editor instance */
@@ -68,7 +68,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
 
   /** reload external scripts. */
   const reloadScripts = () => {
-    loadScript('filter', logger, (unwarppedGlobalSetter as any))
+    loadScript(EScriptType.Filter, logger, (unwarppedGlobalSetter as any))
     setIsModified(false)
   }
 
@@ -78,7 +78,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
    * @param scriptType script type
    * @param actionType action type
    */
-  const updateScripts = (script: IExtFilter, scriptType: EScriptType, actionType: EScriptAction) => {
+  const updateScripts = (script: IExtFilterInstance, scriptType: EScriptType, actionType: EScriptAction) => {
     // script modify detection handled by ScriptEditor, so if this function is called, it means that the script must be modified
     const shadowScript = Object.assign({}, script)
     setIsModified(true)
@@ -146,7 +146,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     const transformedFilters = Object.keys(globalData.sysFiltersExt).reduce((prev, key) => {
       if (!globalData.sysFiltersExt[key].status.deleted) {
         const itemCopy: any = Object.assign({}, globalData.sysFiltersExt[key])
-        itemCopy.func = btoa(itemCopy.func?.toString())
+        itemCopy.func = btoa(encodeURIComponent(itemCopy.func?.toString()))
         // reset script status
         itemCopy.status = {
           ...itemCopy.status,

@@ -1,5 +1,5 @@
 import CodeMirror from '@uiw/react-codemirror'
-import { EFilterScope, IExtFilter } from '@/types/filter'
+import { EFilterScope, IExtFilterInstance } from '@/types/filter'
 import { EScriptAction, EScriptType } from '@/types/extension'
 import { Form, Input, Modal, Select, message } from 'antd'
 import { ParamEditor } from './ParamEditor'
@@ -14,9 +14,9 @@ type Content = {
 }
 
 type ContentProps = {
-  script?: IExtFilter
+  script?: IExtFilterInstance
   scriptType: EScriptType
-  onOk?: (script: IExtFilter, scriptType: EScriptType, actionType: EScriptAction) => void
+  onOk?: (script: IExtFilterInstance, scriptType: EScriptType, actionType: EScriptAction) => void
 }
 
 const baseCls = 'script-editor'
@@ -69,7 +69,7 @@ const Content = forwardRef<Content, ContentProps>((props, ref) => {
       return
     }
 
-    const newFieldsValue: IExtFilter = {
+    const newFieldsValue: IExtFilterInstance = {
       ...allFieldsValue,
       modified: true,
       params: allFieldsValue.params ? JSON.parse(allFieldsValue.params) : [],

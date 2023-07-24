@@ -6,12 +6,12 @@ import useLogger from '@/utils/logger'
 import { ControlButton } from '@/common/ControlButton'
 import { EFilterScope, IFileListScopeFilterArgs, IFileNameScopeFilterArgs, IFilterFunction } from '@/types/filter'
 import { IFileItem } from '@/types/file'
+import { IScriptConfig } from '@/types/script'
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import { getDefaultFilter, getFilters } from '@/utils/filter'
 import { message } from 'antd'
 import { uuid } from '@/utils/common'
 import './index.scss'
-import { IScriptConfig } from '@/types/script'
 
 export type ContentProps = {}
 
@@ -48,9 +48,9 @@ const Content: FC<ContentProps> = () => {
       let copiedFileList = cloneDeep(globalData.filesOriginal)
       const filterArr = state.filters.map(cfg => {
         return {
-          scope: filterSet[cfg.cfgId].scope,
-          func: filterSet[cfg.cfgId].func,
-          params: cfg.cfgParam
+          scope: filterSet[cfg.scriptId].scope,
+          func: filterSet[cfg.scriptId].func,
+          params: cfg.scriptParam
         }
       })
       filterArr.forEach(item => {

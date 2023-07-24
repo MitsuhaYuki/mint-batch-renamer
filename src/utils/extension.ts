@@ -1,10 +1,12 @@
-import { invoke } from '@tauri-apps/api/tauri'
-import { IGlobalReducerAction, IGlobalState } from '@/context/global'
-import { IConsoleState } from '@/context/console'
-import { useAsyncEffect } from 'ahooks'
-import { ILogger, useWrappedLogger } from './logger'
-import { IExtFilterRaw, IExtFilterInstance } from '@/types/filter'
 import filterTemplate from '@/utils/templates/ext_filter.json'
+import renamerTemplate from '@/utils/templates/ext_renamer.json'
+import { EScriptType } from '@/types/extension'
+import { IConsoleState } from '@/context/console'
+import { IExtFilterRaw, IExtFilterInstance } from '@/types/filter'
+import { IGlobalReducerAction, IGlobalState } from '@/context/global'
+import { ILogger, useWrappedLogger } from './logger'
+import { invoke } from '@tauri-apps/api/tauri'
+import { useAsyncEffect } from 'ahooks'
 
 /**
  * Load external script
@@ -14,14 +16,14 @@ import filterTemplate from '@/utils/templates/ext_filter.json'
  * @returns 
  */
 async function loadScript (
-  type: 'filter' | 'renamer',
+  type: EScriptType,
   logger: ILogger,
   globalDispatch: (data: IGlobalReducerAction) => void) {
-  const fileName = type === 'filter' ? 'ext_filter.json' : 'ext_renamer.json'
+  const fileName = `ext_${type}.json`
   try {
     const isFileExist = await invoke("is_file_exist", { filePath: fileName })
     if (!isFileExist) {
-      await invoke("write_file", { filePath: fileName, content: JSON.stringify(type === 'filter' ? filterTemplate : {}, null, 2) })
+      await invoke("write_file", { filePath: fileName, content: JSON.stringify(type === EScriptType.Filter ? filterTemplate : renamerTemplate, null, 2) })
       logger.info(`External ${type} ${fileName} not exist, recreating file`)
       return
     }
@@ -66,7 +68,7 @@ async function loadScript (
     return prev
   }, {} as Record<string, IExtFilterInstance>)
   logger.info(`Load ${Object.keys(finalScript).length} ${type}(s) complete`)
-  globalDispatch({ type: 'internal', payload: { sysFiltersExt: finalScript } })
+  globalDispatch({ type: 'internal', payload: { [type === EScriptType.Filter ? 'sysFiltersExt' : 'sysRenamersExt']: finalScript } })
 }
 
 /**
@@ -87,11 +89,11 @@ const useExternalScriptLoader = (
     if (config) {
       if (config.allow_external_filters) {
         logger.info('Loading external filters...')
-        loadScript('filter', logger, globalDispatch)
+        loadScript(EScriptType.Filter, logger, globalDispatch)
       }
       if (config.allow_external_renamers) {
         logger.info('Loading external renamers...')
-        loadScript('renamer', logger, globalDispatch)
+        loadScript(EScriptType.Renamer, logger, globalDispatch)
       }
     }
   }, [globalData.config])

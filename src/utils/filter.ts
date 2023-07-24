@@ -110,7 +110,7 @@ export const sysFilterList: Record<string, IFilterInstance> = {
 export const getDefaultFilter = (id: string): IScriptConfig => cloneDeep({
   label: sysFilterList['contains'].label,
   id,
-  cfgId: 'contains',
+  scriptId: 'contains',
 })
 
 export const getFilters = (sysFilters: Record<string, IFilterInstance>, extFilters: Record<string, IExtFilterInstance>): Record<string, IFilterInstance> => {

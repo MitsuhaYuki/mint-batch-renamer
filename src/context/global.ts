@@ -1,9 +1,9 @@
 import React, { Reducer } from 'react'
+import { IExtFilterInstance, IFilterInstance } from '@/types/filter'
+import { IExtRenamerInstance, IRenamerInstance } from '@/types/renamer'
 import { IFileItem } from '@/types/file'
 import { defaultConfig, IConfig } from '@/types/config'
-import { IExtFilters, IFilters } from '@/types/filter'
 import { sysFilterList } from '@/utils/filter'
-import { IRenamers } from '@/types/renamer'
 import { sysRenamerList } from '@/utils/renamer'
 
 interface IState {
@@ -12,9 +12,10 @@ interface IState {
   filesFiltered?: IFileItem[]
   filesRenamed?: IFileItem[]
   loading?: boolean
-  sysFilters: IFilters
-  sysFiltersExt: IExtFilters
-  sysRenamers: IRenamers
+  sysFilters: Record<string, IFilterInstance>
+  sysFiltersExt: Record<string, IExtFilterInstance>
+  sysRenamers: Record<string, IRenamerInstance>
+  sysRenamersExt: Record<string, IExtRenamerInstance>
   sourceFolders: string[]
   targetFolder: string
 }
@@ -23,11 +24,10 @@ interface IOptionalState extends Partial<IState> {}
 const initState: IState = {
   config: defaultConfig,
   filesOriginal: [],
-  // filesFiltered: [],
-  // filesRenamed: [],
   sysFilters: sysFilterList,
   sysFiltersExt: {},
   sysRenamers: sysRenamerList,
+  sysRenamersExt: {},
   sourceFolders: [],
   targetFolder: ''
 }

@@ -1,5 +1,5 @@
 import { IFileItem } from './file'
-import { IScriptInstance, IScriptParam, IScriptParamItemType } from './script'
+import { IScriptInstance, IScriptParam } from './script'
 
 /** 文件名型过滤器系统参数列表 */
 export type IFileNameScopeFilterArgs = {
@@ -25,13 +25,9 @@ export type IFilterFunction<T, K = boolean> = (
 
 /** 通用过滤器 */
 export interface ICommonFilterInstance<IScope, IArgs, IResp = boolean> extends Omit<IScriptInstance<IFilterFunction<IArgs, IResp>, IScriptParam>, 'func'> {
-  /**
-   * 过滤器作用域
-   */
+  /** 过滤器作用域 */
   scope: IScope
-  /**
-   * 过滤器方法
-   */
+  /** 过滤器方法 */
   func: IFilterFunction<IArgs, IResp>
 }
 
@@ -52,37 +48,21 @@ export type IFilterInstance = |
 
 /** 从外部加载的过滤器 */
 export interface ICommonExtFilterInstance<IScope, IArgs, IResp = boolean> extends ICommonFilterInstance<IScope, IArgs, IResp> {
-  /**
-   * 功能描述
-   */
+  /** 功能描述 */
   desc: string
-  /**
-   * 过滤器加载状态
-   */
+  /** 过滤器加载状态 */
   error: boolean
-  /**
-   * 过滤器状态(脚本编辑器使用的字段)
-   */
+  /** 过滤器状态(脚本编辑器使用的字段) */
   status: {
-    /**
-     * 脚本被创建
-     */
+    /** 脚本被创建 */
     created: boolean
-    /**
-     * 脚本被删除
-     */
+    /** 脚本被删除 */
     deleted: boolean
-    /**
-     * 脚本被禁用
-     */
+    /** 脚本被禁用 */
     disabled: boolean
-    /**
-     * 该脚本存在加载错误
-     */
+    /** 该脚本存在加载错误 */
     error: boolean
-    /**
-     * 脚本被修改
-     */
+    /** 脚本被修改 */
     modified: boolean
   }
 }

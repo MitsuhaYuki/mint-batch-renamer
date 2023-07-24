@@ -73,16 +73,12 @@ export type IScriptConfig = {
    * 索引ID
    */
   id: string
-  // /**
-  //  * 当前配置的显示名
-  //  */
-  // cfgLabel: string
   /**
    * 当前配置所使用的脚本标识
    */
-  cfgId: string
+  scriptId: string
   /**
    * 当前配置下的脚本参数列表
    */
-  cfgParam?: Record<string, any>
+  scriptParam?: Record<string, any>
 }

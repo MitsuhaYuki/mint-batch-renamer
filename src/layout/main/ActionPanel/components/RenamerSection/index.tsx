@@ -3,8 +3,8 @@ import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { ControlButton } from '@/common/ControlButton'
 import { Dispatch, FC, useMemo, useReducer } from 'react'
-import { IFileItem } from '@/types/file'
-import { IRenamerConfig } from '@/types/renamer'
+import { IFileItemRenamed } from '@/types/file'
+import { IScriptConfig } from '@/types/script'
 import { PlusOutlined, SyncOutlined } from '@ant-design/icons'
 import { cloneDeep } from 'lodash'
 import { getDefaultRenamer } from '@/utils/renamer'
@@ -15,7 +15,7 @@ import './index.scss'
 export type ContentProps = {}
 
 interface IState {
-  renamers: IRenamerConfig[]
+  renamers: IScriptConfig[]
 }
 type IOptionalState = Partial<IState>
 
@@ -54,29 +54,29 @@ const Content: FC<ContentProps> = () => {
     } else {
       message.info('重命名文件列表...')
     }
-    filesToRename = cloneDeep(filesToRename)
+    filesToRename = cloneDeep(filesToRename) as IFileItemRenamed[]
     // reassemble renamer list
     const renamerArr = state.renamers.map(cfg => {
       return {
-        func: globalData.sysRenamers[cfg.renamerId].func,
-        params: cfg.renamerParams
+        func: globalData.sysRenamers[cfg.scriptId].func,
+        params: cfg.scriptParam
       }
     })
     // run renamer
     const totalFileCount = filesToRename.length
     const newFileList = filesToRename.reduce((prev, item, index, list) => {
-      const newFileItem = renamerArr.reduce((prevFileItem, renamer) => {
+      renamerArr.forEach(renamer => {
         const res = renamer.func({
-          fileItem: prevFileItem,
+          fileItem: item,
           fileList: list,
           index,
           total: totalFileCount
         }, renamer.params)
-        return res
-      }, cloneDeep(item))
-      prev.push(newFileItem)
+        Object.assign(item, res)
+      })
+      prev.push(item)
       return prev
-    }, [] as IFileItem[])
+    }, [] as IFileItemRenamed[])
     newFileList.map(item => {
       item.rename_full_name = item.rename_full_name ?? item.full_name
       item.rename_name = item.rename_name ?? item.name
@@ -87,14 +87,14 @@ const Content: FC<ContentProps> = () => {
     message.success('文件列表重命名完成')
   }
 
-  const handleUpdateRenamer = (renamerConfig: IRenamerConfig) => {
+  const handleUpdateRenamer = (renamerConfig: IScriptConfig) => {
     const copiedRenamers = cloneDeep(state.renamers)
     const renamerIndex = copiedRenamers.findIndex(item => item.id === renamerConfig.id)
     copiedRenamers[renamerIndex] = renamerConfig
     dispatch({ renamers: copiedRenamers })
   }
 
-  const handleRemoveRenamer = (renamerConfig: IRenamerConfig) => {
+  const handleRemoveRenamer = (renamerConfig: IScriptConfig) => {
     const copiedRenamers = cloneDeep(state.renamers)
     const renamerIndex = copiedRenamers.findIndex(item => item.id === renamerConfig.id)
     copiedRenamers.splice(renamerIndex, 1)

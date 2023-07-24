@@ -28,8 +28,8 @@ const Content: FC<ContentProps> = (props) => {
   const [form] = Form.useForm()
 
   const extractFormItems = (override: Record<string, any> = {}) => {
-    const overrideVals = { ...override, ...filterConfig.cfgParam }
-    const filterId = overrideVals['filter_id'] ?? filterConfig.cfgId
+    const overrideVals = { ...override, ...filterConfig.scriptParam }
+    const filterId = overrideVals['filter_id'] ?? filterConfig.scriptId
     let filterInst = filterSet[filterId]
     if (!filterInst) {
       message.error(`没有找到 ${filterId} 过滤器, 已重置为默认值!`)
@@ -88,13 +88,13 @@ const Content: FC<ContentProps> = (props) => {
     const newFilterConfig = cloneDeep(filterConfig)
     // assign sys args
     newFilterConfig.label = formVals.filter_label
-    newFilterConfig.cfgId = formVals.filter_id
+    newFilterConfig.scriptId = formVals.filter_id
     // delete unused args
     delete formVals.filter_label
     delete formVals.filter_id
     delete formVals.filter_scope
     // assign filter args
-    newFilterConfig.cfgParam = formVals
+    newFilterConfig.scriptParam = formVals
     // must close modal first, otherwise form will flash blank
     setConfigModalVisible(false)
     onChange?.(newFilterConfig)
@@ -114,7 +114,7 @@ const Content: FC<ContentProps> = (props) => {
   const handleFormValuesChange = (changedValues: Record<string, any>, currentValues: Record<string, any>) => {
     const changedKeys = Object.keys(changedValues)
     if (changedKeys.includes('filter_id')) {
-      if (filterConfig.label === filterSet[filterConfig.cfgId].label) {
+      if (filterConfig.label === filterSet[filterConfig.scriptId].label) {
         extractFormItems({
           filter_id: changedValues.filter_id,
           filter_label: filterSet[changedValues.filter_id].label,

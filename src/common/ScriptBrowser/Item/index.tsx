@@ -1,12 +1,12 @@
 import { FC, useMemo } from 'react'
-import { IExtFilter } from '@/types/filter'
+import { IExtFilterInstance } from '@/types/filter'
 import { Button, Tag } from 'antd'
 import { EScriptAction, EScriptType } from '@/types/extension'
 
 type ContentProps = {
-  script: IExtFilter
+  script: IExtFilterInstance
   scriptType: EScriptType
-  onAction?: (script: IExtFilter, scriptType: EScriptType, actionType: EScriptAction) => void
+  onAction?: (script: IExtFilterInstance, scriptType: EScriptType, actionType: EScriptAction) => void
 }
 const baseCls = 'script-browser-item'
 const Content: FC<ContentProps> = (props) => {
