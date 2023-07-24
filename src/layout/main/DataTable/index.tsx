@@ -25,26 +25,26 @@ const Content: FC<ContentProps> = (props) => {
   const columns = useMemo(() => {
     const resColumns: ColumnsType<IFileItem> = [
       {
-        title: 'Name',
+        title: '文件名',
         dataIndex: 'name',
         width: 200,
         ellipsis: true,
       },
       {
-        title: 'Size',
+        title: '大小',
         dataIndex: 'size',
         width: 80,
         ellipsis: true,
         render: (size: number) => formatFileSize(size),
       },
       {
-        title: 'Ext',
+        title: '拓展名',
         dataIndex: 'extension',
         width: 50,
         ellipsis: true
       },
       {
-        title: 'Path',
+        title: '路径',
         dataIndex: 'path',
         ellipsis: true,
       },
@@ -52,12 +52,12 @@ const Content: FC<ContentProps> = (props) => {
 
     if (globalData.filesRenamed) {
       resColumns.splice(0, 3, {
-        title: 'From',
+        title: '原文件名',
         dataIndex: 'full_name',
         width: 200,
         ellipsis: false,
       }, {
-        title: 'Rename To',
+        title: '重命名后',
         dataIndex: 'rename_full_name',
         width: 200,
         ellipsis: false,

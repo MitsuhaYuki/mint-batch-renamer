@@ -1,7 +1,7 @@
 import React, { Reducer } from 'react'
 import { IExtFilterInstance, IFilterInstance } from '@/types/filter'
 import { IExtRenamerInstance, IRenamerInstance } from '@/types/renamer'
-import { IFileItem } from '@/types/file'
+import { IFileItem, IFileItemRenamed } from '@/types/file'
 import { defaultConfig, IConfig } from '@/types/config'
 import { sysFilterList } from '@/utils/filter'
 import { sysRenamerList } from '@/utils/renamer'
@@ -10,7 +10,7 @@ interface IState {
   config: IConfig
   filesOriginal: IFileItem[]
   filesFiltered?: IFileItem[]
-  filesRenamed?: IFileItem[]
+  filesRenamed?: IFileItemRenamed[]
   loading?: boolean
   sysFilters: Record<string, IFilterInstance>
   sysFiltersExt: Record<string, IExtFilterInstance>
