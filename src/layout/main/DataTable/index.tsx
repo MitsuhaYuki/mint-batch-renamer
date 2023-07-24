@@ -40,7 +40,7 @@ const Content: FC<ContentProps> = (props) => {
       {
         title: '拓展名',
         dataIndex: 'extension',
-        width: 50,
+        width: 70,
         ellipsis: true
       },
       {
