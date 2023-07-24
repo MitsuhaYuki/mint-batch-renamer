@@ -2,6 +2,7 @@ import { Button, Drawer, Modal, Space, Tabs, TabsProps, message } from 'antd'
 import { CloseOutlined, PlusOutlined, ReloadOutlined, SaveFilled } from '@ant-design/icons'
 import { EScriptAction, EScriptType } from '@/types/extension'
 import { IExtFilterInstance, IExtFilterRaw } from '@/types/filter'
+import { IExtRenamerInstance } from '@/types/renamer'
 import { IGlobalSetter } from '@/utils/hooks/useGlobalData'
 import { IGlobalState } from '@/context/global'
 import { ILogger } from '@/utils/logger'
@@ -31,7 +32,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
   /** current active tab & current active script type */
   const [activeTab, setActiveTab] = useState<EScriptType>(EScriptType.Filter)
   /** current modifing script */
-  const [currentScript, setCurrentScript] = useState<IExtFilterInstance>()
+  const [currentScript, setCurrentScript] = useState<IExtFilterInstance | IExtRenamerInstance>()
   /** control if save changes button visible */
   const [isModified, setIsModified] = useState<boolean>(false)
   /** external script editor instance */
@@ -78,7 +79,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
    * @param scriptType script type
    * @param actionType action type
    */
-  const updateScripts = (script: IExtFilterInstance, scriptType: EScriptType, actionType: EScriptAction) => {
+  const updateScripts = (script: IExtFilterInstance | IExtRenamerInstance, scriptType: EScriptType, actionType: EScriptAction) => {
     // script modify detection handled by ScriptEditor, so if this function is called, it means that the script must be modified
     const shadowScript = Object.assign({}, script)
     setIsModified(true)
@@ -136,7 +137,11 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     }
     switch (scriptType) {
       case EScriptType.Filter: {
-        setGlobalData({ 'sysFiltersExt': { ...globalData.sysFiltersExt, [shadowScript.id]: shadowScript } })
+        setGlobalData({ 'sysFiltersExt': { ...(globalData.sysFiltersExt as any), [shadowScript.id]: shadowScript } })
+        break
+      }
+      case EScriptType.Renamer: {
+        setGlobalData({ 'sysRenamersExt': { ...(globalData.sysRenamersExt as any), [shadowScript.id]: shadowScript } })
         break
       }
     }
@@ -249,6 +254,42 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
           </div>
         )
       }
+      case EScriptType.Renamer: {
+        const scripts = globalData.sysRenamersExt
+        return (
+          <div className={`${baseCls}-tabs-content`}>
+            {Object.keys(scripts).map((key: string, index: number) => (
+              <ScriptBrowserItem
+                key={index}
+                script={scripts[key]}
+                scriptType={activeTab}
+                onAction={(script, scriptType, actionType) => {
+                  switch (actionType) {
+                    case EScriptAction.Delete:
+                    case EScriptAction.Disable:
+                      updateScripts(script, scriptType, actionType)
+                      break
+                    case EScriptAction.Update:
+                      setCurrentScript(Object.assign({}, script))
+                      scriptEditorRef.current?.toggle(true)
+                      break
+                  }
+                }}
+              />
+            ))}
+            <div className={`${baseCls}-item add-script`}>
+              <Button
+                type='text'
+                icon={<PlusOutlined />}
+                onClick={() => {
+                  setCurrentScript(undefined)
+                  scriptEditorRef.current?.toggle(true)
+                }}
+              >添加新脚本</Button>
+            </div>
+          </div>
+        )
+      }
       default:
         break
     }
@@ -294,7 +335,10 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
             tabBarGutter={0}
             tabPosition='left'
             // FIXME: warning! tab change should also clear modify state & reload script!
-            onChange={e => setActiveTab(e as EScriptType)}
+            onChange={e => {
+              setCurrentScript(undefined)
+              setActiveTab(e as EScriptType)
+            }}
           />
         </div>
         <div className={`${baseCls}-content`}>

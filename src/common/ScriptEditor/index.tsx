@@ -2,6 +2,7 @@ import CodeMirror from '@uiw/react-codemirror'
 import { EFilterScope, IExtFilterInstance } from '@/types/filter'
 import { EScriptAction, EScriptType } from '@/types/extension'
 import { Form, Input, Modal, Select, message } from 'antd'
+import { IExtRenamerInstance } from '@/types/renamer'
 import { ParamEditor } from './ParamEditor'
 import { cloneDeep, isEmpty, isEqual } from 'lodash'
 import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
@@ -14,9 +15,9 @@ type Content = {
 }
 
 type ContentProps = {
-  script?: IExtFilterInstance
+  script?: IExtFilterInstance | IExtRenamerInstance
   scriptType: EScriptType
-  onOk?: (script: IExtFilterInstance, scriptType: EScriptType, actionType: EScriptAction) => void
+  onOk?: (script: IExtFilterInstance | IExtRenamerInstance, scriptType: EScriptType, actionType: EScriptAction) => void
 }
 
 const baseCls = 'script-editor'
