@@ -24,6 +24,7 @@ const App: FC = () => {
     document.querySelector('#root-loading-screen')?.classList.add('elem-fade-out')
     setTimeout(() => {
       document.querySelector('#root-loading-screen')?.classList.add('elem-hidden')
+      window.postMessage({ type: 'STOP_ANIME' })
     }, 500)
   })
 

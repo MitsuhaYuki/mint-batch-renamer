@@ -1,46 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mint Batch Renamer</title>
-    <style>
-      #root-loading-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        z-index: 10000;
-        width: 100vw;
-        height: 100vh;
-        background-color: #fff;
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mint Batch Renamer</title>
+  <style>
+    #root-loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 10000;
+      width: 100vw;
+      height: 100vh;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 1;
+      transition: opacity 0.5s linear;
+      pointer-events: none;
+
+      .animation {
         display: flex;
         justify-content: center;
         align-items: center;
-        opacity: 1;
-        transition: opacity 0.5s ease-in-out;
-        pointer-events: none;
-      }
+        gap: 10px;
 
-      #root-loading-screen video {
-        opacity: 0.75;
+        .dot {
+          width: 20px;
+          height: 20px;
+          border-radius: 20px;
+          background-color: #8c8c8c;
+        }
       }
-    
-      #root-loading-screen.elem-fade-out {
-        opacity: 0;
-      }
-    
-      #root-loading-screen.elem-hidden {
-        display: none;
-      }
-    </style>
-  </head>
+    }
 
-  <body>
-    <div id="root"></div>
-    <div id="root-loading-screen">
-      <video src="/loading.webm" autoplay loop muted width="300" crossorigin="anonymous"></video>
+    #root-loading-screen.elem-fade-out {
+      opacity: 0;
+    }
+
+    #root-loading-screen.elem-hidden {
+      display: none;
+    }
+  </style>
+  <script src="anime.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <div id="root-loading-screen">
+    <div class="animation">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
     </div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+  </div>
+  <!-- Show animation first -->
+  <script>
+    const animeCfg = {
+      inTime: 300,
+      outTime: 300,
+      overlape: 450,
+    }
+    const animation = anime({
+      targets: '.animation .dot',
+      translateY: [
+        { value: 0 },
+        { value: -20, easing: 'easeOutCubic', duration: animeCfg.inTime },
+        { value: 0, easing: 'easeOutBounce', duration: animeCfg.outTime },
+      ],
+      loop: true,
+      delay: anime.stagger(animeCfg.inTime + animeCfg.outTime - animeCfg.overlape),
+    })
+    // stop animation to release resource.
+    window.addEventListener('message', (data) => (data?.data?.type === 'STOP_ANIME') && animation.pause())
+  </script>
+  <!-- Load actual app -->
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
