@@ -39,10 +39,14 @@
     "windows": [
       {
         "fullscreen": false,
-        "resizable": false,
+        "resizable": true,
         "title": "Mint Batch Renamer",
         "width": 800,
         "height": 600,
+        "minWidth": 800,
+        "minHeight": 600,
+        "maxWidth": 1280,
+        "maxHeight": 720,
         "alwaysOnTop": false
       }
     ]
