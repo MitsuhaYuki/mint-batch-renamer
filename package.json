@@ -1,11 +1,12 @@
 {
   "name": "mint-batch-renamer",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:template": "node template.js",
     "preview": "vite preview",
     "tauri": "tauri"
   },
@@ -23,7 +24,8 @@
     "js-beautify": "^1.14.8",
     "lodash": "^4.17.21",
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "react-window": "^1.8.9"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.3.1",
@@ -32,6 +34,7 @@
     "@types/node": "^18.7.10",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
+    "@types/react-window": "^1.8.5",
     "@vitejs/plugin-react": "^3.0.0",
     "sass": "^1.62.1",
     "typescript": "^4.9.5",

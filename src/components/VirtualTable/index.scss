@@ -1,0 +1,27 @@
+$baseCls: 'virtual-table';
+
+.#{$baseCls} {
+  height: 100%;
+  overflow: hidden;
+
+  &-inner {
+
+    .ant-table-container:before,
+    .ant-table-container:after {
+      display: none;
+    }
+
+    .virtual-table {
+      &-cell {
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      &-cell-last {
+        overflow: hidden;
+      }
+    }
+  }
+}

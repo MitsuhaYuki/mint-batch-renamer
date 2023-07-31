@@ -2,7 +2,7 @@ import type { ColumnsType } from 'antd/es/table'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import { FC, useCallback, useMemo, useRef } from 'react'
 import { IFileItem } from '@/types/file'
-import { Table } from 'antd'
+import { VirtualTable } from '@/components/VirtualTable'
 import './index.scss'
 
 export type ContentProps = {
@@ -27,26 +27,22 @@ const Content: FC<ContentProps> = (props) => {
       {
         title: '文件名',
         dataIndex: 'name',
-        width: 200,
-        ellipsis: true,
+        width: 240,
       },
       {
         title: '大小',
         dataIndex: 'size',
-        width: 80,
-        ellipsis: true,
+        width: 75,
         render: (size: number) => formatFileSize(size),
       },
       {
         title: '拓展名',
+        width: 75,
         dataIndex: 'extension',
-        width: 70,
-        ellipsis: true
       },
       {
         title: '路径',
         dataIndex: 'path',
-        ellipsis: true,
       },
     ]
 
@@ -54,13 +50,9 @@ const Content: FC<ContentProps> = (props) => {
       resColumns.splice(0, 3, {
         title: '原文件名',
         dataIndex: 'full_name',
-        width: 200,
-        ellipsis: false,
       }, {
         title: '重命名后',
         dataIndex: 'rename_full_name',
-        width: 200,
-        ellipsis: false,
       })
     }
 
@@ -69,14 +61,11 @@ const Content: FC<ContentProps> = (props) => {
 
   return (<div className={baseCls}>
     <div className={`${baseCls}-table`} ref={wrapperRef}>
-      <Table
+      <VirtualTable
         columns={columns}
         dataSource={globalData.filesRenamed ?? globalData.filesFiltered ?? globalData.filesOriginal}
         bordered={false}
         rowKey={'path'}
-        pagination={false}
-        sticky={{ getContainer: () => wrapperRef.current || document.body }}
-        size="small"
       />
     </div>
   </div >)

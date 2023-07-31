@@ -23,16 +23,6 @@ $baseCls: 'data-table';
           }
         }
       }
-
-      &-body {
-        .ant-table-tbody {
-          & > tr.ant-table-row {
-            & > td.ant-table-cell {
-              font-size: 12px;
-            }
-          }
-        }
-      }
     }
   }
 }
