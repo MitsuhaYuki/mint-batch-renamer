@@ -50,7 +50,7 @@ const Content: FC<ContentProps> = (props) => {
         type: 'select',
         range: Object.keys(renamerSet).map(key => ({ label: renamerSet[key].label, value: key })),
         default: renamerInst.id,
-        readonly: true,
+        readonly: false,
       },
     ]
     newFormItems.push(...cloneDeep(renamerInst.params))
@@ -91,14 +91,15 @@ const Content: FC<ContentProps> = (props) => {
   }
 
   const handleRemove = () => {
-    Modal.confirm({
-      title: '删除此步骤',
-      content: '你确定要删除此步骤吗?',
-      centered: true,
-      onOk: () => {
-        props.onRemove?.(renamerConfig)
-      }
-    })
+    // Modal.confirm({
+    //   title: '删除此步骤',
+    //   content: '你确定要删除此步骤吗?',
+    //   centered: true,
+    //   onOk: () => {
+    //     props.onRemove?.(renamerConfig)
+    //   }
+    // })
+    props.onRemove?.(renamerConfig)
   }
 
   const handleFormValuesChange = (changedValues: Record<string, any>, currentValues: Record<string, any>) => {

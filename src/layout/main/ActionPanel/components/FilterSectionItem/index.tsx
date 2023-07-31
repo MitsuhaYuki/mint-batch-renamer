@@ -101,14 +101,15 @@ const Content: FC<ContentProps> = (props) => {
   }
 
   const handleRemove = () => {
-    Modal.confirm({
-      title: '删除此过滤器',
-      content: '你确定要删除此过滤器吗?',
-      centered: true,
-      onOk: () => {
-        props.onRemove?.(filterConfig)
-      }
-    })
+    // Modal.confirm({
+    //   title: '删除此过滤器',
+    //   content: '你确定要删除此过滤器吗?',
+    //   centered: true,
+    //   onOk: () => {
+    //     props.onRemove?.(filterConfig)
+    //   }
+    // })
+    props.onRemove?.(filterConfig)
   }
 
   const handleFormValuesChange = (changedValues: Record<string, any>, currentValues: Record<string, any>) => {
