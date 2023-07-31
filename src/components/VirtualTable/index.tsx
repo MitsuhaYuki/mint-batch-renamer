@@ -114,9 +114,10 @@ export const VirtualTable = <RecordType extends object> (props: VirtualTableProp
             style={{
               ...style,
               boxSizing: 'border-box',
-              padding: token.padding,
+              padding: token.paddingXS,
               borderBottom: `${token.lineWidth}px ${token.lineType} ${token.colorSplit}`,
               background: token.colorBgContainer,
+              lineHeight: token.lineHeightSM,
             }}
           >
             {(rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex]}

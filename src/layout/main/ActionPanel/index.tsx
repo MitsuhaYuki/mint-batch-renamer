@@ -263,7 +263,7 @@ const Content: FC<ContentProps> = () => {
         <OperableList dataSource={opsList} />
       </div>
     )
-  }, [globalData.sourceFolders])
+  }, [globalData.config, globalData.sourceFolders])
 
   // target folder control
   const renderTargetControl = useMemo(() => {
