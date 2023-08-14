@@ -1,12 +1,10 @@
-import { FC, MouseEvent } from 'react'
-import { Button, Collapse, message } from 'antd'
+import { FC, MouseEvent, useMemo } from 'react'
+import { Button, Collapse, CollapseProps, message } from 'antd'
 import { useThrottleFn } from 'ahooks'
 import useLogger from '@/utils/logger'
 import './index.scss'
 
-export type ContentProps = {
-  example?: any
-}
+export type ContentProps = {}
 const baseCls = 'output'
 const Content: FC<ContentProps> = (props) => {
   const { logs, clear } = useLogger()
@@ -32,7 +30,16 @@ const Content: FC<ContentProps> = (props) => {
     }
   }
 
-  const renderExtra = () => {
+  const renderLog = useMemo(() => {
+    return logs.map((value, index) => (
+      <div className={`${baseCls}-log`} key={logs.length - index}>
+        <div className={`${baseCls}-log-level ${baseCls}-log-level-${value.levelText.toLowerCase()}`}>{value.levelText}</div>
+        <div className={`${baseCls}-log-content`}>: {value.content}</div>
+      </div>
+    ))
+  }, [logs])
+
+  const renderExtra = useMemo(() => {
     return (
       <div className={`${baseCls}-extra`}>
         <div className={`${baseCls}-extra-btns`}>
@@ -41,19 +48,24 @@ const Content: FC<ContentProps> = (props) => {
         <div className={`${baseCls}-extra-count`}>{logs.length ? `(${logs.length})` : ''}</div>
       </div >
     )
-  }
+  }, [logs])
+
+  const contents: CollapseProps['items'] = [
+    {
+      key: '1',
+      label: 'Console',
+      extra: renderExtra,
+      children: renderLog,
+    }
+  ]
 
   return (<div className={baseCls}>
-    <Collapse className={`${baseCls}-collapse`} size='small' bordered={false}>
-      <Collapse.Panel header='Console' extra={renderExtra()} key='1'>
-        {logs.map((value, index) => (
-          <div className={`${baseCls}-log`} key={logs.length - index}>
-            <div className={`${baseCls}-log-level ${baseCls}-log-level-${value.levelText.toLowerCase()}`}>{value.levelText}</div>
-            <div className={`${baseCls}-log-content`}>: {value.content}</div>
-          </div>
-        ))}
-      </Collapse.Panel>
-    </Collapse>
+    <Collapse
+      bordered={false}
+      className={`${baseCls}-collapse`}
+      items={contents}
+      size='small'
+    />
   </div>)
 }
 
