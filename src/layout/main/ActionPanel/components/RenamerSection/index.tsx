@@ -38,7 +38,8 @@ const Content: FC<ContentProps> = () => {
     })
   }
 
-  const handleRunRenamer = () => {
+  const handleRunRenamer = async () => {
+    // legal check
     if (globalData.filesOriginal.length === 0) {
       message.info('请先加载文件列表')
       return
@@ -47,42 +48,42 @@ const Content: FC<ContentProps> = () => {
       message.info('请先添加重命名步骤')
       return
     }
-    // acquire file list
+    // check file list
     let filesToRename = globalData.filesFiltered ?? globalData.filesOriginal
     if (!globalData.filesFiltered) {
-      message.warning('未执行过滤，使用源文件列表执行操作')
+      logger.warn('No filter executed, use the source file list to perform the operation')
     } else {
-      message.info('重命名文件列表...')
+      logger.info('Renaming files...')
     }
+    message.info('正在重命名文件...')
     filesToRename = cloneDeep(filesToRename) as IFileItemRenamed[]
     // reassemble renamer list
-    const renamerArr = state.renamers.map(cfg => {
-      return {
-        func: globalData.sysRenamers[cfg.scriptId].func,
-        params: cfg.scriptParam
-      }
-    })
+    const renamerArr = state.renamers.map(cfg => ({
+      func: globalData.sysRenamers[cfg.scriptId].func,
+      params: cfg.scriptParam
+    }))
     // run renamer
     const totalFileCount = filesToRename.length
-    const newFileList = filesToRename.reduce((prev, item, index, list) => {
-      renamerArr.forEach(renamer => {
-        const res = renamer.func({
-          fileItem: item,
-          fileList: list,
-          index,
-          total: totalFileCount
-        }, renamer.params)
-        Object.assign(item, res)
-      })
-      prev.push(item)
-      return prev
-    }, [] as IFileItemRenamed[])
-    newFileList.map(item => {
-      item.rename_full_name = item.rename_full_name ?? item.full_name
-      item.rename_name = item.rename_name ?? item.name
-      item.rename_extension = item.rename_extension ?? item.extension
-      return item
+    const newFileList: IFileItemRenamed[] = []
+    const renaming = filesToRename.map(async (item, index, list) => {
+      for (let i = 0; i < renamerArr.length; i++) {
+        const renamer = renamerArr[i]
+        try {
+          const res = await renamer.func({
+            fileItem: item,
+            fileList: list,
+            index,
+            total: totalFileCount
+          }, renamer.params)
+          Object.assign(item, res)
+        } catch (e) {
+          console.log('I: Running script error,', e)
+          logger.error('Running script error, ' + e)
+        }
+      }
+      newFileList.push(item)
     })
+    await Promise.all(renaming)
     setGlobalData('u_renamed_files', newFileList)
     message.success('文件列表重命名完成')
   }
