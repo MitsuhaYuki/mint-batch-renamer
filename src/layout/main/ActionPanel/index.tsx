@@ -12,8 +12,6 @@ import { cloneDeep, isEmpty } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
 import './index.scss'
 
-const { Panel } = Collapse
-
 export type ContentProps = {}
 
 const baseCls = 'action-panel'
@@ -127,12 +125,12 @@ const Content: FC<ContentProps> = () => {
       let totalFiles = 0
       for (const sourcePath of sourceFolders) {
         try {
-          const count: number = await invoke("count_folder_files", { folderPath: sourcePath, maxCount: config.max_file_limit })
-          if (count === -1 || (totalFiles += count) > config.max_file_limit) {
-            logger.error(`Exceed max file limit, limit is ${config.max_file_limit}`)
-            throw `最大处理文件数限制${config.max_file_limit}`
+          const count: number = await invoke("count_folder_files", { folderPath: sourcePath, maxCount: config.max_limit })
+          if (count === -1 || (totalFiles += count) > config.max_limit) {
+            logger.error(`Exceed max file limit, limit is ${config.max_limit}`)
+            throw `最大处理文件数限制${config.max_limit}`
           } else {
-            if (totalFiles > 2000) {
+            if (totalFiles > config.warn_limit) {
               message.warning({
                 content: '当前源文件夹下文件数量过多，可能会导致加载时间过长，请耐心等待',
                 duration: 0,

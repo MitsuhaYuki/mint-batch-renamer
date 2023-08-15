@@ -1,8 +1,13 @@
+/** The configuration file for the program. */
 export interface IConfig {
+  /**
+   * When file count exceeds this limit, a warning will be shown.
+   */
+  warn_limit: number
   /**
    * The maximum file size allowed to be processed.
    */
-  max_file_limit: number
+  max_limit: number
   /**
    * Whether to allow external filters to be used.
    */
@@ -13,8 +18,10 @@ export interface IConfig {
   allow_external_renamers: boolean
 }
 
+/** Default config template */
 export const defaultConfig: IConfig = {
-  max_file_limit: 5000,
+  warn_limit: 10000,
+  max_limit: 50000,
   allow_external_filters: false,
   allow_external_renamers: false
 }

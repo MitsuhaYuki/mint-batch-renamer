@@ -108,8 +108,16 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
           requiredMark={false}
         >
           <Form.Item
+            label='警告文件数'
+            name='warn_limit'
+            tooltip='设置警告阈值，当载入文件超过此值时提示加载可能需要较长的时间'
+            rules={[{ required: true, message: '请输入此项!' }]}
+          >
+            <InputNumber controls={false} min={2000} step={100} />
+          </Form.Item>
+          <Form.Item
             label='最大处理文件数'
-            name='max_file_limit'
+            name='max_limit'
             tooltip='设置最大处理文件数，过大可能导致系统无响应。'
             rules={[{ required: true, message: '请输入此项!' }]}
           >
