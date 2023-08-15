@@ -74,7 +74,7 @@ export const VirtualTable = <RecordType extends object> (props: VirtualTableProp
     })
   }
 
-  useEffect(() => resetVirtualGrid, [tableWidth])
+  useEffect(() => resetVirtualGrid, [tableWidth, columns])
 
   const renderVirtualList = (rawData: readonly object[], { scrollbarSize, ref, onScroll }: any) => {
     ref.current = connectObject
