@@ -24,6 +24,8 @@ const Content: FC<ContentProps> = () => {
   const [inOperation, setInOperation] = useState(false)
   // system config
   const { config } = globalData
+  // current collapse active key
+  const [activeKey, setActiveKey] = useState<string>('1')
 
   const selectFolder = async (): Promise<{ success: boolean; status: string; data?: string | undefined }> => {
     try {
@@ -323,12 +325,13 @@ const Content: FC<ContentProps> = () => {
   return (<div className={baseCls}>
     <Collapse
       accordion={true}
+      activeKey={activeKey}
       bordered={false}
       className={`${baseCls}-collapse`}
-      defaultActiveKey={['1']}
       ghost
       items={contents}
       size='small'
+      onChange={e => setActiveKey(e.length ? e[0] : '1')}
     />
   </div>)
 }
