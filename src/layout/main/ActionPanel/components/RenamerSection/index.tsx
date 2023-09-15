@@ -1,7 +1,7 @@
 import RenamerSectionItem from '../RenamerSectionItem'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
-import { ControlButton } from '@/common/ControlButton'
+import { ControlButton } from '@/components/ControlButton'
 import { Dispatch, FC, useMemo, useReducer } from 'react'
 import { IFileItemRenamed } from '@/types/file'
 import { IScriptConfig } from '@/types/script'

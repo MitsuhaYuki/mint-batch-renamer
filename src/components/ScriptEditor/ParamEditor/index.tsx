@@ -1,7 +1,7 @@
 import type { ColumnsType } from 'antd/es/table'
 import { ArrowDownOutlined, ArrowUpOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons'
 import { Button, ConfigProvider, Form, Input, Modal, Select, Space, Switch, Table, message } from 'antd'
-import { ControlButton } from '@/common/ControlButton'
+import { ControlButton } from '@/components/ControlButton'
 import { FC, useMemo, useState } from 'react'
 import { IScriptParam } from '@/types/script'
 import { cloneDeep, isNaN, toNumber } from 'lodash'

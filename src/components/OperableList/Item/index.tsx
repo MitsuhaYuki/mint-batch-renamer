@@ -1,4 +1,4 @@
-import { ControlButton, ControlButtonProps } from '@/common/ControlButton'
+import { ControlButton, ControlButtonProps } from '@/components/ControlButton'
 import { FC, ReactNode, useMemo } from 'react'
 import './index.scss'
 
