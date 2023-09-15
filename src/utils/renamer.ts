@@ -5,10 +5,37 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
   'serial': {
     label: '序号',
     id: 'serial',
-    params: [],
+    params: [{
+      name: 'apply_to',
+      label: '作用于',
+      tips: '将结果作用于文件名或拓展名',
+      type: 'select',
+      range: [{
+        label: '文件名',
+        value: 'file',
+      }, {
+        label: '拓展名',
+        value: 'ext',
+      }],
+      default: 'file',
+      readonly: false,
+    }, {
+      name: 'start_at',
+      label: '起始于',
+      tips: '序号开始值',
+      type: 'number',
+      default: 1,
+      readonly: false,
+    }],
     func: async (sysArgs, extra: any) => {
-      const newName = `${sysArgs.fileItem.rename_name ?? ''}${sysArgs.index.toString()}`
-      const newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      const curIdx = sysArgs.index + extra['start_at']
+      let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
+      let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      if (extra['apply_to'] === 'file') {
+        newName = `${newName}${curIdx}`
+      } else {
+        newExt = `${newExt}${curIdx}`
+      }
       const newFullName = `${newName}.${newExt}`
       return {
         ...sysArgs.fileItem,
@@ -22,15 +49,15 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
     label: '静态文本',
     id: 'static',
     params: [{
-      name: 'filter_range',
-      label: '限定范围',
-      tips: '此过滤器只会在限定范围工作',
+      name: 'apply_to',
+      label: '作用于',
+      tips: '将结果作用于文件名或拓展名',
       type: 'select',
       range: [{
-        label: '仅限文件名',
+        label: '文件名',
         value: 'file',
       }, {
-        label: '仅限拓展名',
+        label: '拓展名',
         value: 'ext',
       }],
       default: 'file',
@@ -43,25 +70,19 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
       readonly: false,
     }],
     func: async (sysArgs, extra: any) => {
-      let curName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
-      let curExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
-
-      const filterRange = extra?.filter_range ?? 'file'
-      switch (filterRange) {
-        case 'file':
-          curName = extra['text_content']
-          break
-        case 'ext':
-          curExt = extra['text_content']
-          break
+      let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
+      let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      if (extra['apply_to'] === 'file') {
+        newName = `${newName}${extra['text_content']}`
+      } else {
+        newExt = `${newExt}${extra['text_content']}`
       }
-
-      const curFullName = `${curName}.${curExt}`
+      const newFullName = `${newName}.${newExt}`
       return {
         ...sysArgs.fileItem,
-        rename_full_name: curFullName,
-        rename_name: curName,
-        rename_extension: curExt,
+        rename_full_name: newFullName,
+        rename_name: newName,
+        rename_extension: newExt,
       }
     }
   },
@@ -69,18 +90,38 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
     label: '替换',
     id: 'replace',
     params: [{
-      name: 'stage',
+      name: 'apply_to',
+      label: '作用于',
+      tips: '将结果作用于文件名或拓展名',
+      type: 'select',
+      range: [{
+        label: '文件名',
+        value: 'file',
+      }, {
+        label: '拓展名',
+        value: 'ext',
+      }],
+      default: 'file',
+      readonly: false,
+    }, {
+      name: 'apply_from',
       label: '使用',
       type: 'select',
       range: [{
-        label: '原始文件名(替换指定字符后追加)',
-        value: 'origin',
+        label: '原始文件名',
+        value: 'raw_name',
       }, {
-        label: '当前文件名(替换指定字符)',
-        value: 'cur',
+        label: '当前文件名',
+        value: 'cur_name',
+      }, {
+        label: '原始拓展名',
+        value: 'raw_ext',
+      }, {
+        label: '当前拓展名',
+        value: 'cur_ext',
       }],
-      default: 'cur',
-      readonly: true,
+      default: 'cur_name',
+      readonly: false,
     }, {
       name: 'method',
       label: '替换方式',
@@ -89,10 +130,26 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
         label: '文本',
         value: 'text',
       }, {
-        label: '正则表达式',
+        label: '正则表达式(默认)',
         value: 'regex',
+      }, {
+        label: '正则表达式(全局)',
+        value: 'regex_g',
       }],
       default: 'text',
+      readonly: false,
+    }, {
+      name: 'use',
+      label: '作用方式',
+      type: 'select',
+      range: [{
+        label: '追加',
+        value: 'append',
+      }, {
+        label: '替换',
+        value: 'replace',
+      }],
+      default: 'append',
       readonly: false,
     }, {
       name: 'source',
@@ -106,40 +163,54 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
       readonly: false,
     }],
     func: async (sysArgs, extra: any) => {
-      // let fileName = ''
-      // if (extra['stage'] === 'origin') {
-      //   fileName = sysArgs.fileItem.name.replace(extra['source'], extra['replace_to'])
-      // } else {
-      //   fileName = sysArgs.fileItem.rename_name?.replace(extra['source'], extra['replace_to']) ?? ''
-      // }
-      // const newFullName = `${fileName}.${sysArgs.fileItem.extension}`
-      // return {
-      //   ...sysArgs.fileItem,
-      //   rename_full_name: newFullName,
-      //   rename_name: fileName,
-      //   rename_extension: sysArgs.fileItem.extension,
-      // }
-      const fileName = extra['stage'] === 'origin' ? sysArgs.fileItem.name : sysArgs.fileItem.rename_name ?? ''
-      let newFileName = ''
+      let textStore = ''
+      switch (extra['apply_from']) {
+        case 'raw_name':
+          textStore = sysArgs.fileItem.name
+          break
+        case 'cur_name':
+          textStore = sysArgs.fileItem.rename_name ?? ''
+          break
+        case 'raw_ext':
+          textStore = sysArgs.fileItem.extension
+          break
+        case 'cur_ext':
+          textStore = sysArgs.fileItem.rename_extension ?? ''
+          break
+        default:
+          break
+      }
       switch (extra['method']) {
         case 'text': {
-          newFileName = fileName.replace(extra['source'], extra['replace_to'])
+          textStore = textStore.replace(extra['source'], extra['replace_to'])
           break
         }
         case 'regex': {
           const regex = new RegExp(extra['source'] ?? '.*')
-          newFileName = fileName.replace(regex, extra['replace_to'])
+          textStore = textStore.replace(regex, extra['replace_to'])
           break
         }
-        default: {
+        case 'regex_g': {
+          const regex = new RegExp(extra['source'] ?? '.*', 'g')
+          textStore = textStore.replace(regex, extra['replace_to'])
           break
         }
+        default:
+          break
       }
+      let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
+      let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      if (extra['apply_to'] === 'file') {
+        newName = extra['use'] === 'append' ? `${newName}${textStore}` : textStore
+      } else {
+        newExt = extra['use'] === 'append' ? `${newExt}${textStore}` : textStore
+      }
+      const newFullName = `${newName}.${newExt}`
       return {
         ...sysArgs.fileItem,
-        rename_full_name: `${newFileName}.${sysArgs.fileItem.extension}`,
-        rename_name: newFileName,
-        rename_extension: sysArgs.fileItem.extension,
+        rename_full_name: newFullName,
+        rename_name: newName,
+        rename_extension: newExt,
       }
     }
   },
@@ -147,18 +218,32 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
     label: '切片',
     id: 'slice',
     params: [{
-      name: 'method',
-      label: '方式',
+      name: 'apply_to',
+      label: '作用于',
+      tips: '将结果作用于文件名或拓展名',
       type: 'select',
       range: [{
-        label: '范围',
-        value: 'origin',
+        label: '文件名',
+        value: 'file',
       }, {
-        label: '当前文件名',
-        value: 'cur',
+        label: '拓展名',
+        value: 'ext',
       }],
-      default: 'cur',
-      readonly: true,
+      default: 'file',
+      readonly: false,
+    }, {
+      name: 'use',
+      label: '作用方式',
+      type: 'select',
+      range: [{
+        label: '追加',
+        value: 'append',
+      }, {
+        label: '替换',
+        value: 'replace',
+      }],
+      default: 'append',
+      readonly: false,
     }, {
       name: 'slice_start',
       label: '开始截取于',
@@ -173,10 +258,52 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
       readonly: false,
     }],
     func: async (sysArgs, extra: any) => {
+      let textStore = ''
       const startIndex = extra['slice_start'] ?? 0
       const endIndex = extra['slice_end'] ?? 0
-      const newName = `${sysArgs.fileItem.rename_name ?? ''}${sysArgs.fileItem.name.slice(startIndex, endIndex)}`
-      const newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      textStore = (sysArgs.fileItem.rename_full_name ?? sysArgs.fileItem.full_name).slice(startIndex, endIndex)
+      let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
+      let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      if (extra['apply_to'] === 'file') {
+        newName = extra['use'] === 'append' ? `${newName}${textStore}` : textStore
+      } else {
+        newExt = extra['use'] === 'append' ? `${newExt}${textStore}` : textStore
+      }
+      const newFullName = `${newName}.${newExt}`
+      return {
+        ...sysArgs.fileItem,
+        rename_full_name: newFullName,
+        rename_name: newName,
+        rename_extension: newExt,
+      }
+    }
+  },
+  'empty': {
+    label: '清空',
+    id: 'empty',
+    params: [{
+      name: 'apply_to',
+      label: '作用于',
+      tips: '将结果作用于文件名或拓展名',
+      type: 'select',
+      range: [{
+        label: '文件名',
+        value: 'file',
+      }, {
+        label: '拓展名',
+        value: 'ext',
+      }],
+      default: 'file',
+      readonly: false,
+    }],
+    func: async (sysArgs, extra: any) => {
+      let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
+      let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
+      if (extra['apply_to'] === 'file') {
+        newName = ''
+      } else {
+        newExt = ''
+      }
       const newFullName = `${newName}.${newExt}`
       return {
         ...sysArgs.fileItem,

@@ -193,6 +193,7 @@ const Content: FC<ContentProps> = (props) => {
         </div>
       </div>
       <Modal
+        centered
         title='步骤配置'
         open={configModalVisible}
         maskClosable={false}
