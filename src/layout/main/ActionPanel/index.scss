@@ -7,6 +7,14 @@ $baseCls:'action-panel';
   display: flex;
   flex-direction: column;
 
+  &-code {
+    font-size: 12px;
+    line-height: 12px;
+    background-color: #d9d9d9;
+    border-radius: 3px;
+    padding: 0 6px;
+  }
+
   &-collapse {
     @include customScrollbar();
     height: inherit;

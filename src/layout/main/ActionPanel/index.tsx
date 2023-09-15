@@ -175,7 +175,9 @@ const Content: FC<ContentProps> = () => {
     } else {
       Modal.confirm({
         title: '注意',
-        content: '此操作不可撤销, 确定要重命名这些文件吗?',
+        content: (
+          <div>重命名后的文件将会输出到:<span className={`${baseCls}-code`}>{globalData.targetFolder}</span> , 是否继续?</div>
+        ),
         onOk: () => {
           finalRename()
         }
