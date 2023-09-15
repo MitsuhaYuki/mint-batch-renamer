@@ -1,9 +1,18 @@
 # Mint File Batch Renamer
 
-> 此项目使用[Tauri](https://tauri.app/)构建(Tauri v1.3)
+> A simple batch file renamer build with [Tauri](https://tauri.app/) & [React](https://react.dev/)
 
-> This project is still in experiment stage!
+> **Important**: This is a practice program I used to teach myself about Tauri, but it doesn't take full advantage of Tauri's capabilities, and it's important to note that the current Alpha version may have some bugs and UI inconsistencies
 
-## Recommended IDE Setup
+## Feature
 
-- [VS Code](https://code.visualstudio.com/) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
+- Portable version, no installation required
+- Supports batch file sorting, filtering, and renaming in a single process
+- Comes with enough tools to cover everyday use
+- Highly customizable, supports custom filters and renaming functions
+
+## Upcoming
+
+- Multi-language
+- Support auto upgrade config file
+- Optimize operation flow and simplify UI
