@@ -14,7 +14,6 @@ use fstools::count_folder_files;
 use fstools::get_folder_files;
 use fstools::is_file_exist;
 use fstools::read_file;
-use fstools::select_folder;
 use fstools::write_file;
 
 fn main() {
@@ -30,7 +29,6 @@ fn main() {
             get_folder_files,
             is_file_exist,
             read_file,
-            select_folder,
             write_file,
         ])
         .run(tauri::generate_context!())

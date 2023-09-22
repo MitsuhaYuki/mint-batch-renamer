@@ -56,20 +56,6 @@ pub fn copy_file(source: &str, destination: &str) -> Result<String, String> {
  * Folder related functions
  */
 
-// prompt a folder selection dialog, and return the selected folder path
-#[tauri::command]
-pub fn select_folder() -> Result<String, String> {
-    let dialog = match nfd::open_pick_folder(None) {
-        Ok(dialog) => dialog,
-        Err(e) => return Err(e.to_string()),
-    };
-    match dialog {
-        nfd::Response::Okay(path) => Ok(path),
-        nfd::Response::OkayMultiple(_) => Err("Multiple folders selected".to_string()),
-        nfd::Response::Cancel => Err("No folder selected".to_string()),
-    }
-}
-
 // get all files in a folder, and return a vector of file info
 #[derive(Debug, Serialize)]
 pub struct FileInfo {

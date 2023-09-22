@@ -53,7 +53,7 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     }
   }
 
-  const testInvoke = (type: 'read_file' | 'write_file' | 'is_file_exist' | 'select_folders') => {
+  const testInvoke = (type: 'read_file' | 'write_file' | 'is_file_exist') => {
     switch (type) {
       case 'read_file': {
         (async function () {
@@ -77,13 +77,6 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
         (async function () {
           const res = await invoke('is_file_exist', { filePath: 'config.json' })
           console.log('I: invoke is_file_exist', res)
-        })()
-        break
-      }
-      case 'select_folders': {
-        (async function () {
-          const res = await invoke('select_folders')
-          console.log('I: invoke select_folders', res)
         })()
         break
       }
@@ -130,7 +123,6 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
           <DevBtn onClick={() => testInvoke('read_file')}>read_file</DevBtn>
           <DevBtn onClick={() => testInvoke('write_file')}>write_file</DevBtn>
           <DevBtn onClick={() => testInvoke('is_file_exist')}>is_file_exist</DevBtn>
-          <DevBtn onClick={() => testInvoke('select_folders')}>select_folders</DevBtn>
         </div>
       </div>
     </Modal>

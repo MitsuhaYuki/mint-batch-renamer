@@ -10,6 +10,7 @@ import { ControlButton, ControlButtonProps } from '@/components/ControlButton'
 import { FC, useMemo, useState } from 'react'
 import { cloneDeep, isEmpty } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
+import { open } from '@tauri-apps/api/dialog'
 import './index.scss'
 
 export type ContentProps = {}
@@ -27,17 +28,10 @@ const Content: FC<ContentProps> = () => {
   // current collapse active key
   const [activeKey, setActiveKey] = useState<string>('1')
 
-  const selectFolder = async (): Promise<{ success: boolean; status: string; data?: string | undefined }> => {
+  const selectFolder = async (title?: string): Promise<{ success: boolean; status: string; data?: string | undefined }> => {
     try {
-      const res: string = await invoke("select_folder")
-      logger.info(`Selected folder: ${res}`)
-      return {
-        success: true,
-        status: 'ok',
-        data: res
-      }
-    } catch (e) {
-      if (e === 'No folder selected') {
+      const selected = await open({ directory: true, title })
+      if (selected === null) {
         message.info('取消选择文件夹')
         logger.info('Canceled select folder')
         return {
@@ -45,13 +39,21 @@ const Content: FC<ContentProps> = () => {
           status: 'canceled'
         }
       } else {
-        message.error(`选择文件夹失败(${e})`, 5)
-        logger.error(`Select folder failed: ${e}`)
+        const res = Array.isArray(selected) ? selected[0] : selected
+        logger.info(`Selected folder: ${res}`)
         return {
-          success: false,
-          status: 'failed',
-          data: `${e}`
+          success: true,
+          status: 'ok',
+          data: res
         }
+      }
+    } catch (e) {
+      message.error(`选择文件夹失败(${e})`, 5)
+      logger.error(`Select folder failed: ${e}`)
+      return {
+        success: false,
+        status: 'failed',
+        data: `${e}`
       }
     }
   }
@@ -68,7 +70,8 @@ const Content: FC<ContentProps> = () => {
         logger.info('Source folders already empty.')
       }
     } else {
-      const folderInfo = await selectFolder()
+      const folderInfo = await selectFolder('请选择源文件夹')
+      console.log('I: folderInfo', folderInfo)
       if (folderInfo.success) {
         const path = folderInfo.data!
         const conflictSourceFolders = globalData.sourceFolders.filter(i => {
@@ -111,7 +114,7 @@ const Content: FC<ContentProps> = () => {
         logger.info('Target folders already empty.')
       }
     } else {
-      const folderInfo = await selectFolder()
+      const folderInfo = await selectFolder('请选择输出目录')
       if (folderInfo.success && folderInfo.data) {
         message.success('选择目标文件夹成功')
         setGlobalData('u_target', folderInfo.data)
