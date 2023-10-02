@@ -17,7 +17,7 @@
     "@dnd-kit/modifiers": "^6.0.1",
     "@dnd-kit/sortable": "^7.0.2",
     "@dnd-kit/utilities": "^3.2.1",
-    "@tauri-apps/api": "^1.4.0",
+    "@tauri-apps/api": "^1.5.0",
     "@uiw/react-codemirror": "^4.21.3",
     "ahooks": "^3.7.7",
     "antd": "^5.6.3",
@@ -28,7 +28,7 @@
     "react-window": "^1.8.9"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.4.0",
+    "@tauri-apps/cli": "^1.5.0",
     "@types/js-beautify": "^1.13.3",
     "@types/lodash": "^4.14.195",
     "@types/node": "^18.7.10",
