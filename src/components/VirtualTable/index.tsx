@@ -120,7 +120,9 @@ export const VirtualTable = <RecordType extends object> (props: VirtualTableProp
               lineHeight: token.lineHeightSM,
             }}
           >
-            {(rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex]}
+            {mergedColumns[columnIndex].render
+              ? mergedColumns[columnIndex].render!((rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex], (rawData[rowIndex] as any), rowIndex)
+              : (rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex]}
           </div>
         )}
       </Grid>

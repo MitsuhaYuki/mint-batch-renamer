@@ -27,7 +27,6 @@ const Content: FC<ContentProps> = (props) => {
       {
         title: '文件名',
         dataIndex: 'name',
-        width: 240,
       },
       {
         title: '大小',
