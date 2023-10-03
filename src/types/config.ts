@@ -9,6 +9,14 @@ export interface IConfig {
    */
   max_limit: number
   /**
+   * Whether to recursively read files in subdirectories.
+   */
+  recursive_read: boolean
+  /**
+   * The mode of file system operations.
+   */
+  fsop_mode: 'copy' | 'move'
+  /**
    * Whether to allow external filters to be used.
    */
   allow_external_filters: boolean
@@ -22,6 +30,8 @@ export interface IConfig {
 export const defaultConfig: IConfig = {
   warn_limit: 10000,
   max_limit: 50000,
+  recursive_read: true,
+  fsop_mode: 'copy',
   allow_external_filters: false,
   allow_external_renamers: false
 }

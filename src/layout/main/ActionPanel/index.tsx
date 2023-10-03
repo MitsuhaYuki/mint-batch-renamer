@@ -8,7 +8,7 @@ import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, PlayCircleOutlined, 
 import { Collapse, CollapseProps, Modal, message } from 'antd'
 import { ControlButton, ControlButtonProps } from '@/components/ControlButton'
 import { FC, useMemo, useState } from 'react'
-import { cloneDeep, isEmpty } from 'lodash'
+import { cloneDeep, isEmpty, throttle } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import './index.scss'
@@ -130,7 +130,7 @@ const Content: FC<ContentProps> = () => {
       let totalFiles = 0
       for (const sourcePath of sourceFolders) {
         try {
-          const count: number = await invoke("count_folder_files", { folderPath: sourcePath, maxCount: config.max_limit })
+          const count: number = await invoke(config.recursive_read ? "count_folder_files" : "count_folder_file", { folderPath: sourcePath, maxCount: config.max_limit })
           if (count === -1 || (totalFiles += count) > config.max_limit) {
             logger.error(`Exceed max file limit, limit is ${config.max_limit}`)
             throw `最大处理文件数限制${config.max_limit}`
@@ -152,7 +152,7 @@ const Content: FC<ContentProps> = () => {
       try {
         let fileList: IFileItem[] = []
         for (const sourcePath of sourceFolders) {
-          const res: IFileItem[] = await invoke("get_folder_files", { path: sourcePath })
+          const res: IFileItem[] = await invoke(config.recursive_read ? "get_folder_files" : "get_folder_file", { path: sourcePath })
           fileList.push(...res)
           logger.info(`From ${sourcePath} add ${res.length} files.`)
         }
@@ -179,7 +179,7 @@ const Content: FC<ContentProps> = () => {
       Modal.confirm({
         title: '注意',
         content: (
-          <div>重命名后的文件将会输出到:<span className={`${baseCls}-code`}>{globalData.targetFolder}</span> , 是否继续?</div>
+          <div>重命名后的文件将会{config.fsop_mode === 'copy' ? '复制' : '移动'}到:<span className={`${baseCls}-code`}>{globalData.targetFolder}</span> , 是否继续?</div>
         ),
         onOk: () => {
           finalRename()
@@ -193,13 +193,31 @@ const Content: FC<ContentProps> = () => {
     try {
       const isFilesRenamed = globalData.filesRenamed && globalData.filesRenamed.length > 0
       if (globalData.targetFolder && isFilesRenamed) {
-        for (const file of globalData.filesRenamed!) {
-          const res = await invoke("copy_file", {
+        const updateStatusMsg = throttle((current: number, total: number) => {
+          console.log('I: message', current, total)
+          if (current <= total) {
+            message.loading({
+              content: `正在处理文件...(${current}/${globalData.filesRenamed?.length})`,
+              key: 'COPYING_FILES',
+              duration: 0
+            })
+          } else {
+            message.success({
+              content: '文件处理完成',
+              key: 'COPYING_FILES'
+            })
+          }
+        }, 100, { trailing: true })
+        for (const idx in globalData.filesRenamed!) {
+          const file = globalData.filesRenamed![idx]
+          updateStatusMsg(Number(idx) + 1, globalData.filesRenamed.length)
+          const fsop = `${config.fsop_mode}_file`
+          await invoke(fsop, {
             source: file.path,
             destination: `${globalData.targetFolder}\\${file.rename_full_name}`
           })
         }
-        message.success('复制文件成功')
+        updateStatusMsg(1, 0)
         logger.info('Copy files success')
       } else {
         if (!globalData.targetFolder) {

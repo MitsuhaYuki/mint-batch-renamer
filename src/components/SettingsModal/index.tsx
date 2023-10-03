@@ -124,6 +124,28 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
             <InputNumber controls={false} min={2000} step={100} />
           </Form.Item>
           <Form.Item
+            label='递归读取文件夹'
+            name='recursive_read'
+            tooltip='启用此项在读取源文件夹时将会递归读取子文件夹'
+            rules={[{ required: true, message: '请输入此项!' }]}
+          >
+            <Radio.Group>
+              <Radio value={true}>是</Radio>
+              <Radio value={false}>否</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
+            label='文件操作模式'
+            name='fsop_mode'
+            tooltip='复制: 复制文件到目标文件夹，不删除源文件。移动: 移动文件到目标文件夹，删除源文件。'
+            rules={[{ required: true, message: '请输入此项!' }]}
+          >
+            <Radio.Group>
+              <Radio value={'copy'}>复制</Radio>
+              <Radio value={'move'}>移动</Radio>
+            </Radio.Group>
+          </Form.Item>
+          <Form.Item
             label='外部筛选器'
             name='allow_external_filters'
             tooltip='启用此项可允许程序加载第三方筛选脚本，提供更多的筛选功能'

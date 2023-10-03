@@ -52,6 +52,15 @@ pub fn copy_file(source: &str, destination: &str) -> Result<String, String> {
     }
 }
 
+// move a single file from source to destination
+#[tauri::command]
+pub fn move_file(source: &str, destination: &str) -> Result<String, String> {
+    match fs::rename(source, destination) {
+        Ok(_) => Ok("Success".to_string()),
+        Err(e) => Err(e.to_string()),
+    }
+}
+
 /**
  * Folder related functions
  */
@@ -76,6 +85,38 @@ pub fn get_folder_files(path: &str) -> Vec<FileInfo> {
                 if metadata.is_dir() {
                     result.extend(get_folder_files(path.to_str().unwrap()));
                 } else {
+                    let file_name = entry.file_name().to_string_lossy().to_string();
+                    let file_size = metadata.len();
+                    let file_stem = path.file_stem().unwrap().to_string_lossy().to_string();
+                    let extension = path
+                        .extension()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .to_string();
+                    let file_path = path.to_str().unwrap().to_string();
+                    result.push(FileInfo {
+                        full_name: file_name,
+                        name: file_stem,
+                        extension,
+                        size: file_size,
+                        path: file_path,
+                    });
+                }
+            }
+        }
+    }
+    result
+}
+
+// get all files in a folder, and return a vector of file info
+#[tauri::command]
+pub fn get_folder_file(path: &str) -> Vec<FileInfo> {
+    let mut result = Vec::new();
+    if let Ok(entries) = fs::read_dir(path) {
+        for entry in entries.flatten() {
+            if let Ok(metadata) = entry.metadata() {
+                let path = entry.path();
+                if !metadata.is_dir() {
                     let file_name = entry.file_name().to_string_lossy().to_string();
                     let file_size = metadata.len();
                     let file_stem = path.file_stem().unwrap().to_string_lossy().to_string();
@@ -127,6 +168,29 @@ pub fn count_folder_files(folder_path: &str, max_count: usize) -> Result<usize, 
                     }
                 }
                 Err(e) => return Err(e),
+            }
+        }
+    }
+    Ok(count)
+}
+
+#[tauri::command]
+pub fn count_folder_file(folder_path: &str, max_count: usize) -> Result<usize, String> {
+    let mut count = 0;
+    let dir = match fs::read_dir(folder_path) {
+        Ok(dir) => dir,
+        Err(e) => return Err(e.to_string()),
+    };
+    for entry in dir {
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(e) => return Err(e.to_string()),
+        };
+        let path = entry.path();
+        if path.is_file() {
+            count += 1;
+            if count > max_count {
+                return Err("MAX_FILE_COUNT".to_string());
             }
         }
     }
