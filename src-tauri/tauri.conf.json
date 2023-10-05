@@ -44,12 +44,12 @@
         "fullscreen": false,
         "resizable": true,
         "title": "Mint Batch Renamer",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 720,
         "minWidth": 800,
         "minHeight": 600,
-        "maxWidth": 1280,
-        "maxHeight": 720,
+        "maxWidth": 1920,
+        "maxHeight": 1080,
         "alwaysOnTop": false
       }
     ]
