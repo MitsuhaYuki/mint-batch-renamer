@@ -26,9 +26,28 @@ export const sysRenamerList: Record<string, IRenamerInstance> = {
       type: 'number',
       default: 1,
       readonly: false,
+    }, {
+      name: 'fill_blank',
+      label: '填充位',
+      tips: '默认填充位数, 如设置为2则当序号为1时输出01',
+      type: 'number',
+      default: 0,
+      readonly: false,
     }],
     func: async (sysArgs, extra: any) => {
-      const curIdx = sysArgs.index + extra['start_at']
+      let curIdx = sysArgs.index + extra['start_at']
+
+      if (extra.fill_blank) {
+        if (`${curIdx}`.length < extra.fill_blank) {
+          const fill = extra.fill_blank - `${curIdx}`.length
+          let fillStr = ''
+          for (let i = 0; i < fill; i++) {
+            fillStr += '0'
+          }
+          curIdx = `${fillStr}${curIdx}`
+        }
+      }
+
       let newName = `${sysArgs.fileItem.rename_name ?? sysArgs.fileItem.name}`
       let newExt = `${sysArgs.fileItem.rename_extension ?? sysArgs.fileItem.extension}`
       if (extra['apply_to'] === 'file') {

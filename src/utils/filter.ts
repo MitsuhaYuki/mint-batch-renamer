@@ -103,6 +103,48 @@ export const sysFilterList: Record<string, IFilterInstance> = {
       console.log('I: message errerrrer', res)
       return res
     }
+  },
+  'contains_not': {
+    label: '不包含关键词',
+    id: 'contains_not',
+    scope: EFilterScope.fileName,
+    params: [{
+      name: 'filter_range',
+      label: '限定范围',
+      tips: '此过滤器只会在限定范围工作',
+      type: 'select',
+      range: [{
+        label: '文件全名',
+        value: 'full',
+      }, {
+        label: '仅限文件名',
+        value: 'file',
+      }, {
+        label: '仅限拓展名',
+        value: 'ext',
+      }],
+      default: 'file',
+      readonly: false,
+    }, {
+      name: 'contains_text',
+      label: '不包含',
+      type: 'string',
+      default: '',
+      readonly: false,
+    }],
+    func: (sysArgs, extra: any) => {
+      const filterRange = extra?.filter_range ?? 'file'
+      switch (filterRange) {
+        case 'file':
+          return !sysArgs.fileName.includes(extra?.contains_text)
+        case 'ext':
+          return !sysArgs.extName.includes(extra?.contains_text)
+        case 'full':
+          return !sysArgs.fullName.includes(extra?.contains_text)
+        default:
+          return true
+      }
+    }
   }
 }
 
