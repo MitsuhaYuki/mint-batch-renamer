@@ -1,4 +1,4 @@
-import MainPage from './main'
+import { Entrance } from './main'
 import zhCN from 'antd/locale/zh_CN'
 import { App, ConfigProvider } from 'antd'
 import { ConsoleContext, consoleInitState, consoleReducer } from '@/context/console'
@@ -8,6 +8,7 @@ import { useConfigLoader } from '@/utils/config'
 import { useExternalScriptLoader } from '@/utils/extension'
 import { useMount } from 'ahooks'
 import './App.scss'
+import { useSysConfig } from '@/utils/syscfg'
 
 const baseCls = 'app'
 const Content: FC = () => {
@@ -16,6 +17,7 @@ const Content: FC = () => {
   const [consoleState, consoleDispatch] = useReducer(consoleReducer, consoleInitState)
 
   // check & load config file
+  useSysConfig(globalState, globalDispatch)
   useConfigLoader(globalState, globalDispatch)
   useExternalScriptLoader(globalState, globalDispatch, consoleState, consoleDispatch)
 
@@ -32,10 +34,8 @@ const Content: FC = () => {
     <ConfigProvider autoInsertSpaceInButton={false} locale={zhCN}>
       <GlobalContext.Provider value={{ state: globalState, dispatch: globalDispatch }}>
         <ConsoleContext.Provider value={{ state: consoleState, dispatch: consoleDispatch }}>
-          <App>
-            <div className={baseCls}>
-              <MainPage />
-            </div>
+          <App className={baseCls}>
+            <Entrance />
           </App>
         </ConsoleContext.Provider>
       </GlobalContext.Provider>

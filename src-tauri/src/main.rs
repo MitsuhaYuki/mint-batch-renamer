@@ -19,6 +19,14 @@ use fstools::move_file;
 use fstools::read_file;
 use fstools::write_file;
 
+// Re-export fs module
+mod fsmod;
+use fsmod::fs_copy_file;
+use fsmod::fs_exists;
+use fsmod::fs_read_text_file;
+use fsmod::fs_remove_file;
+use fsmod::fs_write_text_file;
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -36,6 +44,12 @@ fn main() {
             move_file,
             read_file,
             write_file,
+            // fs mod
+            fs_copy_file,
+            fs_exists,
+            fs_read_text_file,
+            fs_remove_file,
+            fs_write_text_file,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

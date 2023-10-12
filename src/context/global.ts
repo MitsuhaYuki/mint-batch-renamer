@@ -5,6 +5,7 @@ import { IFileItem, IFileItemRenamed } from '@/types/file'
 import { defaultConfig, IConfig } from '@/types/config'
 import { sysFilterList } from '@/utils/filter'
 import { sysRenamerList } from '@/utils/renamer'
+import { ISysConfig } from '@/types/sysconfig'
 
 interface IState {
   config: IConfig
@@ -18,18 +19,20 @@ interface IState {
   sysRenamersExt: Record<string, IExtRenamerInstance>
   sourceFolders: string[]
   targetFolder: string
+
+  sysConfig?: ISysConfig
 }
 interface IOptionalState extends Partial<IState> {}
 
 const initState: IState = {
-  config: defaultConfig,
+  config: {} as any,
   filesOriginal: [],
   sysFilters: sysFilterList,
   sysFiltersExt: {},
   sysRenamers: sysRenamerList,
   sysRenamersExt: {},
   sourceFolders: [],
-  targetFolder: ''
+  targetFolder: '',
 }
 
 /**
@@ -46,6 +49,8 @@ type IReducerActionType = 'internal'
   | 'u_filtered_files'
   | 'u_renamed_files'
   | 'reset'
+  // New Config Mech
+  | 'u_config'
 
 type IReducerAction = {
   type: IReducerActionType,
@@ -71,6 +76,9 @@ const reducer: Reducer<IState, IReducerAction> = (state, action) => {
         return Object.assign({}, state, { filesRenamed: action.payload })
       case 'reset':
         return Object.assign({}, initState)
+      // new senorio
+      case 'u_config':
+        return Object.assign({}, state, { sysConfig: action.payload })
     }
   }
   return Object.assign({}, state, action.payload)

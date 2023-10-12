@@ -6,10 +6,12 @@ import QuickPanel from './QuickPanel'
 import { Layout } from 'antd'
 import './index.scss'
 
-const { Header, Sider, Content, Footer } = Layout
+const { Header, Sider, Content: AntContent, Footer } = Layout
+
+interface IProps {}
 
 const baseCls = 'entrance'
-const EntrancePage: FC = () => {
+const Content: FC<IProps> = (props) => {
   return (<div className={baseCls}>
     <Layout className={`${baseCls}-layout`}>
       <Layout className={`${baseCls}-layout-inner`}>
@@ -17,9 +19,9 @@ const EntrancePage: FC = () => {
           <ActionPanel />
           <QuickPanel />
         </Sider>
-        <Content className={`${baseCls}-layout-inner-content`}>
+        <AntContent className={`${baseCls}-layout-inner-content`}>
           <DataTable />
-        </Content>
+        </AntContent>
       </Layout>
       <Footer className={`${baseCls}-layout-footer`}>
         <LoggerPanel />
@@ -28,6 +30,7 @@ const EntrancePage: FC = () => {
   </div>)
 }
 
-EntrancePage.defaultProps = {}
-EntrancePage.displayName = baseCls
-export default EntrancePage
+Content.defaultProps = {}
+Content.displayName = baseCls
+export { Content as Entrance }
+export type { IProps as EntranceProps }

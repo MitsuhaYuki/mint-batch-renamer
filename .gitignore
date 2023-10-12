@@ -24,5 +24,7 @@ dist-ssr
 *.sw?
 
 # configuration files
+/src-tauri/app.json
 /src-tauri/config.json
+/src-tauri/syscfg.json
 /src-tauri/ext_*.json
