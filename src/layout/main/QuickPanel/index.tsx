@@ -1,12 +1,14 @@
-import { FC, useMemo, useRef } from 'react'
-import DevModal, { DevModalRef } from '@/components/DevModal'
-import { ScriptBrowser, ScriptBrowserRef } from '@/components/ScriptBrowser'
 import SettingsModal, { SettingsModalRef } from '@/components/SettingsModal'
 import useGlobalData from '@/utils/hooks/useGlobalData'
 import useLogger from '@/utils/logger'
 import { Button } from 'antd'
-import { CodeOutlined, SettingOutlined } from '@ant-design/icons'
-import { useLongPress } from 'ahooks'
+import { CodeOutlined, SettingFilled, SettingOutlined } from '@ant-design/icons'
+import { DevModal } from '@/components/DevModal'
+import { FC, useMemo, useRef } from 'react'
+import { QuickModalRef } from '@/components/QuickModal'
+import { ScriptBrowser, ScriptBrowserRef } from '@/components/ScriptBrowser'
+import { SettingsModal as SM2 } from '@/components/SettingsModalRemake'
+import { useKeyPress } from 'ahooks'
 import './index.scss'
 
 export type ContentProps = {
@@ -22,18 +24,17 @@ const Content: FC<ContentProps> = (props) => {
   const settingsModalRef = useRef<SettingsModalRef>(null)
   // script browser
   const scriptBrowserRef = useRef<ScriptBrowserRef>(null)
-  // settings button
-  const settingsBtnRef = useRef<any>(null)
   // develop test modal
-  const devModalRef = useRef<DevModalRef>(null)
+  const devModalRef = useRef<QuickModalRef>(null)
+  // settings modal rename
+  const SM2Ref = useRef<QuickModalRef>(null)
 
   // dev panel access method
-  useLongPress(() => {
+  useKeyPress(['ctrl.f12'], () => {
     logger.warn('Open dev panel')
     devModalRef.current?.toggle(true)
-  }, settingsBtnRef, {
-    delay: 1000,
-    moveThreshold: { x: 20, y: 20 }
+  }, {
+    exactMatch: true,
   })
 
   const quickBtns = useMemo(() => {
@@ -44,8 +45,10 @@ const Content: FC<ContentProps> = (props) => {
       onClick () { scriptBrowserRef.current?.toggle(true) }
     }, {
       icon: <SettingOutlined className={iconCls} title='Settings' />,
-      ref: settingsBtnRef,
       onClick () { settingsModalRef.current?.toggle(true) }
+    }, {
+      icon: <SettingFilled className={iconCls} title='Settings Remake' />,
+      onClick () { SM2Ref.current?.toggle(true) }
     }]
   }, [globalData.config])
 
@@ -61,6 +64,7 @@ const Content: FC<ContentProps> = (props) => {
       globalData={globalData}
       setGlobalData={setGlobalData}
     />
+    <SM2 ref={SM2Ref} />
   </div>)
 }
 

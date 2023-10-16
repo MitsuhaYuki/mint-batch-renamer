@@ -1,18 +1,26 @@
-$baseCls: 'dev-modal';
+$baseCls: 'modal-dev';
 
 .#{$baseCls} {
   &-content {
     display: flex;
     flex-direction: column;
     gap: 4px;
+  }
+
+  &-section {
+    display: flex;
+    gap: 4px;
+
+    &-title {
+      flex: 0 0 auto;
+      font-weight: bold;
+      width: 100px;
+    }
 
     &-item {
       display: flex;
+      flex-wrap: wrap;
       gap: 4px;
-
-      &-title {
-        width: 60px;
-      }
     }
   }
 }

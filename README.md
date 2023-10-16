@@ -16,3 +16,5 @@
 - Multi-language
 - Support auto upgrade config file
 - Optimize operation flow and simplify UI
+- Supports sorting of current process steps
+- Supports export & import of processing flow

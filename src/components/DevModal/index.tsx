@@ -1,134 +1,110 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
 import useGlobalData from '@/utils/hooks/useGlobalData'
-import { Button, ButtonProps, Col, Modal, Row, Space } from 'antd'
-import useLogger from '@/utils/logger'
+import { Button, ButtonProps } from 'antd'
+import { IConfigReducerActionType, useConfigContext } from '@/context/config'
+import { IGlobalReducerActionType } from '@/context/global'
+import { QuickModal, QuickModalInst, QuickModalRef } from '../QuickModal'
+import { forwardRef } from 'react'
 import './index.scss'
-import { uuid } from '@/utils/common'
-import { invoke } from '@tauri-apps/api/tauri'
-import { useControllableValue } from 'ahooks'
 
-type ContentRef = {
-  toggle: (visible?: boolean) => void
-}
+interface IProps {}
 
-type ContentProps = {
-  exampleprop?: any
-}
-
-export type {
-  ContentRef as DevModalRef,
-  ContentProps as DevModalProps
-}
-
-const baseCls = 'dev-modal'
-const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
+const baseCls = 'modal-dev'
+const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
   const { globalData, setGlobalData } = useGlobalData()
-  const { logs, logger, clear } = useLogger()
-  const [visible, setVisible] = useState(false)
-  const [] = useControllableValue()
+  const [config, setConfig] = useConfigContext()
 
-  useImperativeHandle(ref, () => ({
-    toggle: toggleModalVisible
-  }))
-
-  const toggleModalVisible = (visible?: boolean) => {
-    setVisible(s => visible ?? !s)
-  }
-
-  const testLogger = (type: 'logs' | 'test', payload?: any) => {
+  /* Config Context Tester */
+  const testGlobalData = (type: IGlobalReducerActionType) => {
     switch (type) {
-      case 'logs': {
-        console.log('I: logs', logs)
+      case 'internal': {
+        console.log('I: GlobalData', globalData)
         break
       }
-      case 'test': {
-        logger.debug(`${Date.now()} - ${uuid()}`)
-        logger.info(`${Date.now()} - ${uuid()}`)
-        logger.warn(`${Date.now()} - ${uuid()}`)
-        logger.error(`${Date.now()} - ${uuid()}`)
+      case 'reset': {
+        setGlobalData('reset')
         break
       }
       default:
+        console.warn('I: testGlobalData type not found')
         break
     }
   }
 
-  const testInvoke = (type: 'read_file' | 'write_file' | 'is_file_exist') => {
+  /* Quick Modal Tester */
+  const testQuickModal = (type: 'hide') => {
     switch (type) {
-      case 'read_file': {
-        (async function () {
-          const res = await invoke('read_file', { filePath: 'E:\\test.json' })
-          console.log('I: invoke read_file', res)
-        })()
-        break
-      }
-      case 'write_file': {
-        (async function () {
-          const res = await invoke('write_file', {
-            filePath: 'E:\\test2.json', content: JSON.stringify({
-              "segment1": Date.now()
-            }, undefined, 4)
-          })
-          console.log('I: invoke write_file', res)
-        })()
-        break
-      }
-      case 'is_file_exist': {
-        (async function () {
-          const res = await invoke('is_file_exist', { filePath: 'config.json' })
-          console.log('I: invoke is_file_exist', res)
-        })()
+      case 'hide': {
+        (ref as QuickModalInst)?.current.toggle(false)
         break
       }
       default:
+        console.warn('I: testQuickModal type not found')
         break
     }
   }
 
-  // life cycle
-  useEffect(() => {
-    if (visible) {
-      // ...
+  /* [Deprecated] Global Data Tester */
+  const testConfigContext = (type: IConfigReducerActionType) => {
+    switch (type) {
+      case 'internal': {
+        console.log('I: ConfigContext', config)
+        break
+      }
+      case 'd_system': {
+        setConfig('d_system')
+        break
+      }
+      case 'reset': {
+        setConfig('reset')
+        break
+      }
+      default:
+        console.warn('I: testConfigContext type not found')
+        break
     }
-  }, [visible])
+  }
 
-  const DevBtn = (props: ButtonProps) => (
-    <Button type='primary' size='small' ghost {...props} />
-  )
+  const DevBtn = (props: ButtonProps) => <Button type='primary' size='small' ghost {...props} />
 
   return (
-    <Modal
-      title='Develop'
+    <QuickModal
+      title='Developer Tools'
       focusTriggerAfterClose={false}
       footer={null}
       maskClosable={false}
-      open={visible}
       width={640}
       wrapClassName={baseCls}
-      onCancel={() => setVisible(false)}
+      ref={ref}
     >
       <div className={`${baseCls}-content`}>
-        <div className={`${baseCls}-content-item`}>
-          <div className={`${baseCls}-content-item-title`}>全局状态</div>
-          <DevBtn onClick={() => console.log('I: globalData', globalData)}>全局状态</DevBtn>
-          <DevBtn onClick={() => setGlobalData('reset')}>重置全局</DevBtn>
+        <div className={`${baseCls}-section`}>
+          <div className={`${baseCls}-section-title`}>ConfigContext</div>
+          <div className={`${baseCls}-section-item`}>
+            <DevBtn onClick={() => testConfigContext('internal')}>internal</DevBtn>
+            <DevBtn onClick={() => testConfigContext('d_system')}>d_system</DevBtn>
+            <DevBtn onClick={() => testConfigContext('reset')}>reset</DevBtn>
+          </div>
         </div>
-        <div className={`${baseCls}-content-item`}>
-          <div className={`${baseCls}-content-item-title`}>日志</div>
-          <DevBtn onClick={() => testLogger('logs')}>logs</DevBtn>
-          <DevBtn onClick={() => testLogger('test')}>logger</DevBtn>
+        <div className={`${baseCls}-section`}>
+          <div className={`${baseCls}-section-title`}>GlobalData</div>
+          <div className={`${baseCls}-section-item`}>
+            <DevBtn onClick={() => testGlobalData('internal')}>internal</DevBtn>
+            <DevBtn onClick={() => testGlobalData('reset')}>reset</DevBtn>
+          </div>
         </div>
-        <div className={`${baseCls}-content-item`}>
-          <div className={`${baseCls}-content-item-title`}>Invoke</div>
-          <DevBtn onClick={() => testInvoke('read_file')}>read_file</DevBtn>
-          <DevBtn onClick={() => testInvoke('write_file')}>write_file</DevBtn>
-          <DevBtn onClick={() => testInvoke('is_file_exist')}>is_file_exist</DevBtn>
+        <div className={`${baseCls}-section`}>
+          <div className={`${baseCls}-section-title`}>QuickModal</div>
+          <div className={`${baseCls}-section-item`}>
+            <DevBtn onClick={() => testQuickModal('hide')}>hide</DevBtn>
+          </div>
         </div>
       </div>
-    </Modal>
+    </QuickModal>
   )
 })
 
 Content.defaultProps = {}
 Content.displayName = baseCls
-export default Content
+export {
+  Content as DevModal
+}

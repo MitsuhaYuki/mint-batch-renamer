@@ -7,7 +7,7 @@ import useLogger from '@/utils/logger'
 import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, PlayCircleOutlined, ReloadOutlined } from '@ant-design/icons'
 import { Collapse, CollapseProps, Modal, message } from 'antd'
 import { ControlButton, ControlButtonProps } from '@/components/ControlButton'
-import { FC, useMemo, useState } from 'react'
+import { FC, useEffect, useMemo, useState } from 'react'
 import { cloneDeep, isEmpty, throttle } from 'lodash'
 import { invoke } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
@@ -27,6 +27,23 @@ const Content: FC<ContentProps> = () => {
   const { config } = globalData
   // current collapse active key
   const [activeKey, setActiveKey] = useState<string>('1')
+
+  useEffect(() => {
+    if(globalData.sourceFolders.length > 0) {
+      message.info({
+        content: '正在加载文件列表...',
+        key: 'LOADING_FILE_LIST',
+        duration: 0
+      })
+      getFileList(globalData.sourceFolders).then(()=>{
+        message.success({
+          content: '加载文件列表完成',
+          key: 'LOADING_FILE_LIST',
+          duration: 1
+        })
+      })
+    }
+  }, [globalData.sourceFolders])
 
   const selectFolder = async (title?: string): Promise<{ success: boolean; status: string; data?: string | undefined }> => {
     try {
@@ -229,7 +246,10 @@ const Content: FC<ContentProps> = () => {
         }
       }
     } catch (e) {
-      message.error(`复制文件失败 ${e}`)
+      message.error({
+        content: `文件处理失败 ${e}`,
+        key: 'COPYING_FILES'
+      })
       logger.error(`Copy files failed, code ${e}`)
     } finally {
       setInOperation(false)

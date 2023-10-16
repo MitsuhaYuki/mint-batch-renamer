@@ -1,10 +1,10 @@
-import { GlobalContext, IGlobalReducerAction, IGlobalState } from '@/context/global'
-import { ISysConfig, defaultSysConfig } from '@/types/sysconfig'
+import { ISysConfig, sysConfigTrait } from '@/types/sysconfig'
 import { Button, Modal, ModalFuncProps, Space } from 'antd'
 import { Fragment, ReactNode, useContext, useEffect } from 'react'
 import { CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled, InfoCircleFilled, LoadingOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { invoke } from '@tauri-apps/api/tauri'
 import { exit, relaunch } from '@tauri-apps/api/process'
+import { IConfigReducerAction, IConfigState } from '@/context/config'
 
 type SysCfgModalController = {
   destroy: () => void
@@ -32,13 +32,13 @@ const icons = {
   confirm: <QuestionCircleFilled style={{ color: '#1677ff' }} />,
 }
 
-/**
- * render error tips, with basic error code description.
- * @param error error text reported by tauri or backend
- * @param extra extra tips
- * @returns final tips, rendered as ReactNode[]
- */
-const renderTips = (error: string, extra?: string[]): ReactNode[] => {
+const wait = async () => {
+  await new Promise(resolve => {
+    setTimeout(() => resolve(undefined), cfgLoaderConfig.waitTime)
+  })
+}
+
+const renderTips = (error: string, extra?: string[], override?: string[]): ReactNode[] => {
   let tips: ReactNode[] = []
   // extract error code
   let eCode: any = error.match(/os error \d+/)?.[0]
@@ -68,58 +68,133 @@ const renderTips = (error: string, extra?: string[]): ReactNode[] => {
     }
   }
   // add common after-tips
+  if (override) tips = [tips[0], ...override.map((v) => <li>{v}</li>)]
   if (extra) tips.push(...extra.map((v) => <li>{v}</li>))
   return tips.map((v, k) => <Fragment key={k}>{v}</Fragment>)
 }
 
-/**
- * render sysConfig modal content
- * @param msg main status message
- * @param icon status icon
- * @param tips error tips
- * @returns modal content
- */
 const renderContent = (
   msg: string = '请稍后...',
   icon: 'loading' | 'info' | 'success' | 'error' | 'warning' | 'confirm' = 'loading',
-  tips?: { error: any, extra?: string[] }
+  tips?: { error: any, extra?: string[], override?: string[] }
 ): ReactNode => {
   return (<div>
     {icons[icon]}&nbsp;{msg}
     {tips ? (<ol style={cfgLoaderConfig.tipsTextStyle}>
-      {renderTips(`${tips.error}`, tips.extra)}
+      {renderTips(`${tips.error}`, tips.extra, tips.override)}
     </ol>) : null}
   </div>)
 }
 
-/**
- * load config file
- * @param cfgPath config file path
- * @param modal status modal controller
- * @param globalDispatch global dispatch
- * @param noModal no modal flag
- */
-const loadConfig = async (
-  cfgPath: string,
+const makeDefaultConfig = (): ISysConfig => {
+  let cfg = {} as any
+  for (const k in sysConfigTrait) {
+    if (sysConfigTrait[k as keyof ISysConfig].required)
+      cfg[k] = sysConfigTrait[k as keyof ISysConfig].default
+  }
+  return cfg
+}
+
+const updateConfig = async (
+  config: Partial<ISysConfig>,
   modal: SysCfgModalController,
-  globalDispatch: (data: IGlobalReducerAction) => void,
-  noModal: boolean = false
+  dispatch: (data: IConfigReducerAction) => void
+) => {
+  modal.show()
+  const cfgVer = config.cfg_ver?.match(/^\d+\.\d+\.\d+$/)?.[0]
+  if (cfgVer) {
+    modal.update({
+      content: renderContent('正在更新配置文件...'),
+      footer: null
+    })
+    await wait()
+    const [di, dj, dk] = sysConfigTrait.cfg_ver.default.split('.').map((v: any) => Number(v))
+    const [ci, cj, ck] = cfgVer.split('.').map(v => Number(v))
+    const defaultConfig: any = makeDefaultConfig()
+    let result: any = config
+    if (di !== ci) {
+      // major config version change, rebuild config
+      result = Object.keys(defaultConfig).reduce((prev, cur) => {
+        prev[cur] = (config as any)[cur] ?? defaultConfig[cur]
+        return prev
+      }, defaultConfig)
+    } else if (dj !== cj) {
+      // minor config version change, merge config
+      result = { ...defaultConfig, ...config }
+    } else if (dk !== ck) {
+      // patch config version change, update config
+      // TODO: check which segment has different type and update it
+      // TODO: prompt user that some of the config has changed
+    }
+    result.cfg_ver = sysConfigTrait.cfg_ver.default
+    await saveConfig(cfgLoaderConfig.cfgPath, result, modal)
+    dispatch({ type: 'u_system', payload: result })
+    modal.update({
+      content: renderContent('配置文件更新成功', 'success'),
+      footer: () => (<Button type='primary' onClick={() => {
+        modal.destroy()
+      }}>确定</Button>)
+    })
+  } else {
+    modal.update({
+      content: renderContent('检查配置文件版本失败', 'error', { error: 'config version mismatch', override: ['请尝试重置配置'] }),
+      footer: () => (<Space>
+        <Button type='primary' danger onClick={
+          () => resetConfig(cfgLoaderConfig.cfgPath, modal, dispatch, true)
+        }>重置配置</Button>
+        <Button type='primary' onClick={
+          () => exit(0)
+        }>退出</Button>
+      </Space>)
+    })
+  }
+}
+
+const saveConfig = async (
+  cfgPath: string,
+  config: ISysConfig,
+  modal: SysCfgModalController
+) => {
+  modal.show()
+  modal.update({
+    content: renderContent('正在保存配置文件...'),
+    footer: null
+  })
+  await wait()
+  try {
+    if (await invoke('fs_exists', { path: cfgPath })) await invoke('fs_remove_file', { path: cfgPath })
+    await invoke('fs_write_text_file', { path: cfgPath, contents: JSON.stringify(config, undefined, 2) })
+    modal.update({
+      content: renderContent('配置文件保存成功!', 'success'),
+      footer: null
+    })
+    await wait()
+  } catch (e) {
+    console.log('I: SysConfig save failed,', e)
+    modal.update({
+      content: renderContent('配置文件保存失败', 'error', { error: `${e}`, extra: ['请尝试删除程序目录下的配置文件后重试'] }),
+      footer: () => (<Button type='primary' onClick={() => exit(0)}>退出</Button>)
+    })
+  }
+}
+
+const loadConfig = async (
+  modal: SysCfgModalController,
+  dispatch: (data: IConfigReducerAction) => void,
 ) => {
   try {
-    const cfgJson = JSON.parse(await invoke('fs_read_text_file', { path: cfgPath }))
-    //FIXME: 此处需要加入配置文件升级检查
-    if (noModal) {
-      globalDispatch({ type: 'u_config', payload: cfgJson })
-      modal.destroy()
-    } else {
+    const cfgJson = JSON.parse(await invoke('fs_read_text_file', { path: cfgLoaderConfig.cfgPath }))
+    if (cfgJson.cfg_ver !== sysConfigTrait.cfg_ver.default) {
       modal.show()
       modal.update({
-        content: renderContent('配置文件更新成功', 'success'),
-        footer: () => (<Button type='primary' onClick={() => {
-          globalDispatch({ type: 'u_config', payload: cfgJson })
-          modal.destroy()
-        }}>确定</Button>)
+        content: renderContent('发现配置文件更新...'),
+        footer: null
       })
+      await wait()
+      updateConfig(cfgJson, modal, dispatch)
+    } else {
+      dispatch({ type: 'u_system', payload: cfgJson })
+      modal.destroy()
     }
   } catch (e) {
     console.log('I: SysConfig load failed,', e)
@@ -128,7 +203,7 @@ const loadConfig = async (
       content: renderContent('读取配置文件失败', 'error', { error: `${e}`, extra: ['如果您不知道如何解决这个问题, 请尝试重置配置'] }),
       footer: () => (<Space>
         <Button type='primary' danger onClick={
-          () => resetConfig(cfgPath, modal, globalDispatch, true)
+          () => resetConfig(cfgLoaderConfig.cfgPath, modal, dispatch, true)
         }>重置配置</Button>
         {/* <Button type='primary' onClick={
           () => relaunch()
@@ -141,47 +216,36 @@ const loadConfig = async (
   }
 }
 
-/**
- * reset config file
- * @param cfgPath config file path
- * @param modal status modal controller
- * @param globalDispatch global dispatch
- * @param hardReset hard reset flag, set true to delete config file before reset
- */
 const resetConfig = async (
   cfgPath: string,
   modal: SysCfgModalController,
-  globalDispatch: (data: IGlobalReducerAction) => void,
+  dispatch: (data: IConfigReducerAction) => void,
   hardReset: boolean = false
 ) => {
+  modal.show()
   modal.update({
     content: renderContent('正在重置配置文件...'),
     footer: null
   })
-  setTimeout(async () => {
-    try {
-      if (hardReset && (await invoke('fs_exists', { path: cfgPath }))) await invoke('fs_remove_file', { path: cfgPath })
-      await invoke('fs_write_text_file', { path: cfgPath, contents: JSON.stringify(defaultSysConfig, undefined, 2) })
-      modal.update({
-        content: renderContent('配置文件重置成功!', 'success'),
-        footer: null
-      })
-      setTimeout(() => { loadConfig(cfgPath, modal, globalDispatch) }, cfgLoaderConfig.waitTime)
-    } catch (e) {
-      console.log('I: SysConfig reset failed,', e)
-      modal.update({
-        content: renderContent('重置配置文件失败', 'error', { error: `${e}`, extra: ['请尝试删除程序目录下的配置文件后重试'] }),
-        footer: () => (<Button type='primary' onClick={() => exit(0)}>退出</Button>)
-      })
-    }
-  }, cfgLoaderConfig.waitTime)
+  await wait()
+  try {
+    if (hardReset && (await invoke('fs_exists', { path: cfgPath }))) await invoke('fs_remove_file', { path: cfgPath })
+    await invoke('fs_write_text_file', { path: cfgPath, contents: JSON.stringify(makeDefaultConfig(), undefined, 2) })
+    modal.update({
+      content: renderContent('配置文件重置成功!', 'success'),
+      footer: null
+    })
+    await wait()
+    loadConfig(modal, dispatch)
+  } catch (e) {
+    console.log('I: SysConfig reset failed,', e)
+    modal.update({
+      content: renderContent('重置配置文件失败', 'error', { error: `${e}`, extra: ['请尝试删除程序目录下的配置文件后重试'] }),
+      footer: () => (<Button type='primary' onClick={() => exit(0)}>退出</Button>)
+    })
+  }
 }
 
-/**
- * make sysConfig status indicator modal
- * @param open is modal default open
- * @returns modal controller
- */
 const makeSysConfigModal = (open: boolean = false): SysCfgModalController => {
   const modal = Modal.info({
     centered: true,
@@ -202,32 +266,23 @@ const makeSysConfigModal = (open: boolean = false): SysCfgModalController => {
   return modal
 }
 
-/**
- * useSysConfig: sysConfig management hook
- * @param globalData global state
- * @param globalDispatch global dispatch
- * @returns sysConfig & setSysConfig
- */
 const useSysConfig = (
-  globalData: IGlobalState,
-  globalDispatch: (data: IGlobalReducerAction) => void
+  configState: IConfigState,
+  configDispatch: (data: IConfigReducerAction) => void
 ): {
-  sysConfig: ISysConfig,
   setSysConfig: (config: ISysConfig) => void
 } => {
   // load config
   useEffect(() => {
-    if (!globalData.sysConfig) {
-      const cfgPath = 'syscfg.json'
+    if (!configState.system) {
       const modal = makeSysConfigModal()
-      loadConfig(cfgPath, modal, globalDispatch, true)
+      loadConfig(modal, configDispatch)
     }
-  }, [globalData])
-  // return sysConfig & setSysConfig
+  }, [configState])
+  // return sysConfig setter
   return {
-    sysConfig: globalData.sysConfig || defaultSysConfig,
     setSysConfig: (config: ISysConfig) => {
-      globalDispatch!({ type: 'u_config', payload: config })
+      configDispatch({ type: 'u_system', payload: config })
     }
   }
 }
@@ -235,6 +290,7 @@ const useSysConfig = (
 export {
   loadConfig,
   // saveConfig,
+  makeDefaultConfig,
   makeSysConfigModal,
   resetConfig,
   useSysConfig,

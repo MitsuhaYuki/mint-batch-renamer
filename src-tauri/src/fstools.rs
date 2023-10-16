@@ -196,3 +196,39 @@ pub fn count_folder_file(folder_path: &str, max_count: usize) -> Result<usize, S
     }
     Ok(count)
 }
+
+// count all files include subfolder's file in a folder, and return the count
+// #[tauri::command]
+// pub fn count_files(folder_path: &str, max_count: usize, cascade: bool) -> Result<usize, String> {
+//     let mut count = 0;
+//     let dir = match fs::read_dir(folder_path) {
+//         Ok(dir) => dir,
+//         Err(e) => return Err(e.to_string()),
+//     };
+//     for entry in dir {
+//         let entry = match entry {
+//             Ok(entry) => entry,
+//             Err(e) => return Err(e.to_string()),
+//         };
+//         let path = entry.path();
+//         if path.is_file() {
+//             count += 1;
+//             if count > max_count {
+//                 return Err("MAX_FILE_COUNT".to_string());
+//             }
+//         } else if path.is_dir() {
+//             if (cascade) {
+//                 match count_folder_files(path.to_str().unwrap(), max_count - count) {
+//                     Ok(sub_count) => {
+//                         count += sub_count;
+//                         if count > max_count {
+//                             return Err("MAX_FILE_COUNT".to_string());
+//                         }
+//                     }
+//                     Err(e) => return Err(e),
+//                 }
+//             }
+//         }
+//     }
+//     Ok(count)
+// }

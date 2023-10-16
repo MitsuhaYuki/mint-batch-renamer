@@ -1,37 +1,30 @@
 /** The configuration file for the program. */
 export interface ISysConfig {
   /**
-   * When file count exceeds this limit, a warning will be shown.
+   * The version of the configuration file.
+   * Version number format is `major.minor.patch` with numbers only.
+   * 
+   * major: config has remove or change the key name.
+   * minor: config add new key.
+   * patch: config change the type of key value.
+   * 
+   * other changes like change the default value or description doesn't need to update the version.
    */
-  warn_limit: number
-  /**
-   * The maximum file size allowed to be processed.
-   */
-  max_limit: number
-  /**
-   * Whether to recursively read files in subdirectories.
-   */
-  recursive_read: boolean
-  /**
-   * The mode of file system operations.
-   */
-  fsop_mode: 'copy' | 'move'
-  /**
-   * Whether to allow external filters to be used.
-   */
-  allow_external_filters: boolean
-  /**
-   * Whether to allow external renamers to be used.
-   */
-  allow_external_renamers: boolean
+  cfg_ver: string
 }
 
-/** Default config template */
-export const defaultSysConfig: ISysConfig = {
-  warn_limit: 10000,
-  max_limit: 50000,
-  recursive_read: true,
-  fsop_mode: 'copy',
-  allow_external_filters: false,
-  allow_external_renamers: false
+export interface ISysConfigTrait extends Record<keyof ISysConfig, {
+  name: string
+  type: 'string'
+  default: any
+  required: boolean
+}> {}
+
+export const sysConfigTrait: ISysConfigTrait = {
+  cfg_ver: {
+    name: 'cfg_ver',
+    type: 'string',
+    default: '0.0.0',
+    required: true,
+  }
 }

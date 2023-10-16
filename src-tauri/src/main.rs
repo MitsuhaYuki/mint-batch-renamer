@@ -27,6 +27,10 @@ use fsmod::fs_read_text_file;
 use fsmod::fs_remove_file;
 use fsmod::fs_write_text_file;
 
+// Re-export the std::path module
+mod mod_std_path;
+use mod_std_path::path_is_dir;
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
@@ -50,6 +54,8 @@ fn main() {
             fs_read_text_file,
             fs_remove_file,
             fs_write_text_file,
+            // std::path mod
+            path_is_dir,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
