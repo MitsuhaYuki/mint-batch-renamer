@@ -28,3 +28,6 @@ dist-ssr
 /src-tauri/config.json
 /src-tauri/syscfg.json
 /src-tauri/ext_*.json
+
+# misc
+/src/_test
