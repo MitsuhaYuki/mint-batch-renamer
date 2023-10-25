@@ -82,7 +82,7 @@
     "no_source": "Selected source has no file",
     "no_task": "You have not added any steps yet",
     "preview_done": "Preview done",
-    "no_result": "No result to apply, have you run the \"Preview\"?",
+    "no_result": "No result to apply, have you run the \"Dry Run\"?",
     "cfm_run_title": "Apply Result",
     "cfm_run_msg": "Are you sure to apply result?"
   },
