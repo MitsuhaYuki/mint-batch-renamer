@@ -4,31 +4,29 @@ $baseCls: 'entrance';
   height: 100%;
   overflow: hidden;
 
-  &-layout {
-    height: 100%;
-
-    &-inner {
-      & &-sider {
-        background: #fafafa;
-        border-right: 1px solid #dedede;
-
-        .ant-layout-sider-children {
-          display: flex;
-          flex-direction: column;
-
-          & > div {
-            flex: 1 1 auto;
-
-            &:last-child {
-              flex: 0 0 auto;
-            }
-          }
-        }
-      }
+  // Becareful when overwrite antd's style.
+  .ant-layout {
+    &-sider, &-content, &-footer {
+      background: transparent;
     }
 
     &-footer {
       padding: 0;
+    }
+  }
+
+  &-layout {
+    height: 100%;
+  }
+
+  &-sider {
+    &-flex {
+      height: 100%;
+      overflow: auto;
+
+      & > .ant-flex {
+        width: 100%;
+      }
     }
   }
 }

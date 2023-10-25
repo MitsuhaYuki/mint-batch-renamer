@@ -1,0 +1,11 @@
+$baseCls: 'modal-task-cfg';
+
+.#{$baseCls} {
+  &-form {
+    width: 100%;
+
+    .ant-input-number {
+      width: 40%;
+    }
+  }
+}

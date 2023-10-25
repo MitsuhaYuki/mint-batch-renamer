@@ -1,21 +1,27 @@
-export interface IFileItem {
-  /** 文件全名 */
-  full_name: string
-  /** 文件名 */
+import { TaskResult } from './task'
+
+type FileItem = {
+  /* Basic Information */
+  // 文件全名
   name: string
-  /** 文件大小(字节) */
-  size: number
-  /** 文件拓展名 */
-  extension: string
-  /** 文件路径 */
+  // 路径
   path: string
+
+  /* Extra Information */
+  // 文件名
+  fileName: string
+  // 拓展名
+  fileExt: string
+  // 大小
+  size: number
 }
 
-export interface IFileItemRenamed extends IFileItem {
-  /** 重命名后的文件全名 */
-  rename_full_name?: string
-  /** 重命名后的文件名 */
-  rename_name?: string
-  /** 重命名后的文件拓展名 */
-  rename_extension?: string
+interface FileItemExtend extends FileItem {
+  /* 流转过程 */
+  steps: TaskResult[]
+}
+
+export type {
+  FileItem,
+  FileItemExtend
 }

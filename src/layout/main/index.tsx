@@ -1,31 +1,35 @@
+import { Accessory } from './Accessory'
+import { BaseConfig } from './BaseConfig'
+import { DetailPanel } from './DetailPanel'
 import { FC } from 'react'
-import ActionPanel from './ActionPanel'
-import DataTable from './DataTable'
-import LoggerPanel from './LoggerPanel'
-import QuickPanel from './QuickPanel'
-import { Layout } from 'antd'
+import { Flex, Layout } from 'antd'
+import { MultiLangProps } from '@/types/mlang'
+import { TaskFlow } from './TaskFlow'
+import { fmlNameMaker } from '@/utils/mlang'
+import { useConfigContext } from '@/context/config'
 import './index.scss'
 
-const { Header, Sider, Content: AntContent, Footer } = Layout
-
-interface IProps {}
+interface IProps extends MultiLangProps {}
 
 const baseCls = 'entrance'
 const Content: FC<IProps> = (props) => {
+  const [config, setConfig] = useConfigContext()
   return (<div className={baseCls}>
     <Layout className={`${baseCls}-layout`}>
-      <Layout className={`${baseCls}-layout-inner`}>
-        <Sider className={`${baseCls}-layout-inner-sider`} collapsible={false} width={200}>
-          <ActionPanel />
-          <QuickPanel />
-        </Sider>
-        <AntContent className={`${baseCls}-layout-inner-content`}>
-          <DataTable />
-        </AntContent>
-      </Layout>
-      <Footer className={`${baseCls}-layout-footer`}>
-        <LoggerPanel />
-      </Footer>
+      <Layout.Sider width='220px'>
+        <Flex className={`${baseCls}-sider-flex`} vertical>
+          <Flex flex='0 0 auto'>
+            <BaseConfig />
+          </Flex>
+          <Flex flex='1 1 auto' style={{ overflow: 'auto' }}>
+            <TaskFlow />
+          </Flex>
+          <Accessory inheritName={fmlNameMaker(baseCls, props.inheritName)} />
+        </Flex>
+      </Layout.Sider>
+      <Layout.Content>
+        <DetailPanel />
+      </Layout.Content>
     </Layout>
   </div>)
 }

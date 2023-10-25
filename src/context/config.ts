@@ -1,13 +1,16 @@
-import { ISysConfig } from '@/types/sysconfig'
+import { ISysConfig } from '@/types/syscfg'
+import { langs, ILanguage } from '@/utils/mlang'
 import React, { Reducer, useCallback, useContext } from 'react'
 
-export interface IState {
+interface IState {
   system?: ISysConfig
+  langs: ILanguage
 }
-export interface IOptionalState extends Partial<IState> {}
+interface IOptionalState extends Partial<IState> {}
 
 // State初始值
-export const initState: IState = {
+const initState: IState = {
+  langs: langs['zh-CN'],
 }
 
 /**
@@ -16,15 +19,22 @@ export const initState: IState = {
  * @description naming: c_ for create, r_ for read, u_ for update, d_ for delete, after the prefix is the state name
  */
 type IReducerActionType = 'internal'
+  | 'u_langs'
+  | 'd_langs'
   | 'u_system'
   | 'd_system'
   | 'reset'
 
 interface IReducerAction { type: string; payload?: any }
 
-export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
+const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   if (action.type !== 'internal') {
     switch (action.type) {
+      case 'u_langs':
+        return Object.assign({}, state, { langs: action.payload })
+      case 'd_langs': {
+        return Object.assign({}, state, { langs: initState.langs })
+      }
       case 'u_system':
         return Object.assign({}, state, { system: action.payload })
       case 'd_system': {
@@ -42,7 +52,7 @@ export const reducer: Reducer<IState, IReducerAction> = (state, action) => {
   return state
 }
 
-export const Context = React.createContext<{
+const Context = React.createContext<{
   state: IState
   dispatch: (_: IReducerAction) => void
 }>({

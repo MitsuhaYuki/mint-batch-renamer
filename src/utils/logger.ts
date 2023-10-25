@@ -1,39 +1,32 @@
 import { useCallback, useContext } from 'react'
-import { ConsoleContext, IConsoleState } from '@/context/console'
+import { ConsoleContext, IConsoleReducerAction, IConsoleState } from '@/context/console'
+import { ILogItem, ILogLevel, ILogger } from '@/types/console'
 
-function makeRecord (level: 'debug' | 'info' | 'warn' | 'error', content: string) {
-  const record: any = { type: 'add', payload: { timestamp: Date.now(), content } }
+function makeRecord (level: ILogLevel, content: string) {
+  const record: any = { timestamp: Date.now(), content }
   switch (level) {
     case 'debug':
-      record.payload['level'] = 0
-      record.payload['levelText'] = 'DEBUG'
+      record['level'] = 0
+      record['levelText'] = 'DEBUG'
       break
     case 'info':
-      record.payload['level'] = 1
-      record.payload['levelText'] = 'INFO'
+      record['level'] = 1
+      record['levelText'] = 'INFO'
       break
     case 'warn':
-      record.payload['level'] = 2
-      record.payload['levelText'] = 'WARN'
+      record['level'] = 2
+      record['levelText'] = 'WARN'
       break
     case 'error':
-      record.payload['level'] = 3
-      record.payload['levelText'] = 'ERROR'
+      record['level'] = 3
+      record['levelText'] = 'ERROR'
       break
     default:
-      record.payload['level'] = 9
-      record.payload['levelText'] = 'UNKNOWN'
+      record['level'] = 9
+      record['levelText'] = 'UNKNOWN'
       break
   }
   return record
-}
-
-type LoggerFn = (content: string) => any
-export interface ILogger {
-  debug: LoggerFn
-  info: LoggerFn
-  warn: LoggerFn
-  error: LoggerFn
 }
 
 /**
@@ -42,7 +35,7 @@ export interface ILogger {
  * @returns Console management methods
  */
 const useLogger = (): {
-  logs: IConsoleState
+  logs: ILogItem[]
   logger: ILogger
   clear: () => void
 } => {
@@ -58,38 +51,40 @@ const useLogger = (): {
  */
 const useWrappedLogger = (
   consoleState: IConsoleState,
-  consoleDispatch: (data: any) => void
+  consoleDispatch: (data: IConsoleReducerAction) => void
 ): {
-  logs: IConsoleState
+  logs: ILogItem[]
   logger: ILogger
   clear: () => void
 } => {
   const debug = useCallback((content: string) => {
-    consoleDispatch(makeRecord('debug', content))
+    consoleDispatch({ type: 'c_log', payload: makeRecord('debug', content) })
   }, [consoleDispatch])
 
   const info = useCallback((content: string) => {
-    consoleDispatch(makeRecord('info', content))
+    consoleDispatch({ type: 'c_log', payload: makeRecord('info', content) })
   }, [consoleDispatch])
 
   const warn = useCallback((content: string) => {
-    consoleDispatch(makeRecord('warn', content))
+    consoleDispatch({ type: 'c_log', payload: makeRecord('warn', content) })
   }, [consoleDispatch])
 
   const error = useCallback((content: string) => {
-    consoleDispatch(makeRecord('error', content))
+    consoleDispatch({ type: 'c_log', payload: makeRecord('error', content) })
   }, [consoleDispatch])
 
   const clear = useCallback(() => {
-    consoleDispatch({ type: 'clear' })
+    consoleDispatch({ type: 'd_log' })
   }, [consoleDispatch])
 
   return {
-    logs: consoleState,
+    logs: consoleState.logs,
     logger: { debug, info, warn, error },
     clear
   }
 }
 
-export default useLogger
-export { useWrappedLogger }
+export {
+  useLogger,
+  useWrappedLogger
+}

@@ -1,0 +1,20 @@
+$baseCls: 'accessory';
+
+.#{$baseCls} {
+  position: relative;
+
+  &-flex {
+    position: relative;
+    padding: 4px 0;
+  }
+
+  &-badge {
+    cursor: pointer;
+    user-select: none;
+    pointer-events: none;
+
+    &.ant-badge-count.ant-badge-multiple-words {
+      padding: 0 5px;
+    }
+  }
+}

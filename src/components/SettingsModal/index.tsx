@@ -1,178 +1,160 @@
-import { forwardRef, useEffect, useImperativeHandle, useState } from 'react'
-import useGlobalData from '@/utils/hooks/useGlobalData'
-import { Form, InputNumber, Modal, Radio, message } from 'antd'
-import { saveConfig } from '@/utils/config'
+import { Button, Form, Input, InputNumber, Modal, Radio, Select, Space, Switch } from 'antd'
+import { ConfigContext } from '@/context/config'
+import { ISysConfig } from '@/types/syscfg'
+import { QuickModal, QuickModalInst, QuickModalRef } from '../QuickModal'
+import { forwardRef, useContext, useImperativeHandle, useMemo, useRef } from 'react'
+import { langs, useMultiLang } from '@/utils/mlang'
+import { makeSysConfigModal, saveConfig } from '@/utils/syscfg'
+import { useLockFn } from 'ahooks'
 import './index.scss'
+import { MultiLangProps } from '@/types/mlang'
 
-type ContentRef = {
-  toggle: (visible?: boolean) => void
-}
+interface IProps extends MultiLangProps {}
 
-type ContentProps = {
-  exampleprop?: any
-}
-
-export type {
-  ContentRef as SettingsModalRef,
-  ContentProps as SettingsModalProps
-}
-
-const baseCls = 'settings-modal'
-const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
-  const { globalData, setGlobalData } = useGlobalData()
-  // modal visible status
-  const [visible, setVisible] = useState(false)
-  // is confirm button loading
-  const [confirmLoading, setConfirmLoading] = useState(false)
-  // config form instance
+const baseCls = 'modal-settings'
+const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
+  const { state, dispatch } = useContext(ConfigContext)
+  const { fmlText } = useMultiLang(state, baseCls, props.inheritName)
+  const { system } = state
+  const titleRef = useRef<HTMLSpanElement>(null)
   const [form] = Form.useForm()
+  const mRef = useRef<QuickModalRef>(null)
+
+  const languageOptions = useMemo(() => {
+    return Object.entries(langs).map(([key, value]) => ({
+      value: key,
+      label: value.name
+    }))
+  }, [])
 
   useImperativeHandle(ref, () => ({
-    toggle: toggleModalVisible
+    toggle: (visible?: boolean) => {
+      if (visible) form.setFieldsValue(system)
+      mRef.current?.toggle(visible)
+    }
   }))
 
-  const toggleModalVisible = (visible?: boolean) => {
-    setVisible(s => visible ?? !s)
-  }
-
-  const handleOk = async () => {
-    setConfirmLoading(true)
-    Modal.confirm({
-      title: '注意',
-      content: '确认保存设置?',
-      autoFocusButton: null,
-      focusTriggerAfterClose: false,
-      onCancel () {
-        setConfirmLoading(false)
-      },
-      onOk: async () => {
-        const currentConfig = form.getFieldsValue()
-        const saveConfigStatus = await saveConfig(currentConfig)
-        if (saveConfigStatus === 'ok') {
-          setGlobalData({ config: currentConfig })
-          setConfirmLoading(false)
-          setVisible(false)
-        } else {
-          message.error(`保存失败(${saveConfigStatus})`, 5)
-          // logger.error(`Save config failed: ${saveConfigStatus}`)
-          setConfirmLoading(false)
-        }
-      }
-    })
-  }
-
-  const handleCancel = () => {
-    // if has changed settings, prompt user to confirm ignore changes
-    // reload content from globalData
-    setVisible(false)
-  }
-
-  const handleModifyDangerousSettings = (key: string) => {
-    Modal.confirm({
-      title: '注意',
-      content: '修改此项可能导致您的系统遭受攻击! 请务必确认脚本可信后再启用此项!',
-      autoFocusButton: null,
-      focusTriggerAfterClose: false,
-      okButtonProps: { danger: true },
-      onCancel () { form.setFieldsValue({ [key]: false }) }
-    })
-  }
-
-  // life cycle
-  useEffect(() => {
-    if (visible) {
-      form.setFieldsValue(globalData.config)
+  const onOk = useLockFn(async () => {
+    let formValues: ISysConfig
+    try {
+      formValues = await form.validateFields()
+    } catch (error) {
+      console.log('Failed:', error)
+      return
     }
-  }, [visible])
+    console.log('Success:', formValues)
+    const modal = makeSysConfigModal()
+    await saveConfig(formValues, modal)
+    modal.destroy()
+    dispatch({ type: 'u_system', payload: formValues });
+    (ref as QuickModalInst)?.current.toggle(false)
+  })
 
-  return (
-    <Modal
-      title='设置'
-      confirmLoading={confirmLoading}
-      closable={false}
-      focusTriggerAfterClose={false}
-      maskClosable={false}
-      okText='保存设置'
-      open={visible}
-      width={640}
-      wrapClassName={baseCls}
-      onCancel={handleCancel}
-      onOk={handleOk}
+  const renderTitle = useMemo(() => {
+    return (<span className={`${baseCls}-title`} ref={titleRef}>
+      <span className={`${baseCls}-title-text`}>{fmlText('title')}</span>
+      <span className={`${baseCls}-title-ver`}>Ver {system?.cfg_ver}</span>
+      <span className={`${baseCls}-title-btns`}>
+        <Button size='small' type='text' onClick={() => {
+          Modal.info({
+            title: fmlText('raw_title'),
+            content: (<pre>
+              {JSON.stringify(system, undefined, 2)}
+            </pre>),
+            closable: true,
+            footer: null,
+            maskClosable: true,
+            wrapClassName: `${baseCls}-raw`,
+            getContainer: () => titleRef.current || document.body,
+          })
+        }}>{fmlText('raw')}</Button>
+      </span>
+    </span>)
+  }, [state.langs, system?.cfg_ver])
+
+  return (<QuickModal
+    classNames={{ body: `${baseCls}-body` }}
+    title={renderTitle}
+    ref={mRef}
+    footer={() => (
+      <Space>
+        <Button type='primary' onClick={onOk}>{fmlText('save')}</Button>
+        <Button onClick={() => (ref as QuickModalInst)?.current.toggle(false)}>{fmlText('common:cancel')}</Button>
+      </Space>
+    )}
+  >
+    <Form
+      autoComplete="off"
+      form={form}
+      initialValues={system}
+      labelCol={{ span: 6 }}
+      labelWrap={true}
+      name="sys_cfg"
+      requiredMark={false}
+      colon={false}
     >
-      <div className={`${baseCls}-content`}>
-        <Form
-          form={form}
-          autoComplete='off'
-          colon={false}
-          labelCol={{ span: 6 }}
-          requiredMark={false}
-        >
+      <Form.Item<ISysConfig>
+        hidden
+        label={fmlText('cfg_ver')}
+        name="cfg_ver"
+        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+      >
+        <Input disabled />
+      </Form.Item>
+      <Form.Item<ISysConfig>
+        label={fmlText('cfg_lang')}
+        name="lang"
+        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+      >
+        <Select
+          style={{ width: 120 }}
+          options={languageOptions}
+        />
+      </Form.Item>
+      <Form.Item label={fmlText('cfg_limit')} style={{ marginBottom: 0 }}>
+        <Space>
           <Form.Item
-            label='警告文件数'
-            name='warn_limit'
-            tooltip='设置警告阈值，当载入文件超过此值时提示加载可能需要较长的时间'
-            rules={[{ required: true, message: '请输入此项!' }]}
+            className={`${baseCls}-label-sm`}
+            tooltip={fmlText('cfg_limit_max_tips')}
+            label={fmlText('cfg_limit_max')}
+          />
+          <Form.Item<ISysConfig>
+            name={["limit", "max"]}
+            style={{ display: 'inline-block' }}
+            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
           >
-            <InputNumber controls={false} min={2000} step={100} />
+            <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
           </Form.Item>
           <Form.Item
-            label='最大处理文件数'
-            name='max_limit'
-            tooltip='设置最大处理文件数，过大可能导致系统无响应。'
-            rules={[{ required: true, message: '请输入此项!' }]}
+            className={`${baseCls}-label-sm`}
+            tooltip={fmlText('cfg_limit_warn_tips')}
+            label={fmlText('cfg_limit_warn')}
+          />
+          <Form.Item<ISysConfig>
+            name={["limit", "warn"]}
+            style={{ display: 'inline-block' }}
+            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
           >
-            <InputNumber controls={false} min={2000} step={100} />
+            <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
           </Form.Item>
-          <Form.Item
-            label='递归读取文件夹'
-            name='recursive_read'
-            tooltip='启用此项在读取源文件夹时将会递归读取子文件夹'
-            rules={[{ required: true, message: '请输入此项!' }]}
-          >
-            <Radio.Group>
-              <Radio value={true}>是</Radio>
-              <Radio value={false}>否</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            label='文件操作模式'
-            name='fsop_mode'
-            tooltip='复制: 复制文件到目标文件夹，不删除源文件。移动: 移动文件到目标文件夹，删除源文件。'
-            rules={[{ required: true, message: '请输入此项!' }]}
-          >
-            <Radio.Group>
-              <Radio value={'copy'}>复制</Radio>
-              <Radio value={'move'}>移动</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            label='外部筛选器'
-            name='allow_external_filters'
-            tooltip='启用此项可允许程序加载第三方筛选脚本，提供更多的筛选功能'
-            rules={[{ required: true, message: '请输入此项!' }]}
-          >
-            <Radio.Group onChange={e => { if (e.target.value) handleModifyDangerousSettings('allow_external_filters') }}>
-              <Radio value={true}>是</Radio>
-              <Radio value={false}>否</Radio>
-            </Radio.Group>
-          </Form.Item>
-          <Form.Item
-            label='外部重命名器'
-            name='allow_external_renamers'
-            tooltip='启用此项可允许程序加载第三方重命名脚本，提供更多的重命名功能'
-            rules={[{ required: true, message: '请输入此项!' }]}
-          >
-            <Radio.Group onChange={e => { if (e.target.value) handleModifyDangerousSettings('allow_external_renamers') }}>
-              <Radio value={true}>是</Radio>
-              <Radio value={false}>否</Radio>
-            </Radio.Group>
-          </Form.Item>
-        </Form>
-      </div>
-    </Modal>
-  )
+        </Space>
+      </Form.Item>
+      <Form.Item<ISysConfig>
+        label={fmlText('cfg_fsn')}
+        name="follow_step_name"
+        tooltip={fmlText('cfg_fsn_tips')}
+        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+      >
+        <Radio.Group>
+          <Radio value={true}>{fmlText('common:yes')}</Radio>
+          <Radio value={false}>{fmlText('common:no')}</Radio>
+        </Radio.Group>
+      </Form.Item>
+    </Form>
+  </QuickModal>)
 })
 
 Content.defaultProps = {}
 Content.displayName = baseCls
-export default Content
+export { Content as SettingsModal }
+export type { IProps as SettingsModalProps }

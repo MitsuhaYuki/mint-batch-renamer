@@ -1,9 +1,9 @@
-import { ISysConfig, sysConfigTrait } from '@/types/sysconfig'
+import { ISysConfig, sysConfigTrait } from '@/types/syscfg'
 import { Button, Modal, ModalFuncProps, Space } from 'antd'
-import { Fragment, ReactNode, useContext, useEffect } from 'react'
+import { Fragment, ReactNode, useEffect } from 'react'
 import { CheckCircleFilled, CloseCircleFilled, ExclamationCircleFilled, InfoCircleFilled, LoadingOutlined, QuestionCircleFilled } from '@ant-design/icons'
 import { invoke } from '@tauri-apps/api/tauri'
-import { exit, relaunch } from '@tauri-apps/api/process'
+import { exit } from '@tauri-apps/api/process'
 import { IConfigReducerAction, IConfigState } from '@/context/config'
 
 type SysCfgModalController = {
@@ -127,7 +127,7 @@ const updateConfig = async (
       // TODO: prompt user that some of the config has changed
     }
     result.cfg_ver = sysConfigTrait.cfg_ver.default
-    await saveConfig(cfgLoaderConfig.cfgPath, result, modal)
+    await saveConfig(result, modal)
     dispatch({ type: 'u_system', payload: result })
     modal.update({
       content: renderContent('配置文件更新成功', 'success'),
@@ -140,7 +140,7 @@ const updateConfig = async (
       content: renderContent('检查配置文件版本失败', 'error', { error: 'config version mismatch', override: ['请尝试重置配置'] }),
       footer: () => (<Space>
         <Button type='primary' danger onClick={
-          () => resetConfig(cfgLoaderConfig.cfgPath, modal, dispatch, true)
+          () => resetConfig(modal, dispatch, true)
         }>重置配置</Button>
         <Button type='primary' onClick={
           () => exit(0)
@@ -151,7 +151,6 @@ const updateConfig = async (
 }
 
 const saveConfig = async (
-  cfgPath: string,
   config: ISysConfig,
   modal: SysCfgModalController
 ) => {
@@ -162,8 +161,8 @@ const saveConfig = async (
   })
   await wait()
   try {
-    if (await invoke('fs_exists', { path: cfgPath })) await invoke('fs_remove_file', { path: cfgPath })
-    await invoke('fs_write_text_file', { path: cfgPath, contents: JSON.stringify(config, undefined, 2) })
+    if (await invoke('fs_exists', { path: cfgLoaderConfig.cfgPath })) await invoke('fs_remove_file', { path: cfgLoaderConfig.cfgPath })
+    await invoke('fs_write_text_file', { path: cfgLoaderConfig.cfgPath, contents: JSON.stringify(config, undefined, 2) })
     modal.update({
       content: renderContent('配置文件保存成功!', 'success'),
       footer: null
@@ -203,7 +202,7 @@ const loadConfig = async (
       content: renderContent('读取配置文件失败', 'error', { error: `${e}`, extra: ['如果您不知道如何解决这个问题, 请尝试重置配置'] }),
       footer: () => (<Space>
         <Button type='primary' danger onClick={
-          () => resetConfig(cfgLoaderConfig.cfgPath, modal, dispatch, true)
+          () => resetConfig(modal, dispatch, true)
         }>重置配置</Button>
         {/* <Button type='primary' onClick={
           () => relaunch()
@@ -217,7 +216,6 @@ const loadConfig = async (
 }
 
 const resetConfig = async (
-  cfgPath: string,
   modal: SysCfgModalController,
   dispatch: (data: IConfigReducerAction) => void,
   hardReset: boolean = false
@@ -229,8 +227,8 @@ const resetConfig = async (
   })
   await wait()
   try {
-    if (hardReset && (await invoke('fs_exists', { path: cfgPath }))) await invoke('fs_remove_file', { path: cfgPath })
-    await invoke('fs_write_text_file', { path: cfgPath, contents: JSON.stringify(makeDefaultConfig(), undefined, 2) })
+    if (hardReset && (await invoke('fs_exists', { path: cfgLoaderConfig.cfgPath }))) await invoke('fs_remove_file', { path: cfgLoaderConfig.cfgPath })
+    await invoke('fs_write_text_file', { path: cfgLoaderConfig.cfgPath, contents: JSON.stringify(makeDefaultConfig(), undefined, 2) })
     modal.update({
       content: renderContent('配置文件重置成功!', 'success'),
       footer: null
@@ -289,7 +287,7 @@ const useSysConfig = (
 
 export {
   loadConfig,
-  // saveConfig,
+  saveConfig,
   makeDefaultConfig,
   makeSysConfigModal,
   resetConfig,

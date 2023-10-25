@@ -6,7 +6,52 @@
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mint Batch Renamer</title>
+  <!-- Only preload for default font -->
+  <link rel="preload" href="fonts/LXGWWenKaiLite-Regular.ttf" as="font" type="font/ttf" crossorigin>
   <style>
+    @font-face {
+      font-family: "lxgw-wenkai";
+      font-display: block;
+      src: url('fonts/LXGWWenKaiLite-Light.ttf');
+      font-weight: 100 300;
+    }
+
+    @font-face {
+      font-family: "lxgw-wenkai";
+      font-display: block;
+      src: url('fonts/LXGWWenKaiLite-Regular.ttf');
+      font-weight: 400 600;
+    }
+
+    @font-face {
+      font-family: "lxgw-wenkai";
+      font-display: block;
+      src: url('fonts/LXGWWenKaiLite-Bold.ttf');
+      font-weight: 700 900;
+    }
+
+    @font-face {
+      font-family: "lxgw-wenkai-mono";
+      src: url('fonts/LXGWWenKaiMonoLite-Light.ttf');
+      font-weight: 100 300;
+    }
+
+    @font-face {
+      font-family: "lxgw-wenkai-mono";
+      src: url('fonts/LXGWWenKaiMonoLite-Regular.ttf');
+      font-weight: 400 600;
+    }
+
+    @font-face {
+      font-family: "lxgw-wenkai-mono";
+      src: url('fonts/LXGWWenKaiMonoLite-Bold.ttf');
+      font-weight: 700 900;
+    }
+
+    * {
+      font-family: 'lxgw-wenkai', 'lxgw-wenkai-mono'
+    }
+
     #root-loading-screen {
       position: fixed;
       top: 0;

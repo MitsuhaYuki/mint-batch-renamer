@@ -2,7 +2,6 @@
 import ReactDOM from 'react-dom/client'
 import { App } from './layout/App'
 import 'antd/dist/reset.css'
-import './main.css'
 
 // temporary disable to prevent double render
 // ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(

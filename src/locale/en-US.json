@@ -1,0 +1,113 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "clear": "Clear",
+    "close": "Close",
+    "confirm": "Ok",
+    "example": "Some example text with multi-langs",
+    "form_tips_required": "Required",
+    "save": "Save",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "entrance": {
+    "hello": "hello, entrance, {0}!"
+  },
+  "accessory": {
+    "logs": "Console",
+    "settings": "Settings"
+  },
+  "modal-settings": {
+    "title": "Settings",
+    "raw": "Raw",
+    "raw_title": "Raw Configuration",
+    "save": "Save Config",
+    "cfg_ver": "Config Version",
+    "cfg_dev_ui": "UI Type",
+    "cfg_ui_exp": "Experimental",
+    "cfg_ui_ori": "Original",
+    "cfg_lang": "Languages",
+    "cfg_limit": "Limit",
+    "cfg_limit_max": "Max",
+    "cfg_limit_max_tips": "The maximum number of files that can be processed",
+    "cfg_limit_warn": "Warn",
+    "cfg_limit_warn_tips": "Warn when number of files exceeds this value",
+    "cfg_fsn": "Follow Name",
+    "cfg_fsn_tips": "When this option is enabled, if the current step name is the default value or the same as the current runner name, the step name will be automatically updated when switching the runner"
+  },
+  "console": {
+    "title": "Console",
+    "export": "Export logs",
+    "clear_ok": "Console cleared",
+    "clear_empty": "Console is already empty"
+  },
+  "basecfg": {
+    "ui_source": "Add Source",
+    "ui_source_cls": "Clear Source",
+    "ui_source_rfs": "Refresh",
+    "ui_source_ext": "More Options",
+    "ui_source_del": "Remove This",
+    "uim_source": "Select source folder",
+    "msg_max_limit": "Cannot load file list, too many files",
+    "msg_load_start": "Loading file llst...",
+    "msg_load_success": "Refreshed file list",
+    "msg_no_source": "No source folder selected",
+    "msg_source_conflict": "Do not select duplicate folders, subfolders or parent folders as sources!",
+    "msg_warn_limit": "You selected too many files, please wait for loading",
+    "msg_unknown_err": "Unknown Error ({0})",
+    "ui_read_method": "File List Method",
+    "ui_current": "Current Only",
+    "ui_recursive": "Recursively",
+    "ui_proc_method": "File Processing",
+    "ui_file_copy": "Copy",
+    "ui_file_move": "Move"
+  },
+  "details": {
+    "name": "Full Name",
+    "path": "Path",
+    "file_name": "File Name",
+    "file_ext": "Extension",
+    "size": "Size",
+    "re_name": "re-FullName",
+    "re_file_name": "re-Name",
+    "re_file_ext": "re-Extension"
+  },
+  "taskflow": {
+    "default_task": "Click here to edit"
+  },
+  "flow-ctrl": {
+    "new": "Add Step",
+    "preview": "Dry Run",
+    "run": "Run",
+    "no_source": "Selected source has no file",
+    "no_task": "You have not added any steps yet",
+    "preview_done": "Preview done",
+    "no_result": "No result to apply, have you run the \"Preview\"?",
+    "cfm_run_title": "Apply Result",
+    "cfm_run_msg": "Are you sure to apply result?"
+  },
+  "flow-manage": {
+    "import_seq": "Import Sq",
+    "import_seq_title": "Import Flow Config",
+    "import_ok": "Flow config import successfully",
+    "import_failed": "Import config failed ({0})",
+    "cfg_typevar": "Flow Config",
+    "export_seq": "Export Sq",
+    "export_ok": "Flow config export successfully"
+  },
+  "modal-task-cfg": {
+    "title": "Task Configuration",
+    "step_name": "Step Name",
+    "runner": "Runner",
+    "msg_cfg_invalid": "Configuration is not correct!",
+    "select_path": "Select",
+    "no_path": "Not Selected"
+  },
+  "modal-about": {
+    "title": "About",
+    "app_ver": "App Version",
+    "tauri_ver": "Tauri Version",
+    "author": "Author",
+    "font_name": "Font Name"
+  }
+}

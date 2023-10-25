@@ -1,0 +1,93 @@
+$baseCls: 'basecfg';
+
+.#{$baseCls} {
+  width: 100%;
+  height: 100%;
+
+  .anticon {
+    color: #595959;
+  }
+
+  &-main {
+    padding: 4px 6px;
+  }
+
+  &-extra {
+    &.ant-collapse {
+      .ant-collapse-item {
+        .ant-collapse-header {
+          display: none;
+        }
+
+        .ant-collapse-content {
+          position: relative;
+          overflow: hidden;
+          border-radius: 0;
+          background: #fafafa;
+
+          &-box {
+            padding: 0px 4px 6px;
+          }
+
+          &::before, &::after {
+            display: block;
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 0;
+            z-index: 1;
+            box-shadow: 0 0 5px 1px #bfbfbf;
+          }
+
+          &::before {
+            top: 0;
+          }
+
+          &::after {
+            bottom: 0;
+          }
+        }
+      }
+    }
+
+    &-cfg {
+      .ant-segmented {
+        width: 100%;
+
+        .ant-segmented-group {
+          .ant-segmented-item {
+            flex: 1 1 auto;
+          }
+        }
+      }
+
+      &-title {
+        color: #595959;
+        font-size: 14px;
+        padding: 4px 4px 2px;
+      }
+    }
+  }
+
+  &-src {
+    padding: 2px 6px 4px;
+
+    &-item {
+      background: #f0f0f0;
+      padding: 2px 4px;
+      transition: background-color 0.1s ease-in-out;
+      border-radius: 4px;
+
+      &:hover {
+        background: #d9d9d9;
+      }
+
+      &-text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: default;
+      }
+    }
+  }
+}

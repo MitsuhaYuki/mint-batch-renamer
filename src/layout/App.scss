@@ -1,6 +1,48 @@
 $baseCls: 'app';
 
+/* App Component Style */
 .#{$baseCls} {
   height: 100%;
   overflow: hidden;
+}
+
+/* Ant-Design Component Style Override */
+body {
+  .ant-btn {
+    &.flex-auto {
+      flex: 1 1 auto;
+    }
+
+    &.compact {
+      padding: 0 2px;
+
+      .ant-btn-icon {
+        margin-inline-end: 4px;
+      }
+    }
+  }
+
+  .ant-input {
+    font-family: 'lxgw-wenkai', 'lxgw-wenkai-mono';
+  }
+}
+
+/* Height Correction */
+html, body, #root {
+  height: 100%;
+}
+
+/* Root style adjustment */
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* styles here for dark mode */
+  }
 }

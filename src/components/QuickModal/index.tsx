@@ -1,5 +1,7 @@
-import { useState, forwardRef, useImperativeHandle, MutableRefObject } from 'react'
+import { useState, forwardRef, useImperativeHandle, MutableRefObject, Children, cloneElement, ReactElement } from 'react'
 import { Modal, ModalProps } from 'antd'
+import { MultiLangProps } from '@/types/mlang'
+import { useMultiLangWrapped } from '@/utils/mlang'
 import './index.scss'
 
 type ContentRef = {
@@ -8,11 +10,12 @@ type ContentRef = {
 
 type ContentInst = MutableRefObject<ContentRef>
 
-interface ContentProps extends ModalProps {}
+interface ContentProps extends ModalProps, MultiLangProps {}
 
 const baseCls = 'quick-modal'
 const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
   const [visible, setVisible] = useState(false)
+  const { fmlText } = useMultiLangWrapped(baseCls, props.inheritName)
 
   useImperativeHandle(ref, () => ({
     toggle: toggleModalVisible
@@ -26,9 +29,12 @@ const Content = forwardRef<ContentRef, ContentProps>((props, ref) => {
     <Modal
       title="Modal"
       open={visible}
-      okText='确定'
-      cancelText='取消'
+      okText={fmlText('common:confirm')}
+      cancelText={fmlText('common:cancel')}
       onCancel={() => toggleModalVisible(false)}
+      footer={(i: any) => cloneElement(i, {
+        children: Children.toArray(i.props.children).reverse()
+      })}
       {...props}
     />
   )

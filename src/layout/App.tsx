@@ -1,56 +1,48 @@
-import { Entrance } from './main'
-import zhCN from 'antd/locale/zh_CN'
 import { App, ConfigProvider } from 'antd'
-import { ConsoleContext, consoleInitState, consoleReducer } from '@/context/console'
-import { FC, useReducer } from 'react'
-import { GlobalContext, IGlobalReducerAction, IGlobalState, globalInitState, globalReducer } from '@/context/global'
-import { useConfigLoader } from '@/utils/config'
-import { useExternalScriptLoader } from '@/utils/extension'
-import { useMount } from 'ahooks'
-import './App.scss'
-import { useSysConfig } from '@/utils/syscfg'
-import { useTauriEvent } from '@/utils/tauri'
 import { ConfigContext, configInitState, configReducer } from '@/context/config'
+import { ConsoleContext, consoleInitState, consoleReducer } from '@/context/console'
+import { Entrance } from './main'
+import { FC, useReducer } from 'react'
+import { RuntimeContext, runtimeInitState, runtimeReducer } from '@/context/runtime'
+import { useMount } from 'ahooks'
+import { useMultiLangLoader } from '@/utils/mlang'
+import { useSysConfig } from '@/utils/syscfg'
+import { useSystemTaskRunner } from '@/utils/runners/common'
+import './App.scss'
 
 const baseCls = 'app'
 const Content: FC = () => {
-  // initialize all context
-  const [globalState, globalDispatch] = useReducer(globalReducer, globalInitState)
-  const [consoleState, consoleDispatch] = useReducer(consoleReducer, consoleInitState)
-
-  // check & load config file
-  useConfigLoader(globalState, globalDispatch)
-  useExternalScriptLoader(globalState, globalDispatch, consoleState, consoleDispatch)
-
-  // Listen to tauri event
-  useTauriEvent(globalState, globalDispatch)
-
-  /* UPDATE - NEW SEASON */
   // initialize config context
   const [configState, configDispatch] = useReducer(configReducer, configInitState)
+  const [consoleState, consoleDispatch] = useReducer(consoleReducer, consoleInitState)
+  const [runtimeState, runtimeDispatch] = useReducer(runtimeReducer, runtimeInitState)
 
-  // check & load config file
+  // check & load essential data
   useSysConfig(configState, configDispatch)
+  useMultiLangLoader(configState, configDispatch)
+  useSystemTaskRunner(runtimeState, runtimeDispatch)
 
   // hide loading screen
   useMount(() => {
-    document.querySelector('#root-loading-screen')?.classList.add('elem-fade-out')
     setTimeout(() => {
-      document.querySelector('#root-loading-screen')?.classList.add('elem-hidden')
-      window.postMessage({ type: 'STOP_ANIME' })
-    }, 500)
+      document.querySelector('#root-loading-screen')?.classList.add('elem-fade-out')
+      setTimeout(() => {
+        document.querySelector('#root-loading-screen')?.classList.add('elem-hidden')
+        window.postMessage({ type: 'STOP_ANIME' })
+      }, 500)
+    }, 100)
   })
 
   return (
-    <ConfigProvider autoInsertSpaceInButton={false} locale={zhCN}>
+    <ConfigProvider autoInsertSpaceInButton={false}>
       <ConfigContext.Provider value={{ state: configState, dispatch: configDispatch }}>
-        <GlobalContext.Provider value={{ state: globalState, dispatch: globalDispatch }}>
-          <ConsoleContext.Provider value={{ state: consoleState, dispatch: consoleDispatch }}>
+        <ConsoleContext.Provider value={{ state: consoleState, dispatch: consoleDispatch }}>
+          <RuntimeContext.Provider value={{ state: runtimeState, dispatch: runtimeDispatch }}>
             <App className={baseCls}>
               <Entrance />
             </App>
-          </ConsoleContext.Provider>
-        </GlobalContext.Provider>
+          </RuntimeContext.Provider>
+        </ConsoleContext.Provider>
       </ConfigContext.Provider>
     </ConfigProvider>
   )

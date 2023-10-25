@@ -1,0 +1,81 @@
+$baseCls: 'taskflow';
+@import '@/styles/common.scss';
+
+.#{$baseCls} {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .anticon {
+    color: #595959;
+  }
+
+  &-main {
+    padding: 4px 6px;
+  }
+
+  &-cpt {
+    flex: 1 1 auto;
+  }
+
+  &-tasks {
+    flex: 1 1 auto;
+    position: relative;
+    overflow: hidden;
+    background: #fafafa;
+
+    &::before, &::after {
+      display: block;
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 0;
+      z-index: 1;
+      box-shadow: 0 0 5px 1px #bfbfbf;
+    }
+
+    &::before {
+      top: 0;
+    }
+
+    &::after {
+      bottom: 0;
+    }
+
+    &-inner {
+      @include customScrollbar();
+      height: 100%;
+      padding: 4px;
+      overflow: auto;
+    }
+
+    &-item {
+      background: #f0f0f0;
+      padding: 2px 4px;
+      transition: background-color 0.1s ease-in-out;
+      border-radius: 4px;
+
+      &:hover {
+        background: #d9d9d9;
+      }
+
+      &-text {
+        cursor: pointer;
+        flex: 1 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      &-btns {
+        .ant-btn:disabled {
+          .ant-btn-icon .anticon {
+            color: #d9d9d9;
+          }
+        }
+      }
+    }
+  }
+}

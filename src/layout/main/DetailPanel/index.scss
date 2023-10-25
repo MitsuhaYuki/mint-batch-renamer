@@ -1,0 +1,30 @@
+$baseCls: 'details';
+@import '@/styles/common.scss';
+
+.#{$baseCls} {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  &-table {
+    @include customScrollbar();
+    flex: 1 1 auto;
+    overflow: auto;
+
+    .ant-table {
+      &.ant-table-empty {
+        .ant-table-body {
+          .ant-table-tbody {
+            & > tr.ant-table-placeholder {
+              & > td.ant-table-cell {
+                padding: 0;
+                border: none;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

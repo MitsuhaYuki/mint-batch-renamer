@@ -1,0 +1,13 @@
+$baseCls: 'folder-selector';
+
+.#{$baseCls} {
+  // styles here
+  &-main {
+    &-path {
+      min-height: 32px;
+      word-break: break-all;
+      display: flex;
+      align-items: center;
+    }
+  }
+}

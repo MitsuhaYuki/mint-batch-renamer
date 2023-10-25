@@ -1,0 +1,113 @@
+{
+  "common": {
+    "cancel": "取消",
+    "clear": "清除",
+    "close": "关闭",
+    "confirm": "确定",
+    "example": "一些多语言的示例文本",
+    "form_tips_required": "必填项",
+    "save": "保存",
+    "yes": "是",
+    "no": "否"
+  },
+  "entrance": {
+    "hello": "你好, entrance, {0}!"
+  },
+  "accessory": {
+    "logs": "日志记录",
+    "settings": "系统设置"
+  },
+  "modal-settings": {
+    "title": "设置",
+    "raw": "Raw",
+    "raw_title": "原始配置文件信息",
+    "save": "保存配置",
+    "cfg_ver": "配置文件版本",
+    "cfg_dev_ui": "UI类型",
+    "cfg_ui_exp": "实验性",
+    "cfg_ui_ori": "原始",
+    "cfg_lang": "语言",
+    "cfg_limit": "资源限制",
+    "cfg_limit_max": "最大",
+    "cfg_limit_max_tips": "最大允许处理的文件数",
+    "cfg_limit_warn": "警告",
+    "cfg_limit_warn_tips": "警告弹窗文件数阈值",
+    "cfg_fsn": "跟随步骤名",
+    "cfg_fsn_tips": "当此项开启时, 若当前步骤名为默认值或与当前执行器名称一致时, 则会在切换执行器时自动更新步骤名"
+  },
+  "console": {
+    "title": "日志记录",
+    "export": "导出日志",
+    "clear_ok": "日志已清空",
+    "clear_empty": "无更多日志可清理"
+  },
+  "basecfg": {
+    "ui_source": "选择源文件夹",
+    "ui_source_cls": "清空源文件夹",
+    "ui_source_rfs": "刷新文件列表",
+    "ui_source_ext": "选项",
+    "ui_source_del": "移除此源",
+    "uim_source": "选择源文件夹",
+    "msg_max_limit": "文件数过多, 无法载入文件列表",
+    "msg_load_start": "正在加载文件列表...",
+    "msg_load_success": "文件列表已刷新",
+    "msg_no_source": "没有选择源文件夹",
+    "msg_source_conflict": "不要选择重复的文件夹、子文件夹或父文件夹作为源!",
+    "msg_warn_limit": "正在载入的文件数较多, 请耐心等待",
+    "msg_unknown_err": "未知错误 ({0})",
+    "ui_read_method": "文件夹读取方式",
+    "ui_current": "仅当前目录",
+    "ui_recursive": "递归子目录",
+    "ui_proc_method": "文件处理方式",
+    "ui_file_copy": "复制",
+    "ui_file_move": "移动"
+  },
+  "details": {
+    "name": "文件全名",
+    "path": "路径",
+    "file_name": "文件名",
+    "file_ext": "拓展名",
+    "size": "大小",
+    "re_name": "重命名全名",
+    "re_file_name": "重命名文件名",
+    "re_file_ext": "重命名拓展名"
+  },
+  "taskflow": {
+    "default_task": "单击此处编辑任务"
+  },
+  "flow-ctrl": {
+    "new": "添加步骤",
+    "preview": "预运行",
+    "run": "运行",
+    "no_source": "当前源没有任何文件可以处理",
+    "no_task": "你还没有添加处理步骤",
+    "preview_done": "预运行完成",
+    "no_result": "没有可用结果, 请先点击 \"预运行\" 以生成结果",
+    "cfm_run_title": "确认运行",
+    "cfm_run_msg": "确认运行此任务?"
+  },
+  "flow-manage": {
+    "import_seq": "导入序列",
+    "import_seq_title": "请选择配置文件",
+    "import_ok": "序列配置导入成功",
+    "import_failed": "序列配置导入失败({0})",
+    "cfg_typevar": "序列配置文件",
+    "export_seq": "导出序列",
+    "export_ok": "序列配置导出成功"
+  },
+  "modal-task-cfg": {
+    "title": "任务配置",
+    "step_name": "步骤名",
+    "runner": "执行器",
+    "msg_cfg_invalid": "执行器配置不正确!",
+    "select_path": "选择路径",
+    "no_path": "无目标路径"
+  },
+  "modal-about": {
+    "title": "关于",
+    "app_ver": "版本",
+    "tauri_ver": "Tauri 版本",
+    "author": "作者",
+    "font_name": "字体名称"
+  }
+}

@@ -47,7 +47,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "Mint Batch Renamer",
+        "title": "Mint Renamer",
         "width": 1280,
         "height": 720,
         "minWidth": 800,

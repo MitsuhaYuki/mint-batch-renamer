@@ -1,0 +1,11 @@
+$baseCls:modal-about;
+
+.#{$baseCls} {
+  &-desc {
+    &-title {
+      font-weight: bold;
+      width: 100px;
+      text-align: right;
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "allow_external_filters": false,
+  "allow_external_renamers": false,
+  "fsop_mode": "move",
+  "max_limit": 50000,
+  "recursive_read": false,
+  "warn_limit": 10000
+}

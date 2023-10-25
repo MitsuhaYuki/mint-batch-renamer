@@ -5,10 +5,31 @@ $baseCls: 'virtual-table';
   overflow: hidden;
 
   &-inner {
+    &.ant-table-wrapper, .ant-spin-nested-loading, .ant-spin-container {
+      height: inherit;
+    }
 
-    .ant-table-container:before,
-    .ant-table-container:after {
-      display: none;
+    .ant-table {
+      height: 100%;
+
+      .ant-table-container:before,
+      .ant-table-container:after {
+        display: none;
+      }
+
+      .ant-table-header {
+        border-radius: 0;
+
+        table > thead > tr:first-child {
+          & > *:first-child {
+            border-start-start-radius: 0;
+          }
+
+          & > *:last-child {
+            border-start-end-radius: 0;
+          }
+        }
+      }
     }
 
     .virtual-table {
