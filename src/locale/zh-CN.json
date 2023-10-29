@@ -60,6 +60,7 @@
     "msg_source_conflict": "不要选择重复的文件夹、子文件夹或父文件夹作为源!",
     "msg_warn_limit": "正在载入的文件数较多, 请耐心等待",
     "msg_unknown_err": "未知错误 ({0})",
+    "msg_drop_impure": "选中的路径中包含非文件夹的项目，已自动过滤",
     "ui_read_method": "文件夹读取方式",
     "ui_current": "仅当前目录",
     "ui_recursive": "递归子目录",
@@ -136,6 +137,8 @@
   },
   "fields": {
     "path_select": "选择路径",
+    "path_drop_enable": "启用拖拽选择路径",
+    "path_drop_tips": "拖动文件/文件夹到此以选择",
     "path_empty": "未选择",
     "runner_type_all": "全部",
     "runner_type_untouch": "无修改",

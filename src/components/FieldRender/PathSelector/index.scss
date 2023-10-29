@@ -1,6 +1,8 @@
 $baseCls: 'field-path-selector';
+$interceptorCls: 'modal-drop-interceptor';
 
 .#{$baseCls} {
+
   // styles here
   &-main {
     &-path {
@@ -9,5 +11,24 @@ $baseCls: 'field-path-selector';
       display: flex;
       align-items: center;
     }
+  }
+}
+
+.#{$interceptorCls} {
+  height: 30%;
+
+  &-content, &-content .ant-modal-body {
+    height: 100%;
+  }
+
+  &-tips {
+    display: flex;
+    height: 100%;
+    font-size: 20px;
+    color: #8c8c8c;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed #8c8c8c;
+    border-radius: 6px;
   }
 }

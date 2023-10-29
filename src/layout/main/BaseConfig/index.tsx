@@ -1,8 +1,9 @@
-import { Button, Collapse, CollapseProps, Flex, Segmented, message } from 'antd'
+import { App, Button, Collapse, CollapseProps, Flex, Segmented } from 'antd'
 import { CloseOutlined, DeleteOutlined, FolderOpenOutlined, MenuOutlined, ReloadOutlined } from '@ant-design/icons'
-import { FC, useState } from 'react'
+import { FC, useContext, useEffect, useState } from 'react'
 import { FileItemExtend } from '@/types/file'
 import { MultiLangProps } from '@/types/mlang'
+import { SysUtilContext } from '@/context/sysutil'
 import { invoke } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useConfigContext } from '@/context/config'
@@ -11,7 +12,6 @@ import { useMultiLang } from '@/utils/mlang'
 import { useRuntimeContext } from '@/context/runtime'
 import { useUpdateEffect } from 'ahooks'
 import './index.scss'
-import { useKeyMessage } from '@/utils/common'
 
 interface IProps extends MultiLangProps {}
 
@@ -19,11 +19,41 @@ const baseCls = 'basecfg'
 const Content: FC<IProps> = (props) => {
   const [config, setConfig] = useConfigContext()
   const [runtime, setRuntime] = useRuntimeContext()
-  const [msgApi, msgCtx] = useKeyMessage(baseCls)
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
   const { logs, logger } = useLogger()
-  // Collapse panel active key
+  const { message } = App.useApp()
+  const { listenTauri } = useContext(SysUtilContext)
   const [activeKey, setActiveKey] = useState<string[]>([])
+
+  const onDropSource = async (path: string[]) => {
+    const dirPath: string[] = []
+    for (const i of path) {
+      const res = await invoke('path_is_dir', { path: i })
+      if (res) { dirPath.push(i) }
+    }
+    if (dirPath.length > 0) {
+      if (dirPath.length !== path.length) {
+        message.warning(fmlText('msg_drop_impure'))
+      }
+      for (const i of dirPath) {
+        const conflict = await isPathConflict(i)
+        if (conflict) return
+      }
+
+      setRuntime('u_source', runtime.source.concat(dirPath))
+    } else {
+      message.error(fmlText('msg_no_source'))
+    }
+  }
+
+  useEffect(() => {
+    const eFileDrop = listenTauri("tauri://file-drop", (e: any) => {
+      if (Array.isArray(e.payload) && e.payload.length > 0) {
+        onDropSource(e.payload)
+      }
+    })
+    return () => { eFileDrop.then(i => i()) }
+  })
 
   /** Refresh file list when receive signal */
   useUpdateEffect(() => {
@@ -34,7 +64,8 @@ const Content: FC<IProps> = (props) => {
   }, [runtime.sync.action, runtime.sync.refresh])
 
   const refreshFileList = async () => {
-    msgApi.info(fmlText('msg_load_start'), 0)
+    const withKey = (content: string, duration?: number) => ({ content, duration, key: 'refresh_source' })
+    message.info(withKey(fmlText('msg_load_start'), 0))
     let totalCount = 0
     let files: FileItemExtend[] = []
     if (runtime.source.length > 0) {
@@ -53,10 +84,10 @@ const Content: FC<IProps> = (props) => {
         totalCount = warnCount
       } catch (e) {
         if (e === 'MAX_LIMIT') {
-          msgApi.warning(fmlText('msg_warn_limit'), 0)
+          message.warning(fmlText('msg_warn_limit'))
         } else {
           logger.error(`RefreshFileList: warn error, ${e}`)
-          msgApi.error(fmlText('msg_unknown_err', `${e}`))
+          message.error(withKey(fmlText('msg_unknown_err', `${e}`)))
           return
         }
       }
@@ -77,10 +108,10 @@ const Content: FC<IProps> = (props) => {
       } catch (e) {
         if (e === 'MAX_LIMIT') {
           logger.error('RefreshFileList: file count exceed max limit')
-          msgApi.error(fmlText('msg_max_limit'))
+          message.error(withKey(fmlText('msg_max_limit')))
         } else {
           logger.error(`RefreshFileList: other error, ${e}`)
-          msgApi.error(fmlText('msg_unknown_err', `${e}`))
+          message.error(withKey(fmlText('msg_unknown_err', `${e}`)))
         }
         return
       }
@@ -104,13 +135,13 @@ const Content: FC<IProps> = (props) => {
         }
       } catch (e) {
         logger.error(`RefreshFileList: READ stage with other error, ${e}`)
-        msgApi.error(fmlText('msg_unknown_err', `${e}`))
+        message.error(withKey(fmlText('msg_unknown_err', `${e}`)))
         return
       }
       logger.info(`RefreshFileList: read finished, total ${files.length} files`)
     }
     // final dispatch
-    msgApi.success(fmlText('msg_load_success'))
+    message.success(withKey(fmlText('msg_load_success')))
     setRuntime('u_file_list', files)
     setRuntime('sig_refresh')
   }
@@ -133,27 +164,33 @@ const Content: FC<IProps> = (props) => {
     return
   }
 
+  const isPathConflict = async (path: string) => {
+    // Check path conflicts
+    const conflicts = runtime.source.filter(i => {
+      let conflict = false
+      if (path.length === i.length) {
+        conflict = path === i
+      } else if (path.length > i.length) {
+        conflict = path.startsWith(i + '\\') || path.startsWith(i + '/')
+      } else {
+        conflict = i.startsWith(path + '\\') || i.startsWith(path + '/')
+      }
+      return conflict
+    })
+    if (conflicts.length > 0) {
+      message.error(fmlText('msg_source_conflict'))
+      logger.warn(`Conflict source folder: ${conflicts.join(', ')}`)
+      return true
+    } else {
+      return false
+    }
+  }
+
   const onSelectSource = async () => {
     const res = await fsOpenDialog(fmlText('uim_source'))
     if (res) {
-      // Check path conflicts
-      const conflicts = runtime.source.filter(i => {
-        let conflict = false
-        if (res.length === i.length) {
-          conflict = res === i
-        } else if (res.length > i.length) {
-          conflict = res.startsWith(i + '\\') || res.startsWith(i + '/')
-        } else {
-          conflict = i.startsWith(res + '\\') || i.startsWith(res + '/')
-        }
-        return conflict
-      })
-      if (conflicts.length > 0) {
-        message.error(fmlText('msg_source_conflict'))
-        logger.warn(`Conflict source folder: ${conflicts.join(', ')}`)
-      } else {
-        setRuntime('c_source', res)
-      }
+      const conflict = await isPathConflict(res)
+      if (!conflict) setRuntime('c_source', res)
     }
   }
 
@@ -194,7 +231,6 @@ const Content: FC<IProps> = (props) => {
   ]
 
   return (<div className={baseCls}>
-    {msgCtx}
     <Flex className={`${baseCls}-main`} justify='space-between'>
       <Button
         icon={<FolderOpenOutlined />}

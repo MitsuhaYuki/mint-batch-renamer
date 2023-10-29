@@ -103,9 +103,11 @@ const Content: FC<IProps> = (props) => {
       return [{
         title: fmlText('col_full'),
         dataIndex: 'name',
+        view: ['all', 'flow_ok', 'output_ok'],
       }, {
         title: fmlText('col_latest_name'),
         dataIndex: 'steps',
+        view: ['all', 'flow_ok'],
         render: (steps: TaskResult[]) => {
           const flag = steps.length > 0 && (steps[steps.length - 1].next || steps[steps.length - 1].to)
           return flag ? steps[steps.length - 1].result.name : fmlText('res_empty')
@@ -113,6 +115,7 @@ const Content: FC<IProps> = (props) => {
       }, {
         title: fmlText('col_res_name'),
         dataIndex: 'steps',
+        view: ['all', 'output_ok'],
         render: (steps: TaskResult[]) => {
           const flag = steps.length > 0 && steps[steps.length - 1].to
           return flag ? steps[steps.length - 1].result.name : fmlText('res_empty')
@@ -120,6 +123,7 @@ const Content: FC<IProps> = (props) => {
       }, {
         title: fmlText('col_flowpass'),
         dataIndex: 'steps',
+        view: ['all', 'flow_ok', 'output_ok'],
         width: 50,
         render: (steps: TaskResult[]) => {
           const flag = steps.length > 0 && (steps[steps.length - 1].next || steps[steps.length - 1].to)
@@ -130,6 +134,7 @@ const Content: FC<IProps> = (props) => {
       }, {
         title: fmlText('col_complete'),
         dataIndex: 'steps',
+        view: ['all', 'flow_ok', 'output_ok'],
         width: 60,
         render: (steps: TaskResult[]) => {
           const flag = steps.length > 0 && steps[steps.length - 1].to
@@ -137,9 +142,9 @@ const Content: FC<IProps> = (props) => {
             flag ? fmlText('complete_ok') : fmlText('complete_fail')
           }>{statusIcon(flag)}</div>
         },
-      }]
+      }].filter((item) => item.view.includes(resRange))
     }
-  }, [fmlText, viewMode])
+  }, [fmlText, viewMode, resRange])
 
   return (<div className={baseCls}>
     <Flex className={`${baseCls}-toolbar`} gap='4px' justify='flex-end' style={{ padding: '4px' }}>

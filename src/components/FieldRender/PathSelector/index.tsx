@@ -1,10 +1,12 @@
-import { WithConfigProps, WithConsoleProps } from '@/types/common'
-import { MultiLangProps } from '@/types/mlang'
-import { useMultiLang } from '@/utils/mlang'
-import { FC } from 'react'
-import { open } from '@tauri-apps/api/dialog'
 import { Button, Flex } from 'antd'
-import { FolderOpenOutlined } from '@ant-design/icons'
+import { DropInterceptor } from './interceptor'
+import { FC, useRef } from 'react'
+import { FolderOpenOutlined, InboxOutlined } from '@ant-design/icons'
+import { MultiLangProps } from '@/types/mlang'
+import { QuickModalRef } from '@/components/QuickModal'
+import { WithConfigProps, WithConsoleProps } from '@/types/common'
+import { open } from '@tauri-apps/api/dialog'
+import { useMultiLang } from '@/utils/mlang'
 import './index.scss'
 
 interface PathSelectorFilter {
@@ -34,6 +36,7 @@ const Content: FC<IProps> = (props) => {
   const { con, config, inheritName, value, onChange, ...dialogProps } = props
   const { logger } = con
   const { fmlName, fmlText } = useMultiLang(config.state, baseCls, inheritName)
+  const interceptor = useRef<QuickModalRef>(null)
 
   const fsOpenDialog = async (): Promise<string | undefined> => {
     try {
@@ -58,12 +61,24 @@ const Content: FC<IProps> = (props) => {
 
   return (<div className={baseCls}>
     <Flex className={`${baseCls}-main`} justify='space-between' gap='8px'>
-      <Button
-        icon={<FolderOpenOutlined />}
-        onClick={() => onSelect()}
-      >{fmlText('fields:path_select')}</Button>
+      <Flex gap='4px'>
+        <Button
+          icon={<FolderOpenOutlined />}
+          onClick={() => onSelect()}
+        >{fmlText('fields:path_select')}</Button>
+        <Button
+          icon={<InboxOutlined />}
+          title={fmlText('fields:path_drop_enable')}
+          onClick={() => interceptor.current?.toggle(true)}
+        />
+      </Flex>
       <div className={`${baseCls}-main-path`}>{value ? value : fmlText('fields:path_empty')}</div>
     </Flex>
+    <DropInterceptor
+      ref={interceptor}
+      tips={fmlText('fields:path_drop_tips')}
+      onDrop={res => { if (res && res.length > 0) onChange?.(res[0]) }}
+    />
   </div>)
 }
 

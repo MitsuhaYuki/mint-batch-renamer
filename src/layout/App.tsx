@@ -4,6 +4,7 @@ import { ConsoleContext, consoleInitState, consoleReducer } from '@/context/cons
 import { Entrance } from './main'
 import { FC, useEffect, useReducer } from 'react'
 import { RuntimeContext, runtimeInitState, runtimeReducer } from '@/context/runtime'
+import { SysUtilContext, SysUtilInitValue } from '@/context/sysutil'
 import { useKeyPress, useMount } from 'ahooks'
 import { useMultiLangLoader } from '@/utils/mlang'
 import { useSysConfig } from '@/utils/syscfg'
@@ -98,15 +99,17 @@ const Content: FC = () => {
 
   return (
     <ConfigProvider autoInsertSpaceInButton={false}>
-      <ConfigContext.Provider value={{ state: configState, dispatch: configDispatch }}>
-        <ConsoleContext.Provider value={{ state: consoleState, dispatch: consoleDispatch }}>
-          <RuntimeContext.Provider value={{ state: runtimeState, dispatch: runtimeDispatch }}>
-            <App className={baseCls}>
-              <Entrance />
-            </App>
-          </RuntimeContext.Provider>
-        </ConsoleContext.Provider>
-      </ConfigContext.Provider>
+      <SysUtilContext.Provider value={SysUtilInitValue}>
+        <ConfigContext.Provider value={{ state: configState, dispatch: configDispatch }}>
+          <ConsoleContext.Provider value={{ state: consoleState, dispatch: consoleDispatch }}>
+            <RuntimeContext.Provider value={{ state: runtimeState, dispatch: runtimeDispatch }}>
+              <App className={baseCls} message={{ duration: 2, maxCount: 3 }}>
+                <Entrance />
+              </App>
+            </RuntimeContext.Provider>
+          </ConsoleContext.Provider>
+        </ConfigContext.Provider>
+      </SysUtilContext.Provider>
     </ConfigProvider>
   )
 }
