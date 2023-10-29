@@ -33,7 +33,12 @@
     "cfg_limit_warn": "警告",
     "cfg_limit_warn_tips": "警告弹窗文件数阈值",
     "cfg_fsn": "跟随步骤名",
-    "cfg_fsn_tips": "当此项开启时, 若当前步骤名为默认值或与当前执行器名称一致时, 则会在切换执行器时自动更新步骤名"
+    "cfg_fsn_tips": "当此项开启时, 若当前步骤名为默认值或与当前执行器名称一致时, 则会在切换执行器时自动更新步骤名",
+    "cfg_font": "字体",
+    "cfg_font_sys": "内置字体",
+    "cfg_font_sys_tips": "使用程序内置的字体, 关闭后使用系统字体. 注意: 使用系统字体可能会出现未知的UI问题, 且这些问题*不会*被修复.",
+    "cfg_font_bold": "加粗字体",
+    "cfg_font_bold_tips": "使用更粗的字号以增强可读性"
   },
   "console": {
     "title": "日志记录",
@@ -63,14 +68,30 @@
     "ui_file_move": "移动"
   },
   "details": {
-    "name": "文件全名",
-    "path": "路径",
-    "file_name": "文件名",
-    "file_ext": "拓展名",
-    "size": "大小",
-    "re_name": "重命名全名",
-    "re_file_name": "重命名文件名",
-    "re_file_ext": "重命名拓展名"
+    "source_view": "源视图",
+    "source_view_title": "查看源中的所有文件列表",
+    "result_view": "结果视图",
+    "result_view_title": "查看当前流程结果状态列表",
+    "filter_all": "全部",
+    "filter_all_title": "展示所有源文件的状态",
+    "filter_flowpass": "校验通过",
+    "filter_flowpass_title": "仅展示通过流程校验的文件",
+    "filter_complete": "有输出",
+    "filter_complete_title": "仅展示流程通过且有结果输出的文件",
+    "col_full": "文件全名",
+    "col_path": "路径",
+    "col_name": "文件名",
+    "col_ext": "拓展名",
+    "col_size": "大小",
+    "col_latest_name": "最终节点文件名",
+    "col_res_name": "结果名",
+    "res_empty": "未通过流程或无结果输出",
+    "col_flowpass": "序列",
+    "flowpass_ok": "流程校验通过",
+    "flowpass_fail": "流程校验失败",
+    "col_complete": "完成",
+    "complete_ok": "已正确输出",
+    "complete_fail": "没有输出结果"
   },
   "taskflow": {
     "default_task": "单击此处编辑任务"
@@ -82,6 +103,7 @@
     "no_source": "当前源没有任何文件可以处理",
     "no_task": "你还没有添加处理步骤",
     "preview_done": "预运行完成",
+    "preview_no_runner": "错误: 某个步骤引用了不存在的执行器!",
     "no_result": "没有可用结果, 请先点击 \"预运行\" 以生成结果",
     "cfm_run_title": "确认运行",
     "cfm_run_msg": "确认运行此任务?"
@@ -93,15 +115,17 @@
     "import_failed": "序列配置导入失败({0})",
     "cfg_typevar": "序列配置文件",
     "export_seq": "导出序列",
-    "export_ok": "序列配置导出成功"
+    "export_ok": "序列配置导出成功",
+    "export_no_task": "你不能导出一个空序列"
   },
   "modal-task-cfg": {
     "title": "任务配置",
     "step_name": "步骤名",
+    "no_step_name": "必须提供此步骤的名称",
     "runner": "执行器",
+    "no_runner": "必须选择一个执行器",
     "msg_cfg_invalid": "执行器配置不正确!",
-    "select_path": "选择路径",
-    "no_path": "无目标路径"
+    "folder_sel_title": "选择文件夹"
   },
   "modal-about": {
     "title": "关于",
@@ -109,5 +133,14 @@
     "tauri_ver": "Tauri 版本",
     "author": "作者",
     "font_name": "字体名称"
+  },
+  "fields": {
+    "path_select": "选择路径",
+    "path_empty": "未选择",
+    "runner_type_all": "全部",
+    "runner_type_untouch": "无修改",
+    "runner_type_filter": "过滤",
+    "runner_type_renamer": "重命名",
+    "runner_type_toolset": "工具集"
   }
 }

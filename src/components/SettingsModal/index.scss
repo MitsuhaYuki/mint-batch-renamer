@@ -33,14 +33,21 @@ $baseCls:modal-settings;
     margin: 0 -8px;
   }
 
+  &-2col {
+    display: inline-block;
+    width: 50%;
+  }
+
   &-label-sm {
+    display: 'inline-block';
+
     .ant-form-item-label {
       label {
         color: #8c8c8c;
         font-size: 12px;
 
         &::after {
-          display: none;
+          margin-inline-end: 4px;
         }
 
         & > span.anticon {

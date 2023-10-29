@@ -48,6 +48,13 @@ pub fn fs_remove_file(path: &str) -> SerializedResult<()> {
 }
 
 // renameFile
+#[tauri::command]
+pub fn fs_rename_file(old_path: &str, new_path: &str) -> SerializedResult<()> {
+    match fs::rename(old_path, new_path) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Error::Io(e)),
+    }
+}
 
 // writeBinaryFile
 

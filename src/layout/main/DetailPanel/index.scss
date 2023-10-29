@@ -11,6 +11,15 @@ $baseCls: 'details';
     @include customScrollbar();
     flex: 1 1 auto;
     overflow: auto;
+    z-index: 1;
+    border-top-left-radius: 6px;
+    box-shadow: 0 0 5px 1px #d9d9d9;
+
+    &-status {
+      display: flex;
+      height: 100%;
+      justify-content: center;
+    }
 
     .ant-table {
       &.ant-table-empty {
@@ -26,5 +35,9 @@ $baseCls: 'details';
         }
       }
     }
+  }
+
+  &-toolbar {
+    background: linear-gradient(to right, rgba(255, 255, 255, 0), #fff 50%);
   }
 }

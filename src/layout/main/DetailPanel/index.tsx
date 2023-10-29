@@ -8,7 +8,10 @@ import { FileItemExtend } from '@/types/file'
 import { ColumnsType } from 'antd/es/table'
 import { VirtualTable } from '@/components/VirtualTable'
 import { MultiLangProps } from '@/types/mlang'
-import { Button, Flex, Radio } from 'antd'
+import { Button, Flex, Radio, Segmented } from 'antd'
+import { useUpdateEffect } from 'ahooks'
+import { TaskResult } from '@/types/task'
+import { CheckCircleFilled, CloseCircleFilled } from '@ant-design/icons'
 
 interface IProps extends MultiLangProps {}
 
@@ -21,8 +24,7 @@ const Content: FC<IProps> = (props) => {
   // Multi-Language
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
   // Logs
-  const con = useLogger()
-  const { logs, logger } = con
+  const { logs, logger } = useLogger()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
 
@@ -35,13 +37,22 @@ const Content: FC<IProps> = (props) => {
     return `${(size / 1099511627776).toFixed(2)} TB`
   }, [])
 
+  // status icon for "ok" or "fail"
+  const statusIcon = useCallback((ok: any) => {
+    return ok
+      ? <CheckCircleFilled style={{ color: '#52c41a', fontSize: '16px' }} />
+      : <CloseCircleFilled style={{ color: '#ff4d4f', fontSize: '16px' }} />
+  }, [])
+
+  // View Mode
+  const [viewMode, setViewMode] = useState<'source' | 'result'>('source')
+  // FIXME: 这里分离了过滤和数据之后，在更新数据的时候表格会闪烁，需要优化
+  // Filter options in result mode
+  const [resRange, setResRange] = useState<'all' | 'flow_ok' | 'output_ok'>('flow_ok')
+  // Table data source with filter
   const [data, setData] = useState<FileItemExtend[]>([])
 
-  // 视图模式
-  const [viewMode, setViewMode] = useState<'source' | 'result'>('source')
-  // Result 模式下的过滤器选项
-  const [resRange, setResRange] = useState<'all' | 'flow_ok' | 'output_ok'>('flow_ok')
-
+  /** Re-filter data when filter or data change */
   useEffect(() => {
     if (runtime.fileList.length > 0) {
       switch (resRange) {
@@ -60,58 +71,102 @@ const Content: FC<IProps> = (props) => {
     }
   }, [runtime.fileList, resRange, viewMode])
 
-  const columns = useMemo(() => {
-    const resColumns: ColumnsType<FileItemExtend> = [
-      {
-        title: fmlText('name'),
+  /** Auto toggle view when receive signal */
+  useUpdateEffect(() => {
+    console.log('I: SIG_RECV/TOGGLE_RESULT_VIEW', runtime.sync.preview > runtime.sync.refresh)
+    if (runtime.sync.preview > runtime.sync.refresh) {
+      if (viewMode === 'source') setViewMode('result')
+    } else {
+      if (viewMode === 'result') setViewMode('source')
+    }
+  }, [runtime.sync.refresh, runtime.sync.preview])
+
+  const columns = useMemo((): ColumnsType<FileItemExtend> => {
+    if (viewMode === 'source') {
+      return [{
+        title: fmlText('col_full'),
         dataIndex: 'name',
-      },
-      {
-        title: fmlText('size'),
+      }, {
+        title: fmlText('col_size'),
         dataIndex: 'size',
         width: 75,
         render: (size: number) => formatFileSize(size),
-      },
-      {
-        title: fmlText('file_ext'),
+      }, {
+        title: fmlText('col_ext'),
         width: 80,
         dataIndex: 'fileExt',
-      },
-      {
-        title: fmlText('path'),
+      }, {
+        title: fmlText('col_path'),
         dataIndex: 'path',
-      },
-    ]
-
-    // if (globalData.filesRenamed) {
-    //   resColumns.splice(0, 3, {
-    //     title: '原文件名',
-    //     dataIndex: 'full_name',
-    //   }, {
-    //     title: '重命名后',
-    //     dataIndex: 'rename_full_name',
-    //   })
-    // }
-
-    return resColumns
-  }, [fmlText, runtime])
+      }]
+    } else {
+      return [{
+        title: fmlText('col_full'),
+        dataIndex: 'name',
+      }, {
+        title: fmlText('col_latest_name'),
+        dataIndex: 'steps',
+        render: (steps: TaskResult[]) => {
+          const flag = steps.length > 0 && (steps[steps.length - 1].next || steps[steps.length - 1].to)
+          return flag ? steps[steps.length - 1].result.name : fmlText('res_empty')
+        },
+      }, {
+        title: fmlText('col_res_name'),
+        dataIndex: 'steps',
+        render: (steps: TaskResult[]) => {
+          const flag = steps.length > 0 && steps[steps.length - 1].to
+          return flag ? steps[steps.length - 1].result.name : fmlText('res_empty')
+        },
+      }, {
+        title: fmlText('col_flowpass'),
+        dataIndex: 'steps',
+        width: 50,
+        render: (steps: TaskResult[]) => {
+          const flag = steps.length > 0 && (steps[steps.length - 1].next || steps[steps.length - 1].to)
+          return <div className={`${baseCls}-table-status`} title={
+            flag ? fmlText('flowpass_ok') : fmlText('flowpass_fail')
+          }>{statusIcon(flag)}</div>
+        },
+      }, {
+        title: fmlText('col_complete'),
+        dataIndex: 'steps',
+        width: 60,
+        render: (steps: TaskResult[]) => {
+          const flag = steps.length > 0 && steps[steps.length - 1].to
+          return <div className={`${baseCls}-table-status`} title={
+            flag ? fmlText('complete_ok') : fmlText('complete_fail')
+          }>{statusIcon(flag)}</div>
+        },
+      }]
+    }
+  }, [fmlText, viewMode])
 
   return (<div className={baseCls}>
-    <Flex gap='4px' justify='flex-end' style={{ padding: '4px' }}>
-      <Radio.Group size='small' value={viewMode} onChange={(e) => setViewMode(e.target.value)}>
-        <Radio.Button value='source'>Source</Radio.Button>
-        <Radio.Button value='result'>Result</Radio.Button>
-      </Radio.Group>
-      <Radio.Group size='small' disabled={viewMode === 'source'} value={resRange} onChange={(e) => setResRange(e.target.value)}>
-        <Radio.Button value='all'>All</Radio.Button>
-        <Radio.Button value='flow_ok'>P.Flow</Radio.Button>
-        <Radio.Button value='output_ok'>P.Result</Radio.Button>
-      </Radio.Group>
+    <Flex className={`${baseCls}-toolbar`} gap='4px' justify='flex-end' style={{ padding: '4px' }}>
+      <Segmented
+        size='small'
+        value={viewMode}
+        options={[
+          { label: fmlText('source_view'), title: fmlText('source_view_title'), value: 'source' },
+          { label: fmlText('result_view'), title: fmlText('result_view_title'), value: 'result' }
+        ]}
+        onChange={(i: any) => setViewMode(i)}
+      />
+      <Segmented
+        size='small'
+        value={resRange}
+        options={[
+          { label: fmlText('filter_all'), title: fmlText('filter_all_title'), value: 'all' },
+          { label: fmlText('filter_flowpass'), title: fmlText('filter_flowpass_title'), value: 'flow_ok' },
+          { label: fmlText('filter_complete'), title: fmlText('filter_complete_title'), value: 'output_ok' }
+        ]}
+        disabled={viewMode === 'source'}
+        onChange={(i: any) => setResRange(i)}
+      />
     </Flex>
     <div className={`${baseCls}-table`} ref={wrapperRef}>
       <VirtualTable
         columns={columns}
-        // dataSource={runtime.originList}
         dataSource={viewMode === 'source' ? runtime.fileList : data}
         bordered={false}
         rowKey={'path'}

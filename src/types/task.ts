@@ -1,46 +1,65 @@
 import { FileItem, FileItemExtend } from './file'
 import { MultiLangField } from './mlang'
 
-enum TaskRunnerScope {
-  fileItem = 'fileItem',
-  fileList = 'fileList'
-}
-
 enum TaskRunnerType {
   untouch = 'untouch',
   filter = 'filter',
   renamer = 'renamer',
-  output = 'output',
+  toolset = 'toolset',
 }
 
 type TaskRunnerUtils = {
-  split: () => {
-    originFile: FileItem,
-    latestFile: FileItem,
-    steps: TaskResult[]
-  },
-  forward: (info: {
-    result: FileItem,
-    message: string,
-    to?: string,
-    next: boolean
-  }) => FileItemExtend
 }
 
-type TaskRunnerSysArg<DataType> = {
-  data: DataType
-  utils: TaskRunnerUtils
+type SingleFileProcessorCallback = (
+  split: () => { readonly origin: FileItem, latest: FileItem, steps: TaskResult[] },
+  forward: (
+    info: {
+      result: FileItem,
+      message: string,
+      to?: string,
+      next: boolean
+    }
+  ) => void
+) => void
+
+type SingleFileProcessor = (callback: SingleFileProcessorCallback) => Promise<FileItemExtend[]>
+
+type MultiFileProcessorCallback = (
+  list: { readonly source: FileItemExtend[], latest: FileItemExtend[] },
+  split: (fileItem: FileItemExtend) => { readonly origin: FileItem, latest: FileItem, steps: TaskResult[] },
+  forward: (
+    fileItem: FileItemExtend,
+    info: {
+      result: FileItem,
+      message: string,
+      to?: string,
+      next: boolean
+    }
+  ) => void
+) => void
+
+type MultiFileProcessor = (callback: MultiFileProcessorCallback) => Promise<FileItemExtend[]>
+
+type TaskRunnerSysArg = {
+  /** 单文件处理模式 */
+  fileItem: SingleFileProcessor
+  /** 列表处理模式 */
+  fileList: MultiFileProcessor
+  utils?: TaskRunnerUtils
 }
 
 type TaskRunnerExtArgType =
+  | 'path-folder'
+  | 'path-file'
   | 'string'
   | 'number'
-  | 'folder_selector'
-// | 'boolean'
-// | 'select'
-// | 'multi-select'
-// | 'file'
-// | 'folder'
+  | 'checkbox'
+  | 'radio'
+  | 'radio-button'
+  | 'segmented'
+  | 'select'
+  | 'switch'
 
 // FIXME: 需要增加标识用于导出时识别某些参数是否应该被导出，例如输出路径之类的关键参数不应被导出
 type TaskRunnerExtArg = {
@@ -48,36 +67,37 @@ type TaskRunnerExtArg = {
   id: string
   /** field label */
   name: MultiLangField
-  // /** Form Item Tips */
-  // tips?: string
-  // /** Form Item Extra */
-  // extra?: string
+  /** field desc */
+  desc?: MultiLangField
+  /** Form Item Tips */
+  tips?: string
+  /** Form Item Extra */
+  extra?: string
   /** param type */
   type: TaskRunnerExtArgType
   /** field options, when field is selective component, this will pass to 'option' props */
-  options?: any
+  options?: {
+    label: MultiLangField
+    value: string
+  }[]
   default?: any
   readonly?: boolean
 }
 
-type TaskRunnerFunc<DataType, RespType = DataType> = (
-  sys: TaskRunnerSysArg<DataType>,
+type TaskRunnerFunc = (
+  sys: TaskRunnerSysArg,
   ext: Record<string, any>
-) => RespType
+) => Promise<FileItemExtend[]>
 
-type TaskRunnerScoped<TaskRunnerScope, DataType, RespType = DataType> = {
+type TaskRunner = {
   id: string
   name: MultiLangField
+  desc?: MultiLangField
   type: TaskRunnerType
-  scope: TaskRunnerScope
   // 这里放的是参数信息
   args: TaskRunnerExtArg[]
-  func: TaskRunnerFunc<DataType, RespType>
+  func: TaskRunnerFunc
 }
-
-type TaskRunner =
-  | TaskRunnerScoped<TaskRunnerScope.fileItem, FileItemExtend>
-  | TaskRunnerScoped<TaskRunnerScope.fileList, FileItemExtend[]>
 
 type TaskRunnerConfig = {
   id: string
@@ -105,7 +125,6 @@ interface TaskResult {
 
 export {
   TaskRunnerType,
-  TaskRunnerScope,
 }
 export type {
   TaskResult,
@@ -114,4 +133,6 @@ export type {
   TaskRunner,
   TaskRunnerConfig,
   TaskRunnerUtils,
+  SingleFileProcessorCallback,
+  MultiFileProcessorCallback
 }

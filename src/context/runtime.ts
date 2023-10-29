@@ -11,6 +11,7 @@ interface IState {
   sync: {
     refresh: number
     action: number
+    preview: number
   }
   fileList: FileItemExtend[]
   tasks: TaskRunnerConfig[]
@@ -27,7 +28,8 @@ const initState: IState = {
   },
   sync: {
     refresh: 0,
-    action: 0
+    action: 0,
+    preview: 0,
   },
   fileList: [],
   tasks: [],
@@ -52,6 +54,7 @@ type IReducerActionType = 'internal'
   | 'u_file_list'
   | 'sig_refresh'
   | 'sig_action'
+  | 'sig_preview'
   | 'reset'
 
 interface IReducerAction { type: string; payload?: any }
@@ -62,17 +65,17 @@ const reducer: Reducer<IState, IReducerAction> = (state, action) => {
       case 'c_source':
         return Object.assign({}, state, {
           source: [...state.source, action.payload],
-          sync: { refresh: state.sync.refresh, action: Date.now() }
+          sync: { ...state.sync, action: Date.now() }
         })
       case 'u_source':
         return Object.assign({}, state, {
           source: [...action.payload],
-          sync: { refresh: state.sync.refresh, action: Date.now() }
+          sync: { ...state.sync, action: Date.now() }
         })
       case 'd_source': {
         return Object.assign({}, state, {
           source: [],
-          sync: { refresh: state.sync.refresh, action: Date.now() }
+          sync: { ...state.sync, action: Date.now() }
         })
       }
       case 'u_config_partial':
@@ -105,18 +108,19 @@ const reducer: Reducer<IState, IReducerAction> = (state, action) => {
         return Object.assign({}, state, { tasks: [] })
       /** FILE LIST */
       case 'u_file_list':
-        return Object.assign({}, state, {
-          fileList: [...action.payload],
-          sync: { refresh: Date.now(), action: state.sync.action }
-        })
+        return Object.assign({}, state, { fileList: [...action.payload] })
       // 信号
       case 'sig_refresh':
         return Object.assign({}, state, {
-          sync: { refresh: Date.now(), action: state.sync.action }
+          sync: { ...state.sync, refresh: Date.now() }
         })
       case 'sig_action':
         return Object.assign({}, state, {
-          sync: { refresh: state.sync.refresh, action: Date.now() }
+          sync: { ...state.sync, action: Date.now() }
+        })
+      case 'sig_preview':
+        return Object.assign({}, state, {
+          sync: { ...state.sync, preview: Date.now() }
         })
       // 重置到初始状态
       case 'reset':

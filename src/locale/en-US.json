@@ -33,7 +33,12 @@
     "cfg_limit_warn": "Warn",
     "cfg_limit_warn_tips": "Warn when number of files exceeds this value",
     "cfg_fsn": "Follow Name",
-    "cfg_fsn_tips": "When this option is enabled, if the current step name is the default value or the same as the current runner name, the step name will be automatically updated when switching the runner"
+    "cfg_fsn_tips": "When this option is enabled, if the current step name is the default value or the same as the current runner name, the step name will be automatically updated when switching the runner",
+    "cfg_font": "Font",
+    "cfg_font_sys": "Built-in Font",
+    "cfg_font_sys_tips": "Use the built-in font of the program, close it and use the system font. Note: Using the system font may cause unknown UI problems, and these problems will *not* be fixed.",
+    "cfg_font_bold": "Bold Font",
+    "cfg_font_bold_tips": "Use a bolder font to enhance readability"
   },
   "console": {
     "title": "Console",
@@ -63,14 +68,30 @@
     "ui_file_move": "Move"
   },
   "details": {
-    "name": "Full Name",
-    "path": "Path",
-    "file_name": "File Name",
-    "file_ext": "Extension",
-    "size": "Size",
-    "re_name": "re-FullName",
-    "re_file_name": "re-Name",
-    "re_file_ext": "re-Extension"
+    "source_view": "Source",
+    "source_view_title": "查看源中的所有文件列表",
+    "result_view": "Result",
+    "result_view_title": "查看当前流程结果状态列表",
+    "filter_all": "All",
+    "filter_all_title": "展示所有源文件的状态",
+    "filter_flowpass": "Task OK",
+    "filter_flowpass_title": "仅展示通过流程校验的文件",
+    "filter_complete": "Complete",
+    "filter_complete_title": "仅展示流程通过且有结果输出的文件",
+    "col_full": "Full Name",
+    "col_path": "Path",
+    "col_name": "Name",
+    "col_ext": "Extension",
+    "col_size": "Size",
+    "col_latest_name": "最终节点文件名",
+    "col_res_name": "结果名",
+    "res_empty": "未通过流程或无结果输出",
+    "col_flowpass": "序列",
+    "flowpass_ok": "流程校验通过",
+    "flowpass_fail": "流程校验失败",
+    "col_complete": "完成",
+    "complete_ok": "已正确输出",
+    "complete_fail": "没有输出结果"
   },
   "taskflow": {
     "default_task": "Click here to edit"
@@ -82,6 +103,7 @@
     "no_source": "Selected source has no file",
     "no_task": "You have not added any steps yet",
     "preview_done": "Preview done",
+    "preview_no_runner": "Error: Some steps reference non-existent runners!",
     "no_result": "No result to apply, have you run the \"Dry Run\"?",
     "cfm_run_title": "Apply Result",
     "cfm_run_msg": "Are you sure to apply result?"
@@ -93,15 +115,17 @@
     "import_failed": "Import config failed ({0})",
     "cfg_typevar": "Flow Config",
     "export_seq": "Export Sq",
-    "export_ok": "Flow config export successfully"
+    "export_ok": "Flow config export successfully",
+    "export_no_task": "No task to export"
   },
   "modal-task-cfg": {
     "title": "Task Configuration",
     "step_name": "Step Name",
+    "no_step_name": "You must provide a name for this step",
     "runner": "Runner",
+    "no_runner": "You must select a runner",
     "msg_cfg_invalid": "Configuration is not correct!",
-    "select_path": "Select",
-    "no_path": "Not Selected"
+    "folder_sel_title": "Select Folder"
   },
   "modal-about": {
     "title": "About",
@@ -109,5 +133,14 @@
     "tauri_ver": "Tauri Version",
     "author": "Author",
     "font_name": "Font Name"
+  },
+  "fields": {
+    "path_select": "Select",
+    "path_empty": "Not Selected",
+    "runner_type_all": "All",
+    "runner_type_untouch": "Untouch",
+    "runner_type_filter": "Filter",
+    "runner_type_renamer": "Renamer",
+    "runner_type_toolset": "Utils"
   }
 }

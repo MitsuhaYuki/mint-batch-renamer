@@ -4,9 +4,9 @@ import { Children, FC, cloneElement } from 'react'
 import './index.scss'
 import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
 import { useMultiLang } from '@/utils/mlang'
-import { makeDefaultTask, makeTaskRunnerUtils } from '@/utils/runners/common'
+import { makeDefaultTask, makeTaskRunnerSysArg } from '@/utils/runners/common'
 import { MultiLangProps } from '@/types/mlang'
-import { useKeyMessage } from '@/utils/common'
+import { checkOsError, useKeyMessage } from '@/utils/common'
 import { FileItemExtend } from '@/types/file'
 import { invoke } from '@tauri-apps/api/tauri'
 
@@ -42,27 +42,21 @@ const Content: FC<IProps> = (props) => {
     const tasks = runtime.state.tasks
     const runners = runtime.state.runners
     const clearList = clearHistoryData(runtime.state.fileList)
-    const storeList: FileItemExtend[] = clearList
+    let storeList: FileItemExtend[] = clearList
     for (const task of tasks) {
-      if (runners[task.runner].scope === 'fileItem') {
-        // SFC
-        for (let i = 0; i < storeList.length; i++) {
-          const fileItem = storeList[i]
-          const flag = fileItem.steps.length === 0 || fileItem.steps[fileItem.steps.length - 1].next
-          if (flag) {
-            const result = await runners[task.runner].func({
-              data: fileItem as any,
-              utils: makeTaskRunnerUtils(fileItem, runners[task.runner])
-            }, task.args) as FileItemExtend
-            storeList[i] = result
-          }
-        }
+      if (runners[task.runner]) {
+        storeList = await runners[task.runner].func(
+          makeTaskRunnerSysArg(storeList, runners[task.runner]),
+          task.args
+        )
       } else {
-        // MFC
+        msgApi.error(fmlText('preview_no_runner'))
+        return
       }
     }
     msgApi.success(fmlText('preview_done'))
     runtime.set('u_file_list', storeList)
+    runtime.set('sig_preview')
   }
 
   // FIXME: 运行之前需要校验所有执行器的配置是否正确
@@ -109,6 +103,22 @@ const Content: FC<IProps> = (props) => {
         }
       } else {
         // Move to target
+        try {
+          await invoke('fs_rename_file', {
+            oldPath: fileItem.path,
+            newPath: `${targetPath}\\${targetFile.name}`
+          })
+          msgApi.loading(`Rename File ${i + 1} / ${fileList.length}`, 0)
+        } catch (e) {
+          const osErrNum = checkOsError(e)
+          if (osErrNum === 17) {
+            // msgApi.error('The system cannot move the file to a different disk drive. (os error 17)')
+            msgApi.error('系统无法将文件移到不同的磁盘驱动器。 (os error 17)')
+          } else {
+            msgApi.error(`Rename File Error: ${e}`)
+          }
+          return
+        }
       }
     }
     msgApi.success('Copy File Done')

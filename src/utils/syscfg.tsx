@@ -183,6 +183,15 @@ const loadConfig = async (
 ) => {
   try {
     const cfgJson = JSON.parse(await invoke('fs_read_text_file', { path: cfgLoaderConfig.cfgPath }))
+    /**
+     * 注意：此处已经可以拿到多语言相关的信息了，
+     * 可以在此处绕过通常方式，直接import langs，通过langs[langkey]的方式获取目标多语言文本集
+     * 再通过langs[langkey][module][indexkey]的方式获取到目标文本
+     * 
+     * 但是存在一些问题，例如:
+     *  1.如果cfg没有多语言字段该如何处理
+     *  2.如果cfg中的多语言字段不是langkey该如何处理
+     */
     if (cfgJson.cfg_ver !== sysConfigTrait.cfg_ver.default) {
       modal.show()
       modal.update({

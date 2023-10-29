@@ -2,7 +2,7 @@ import { ConfigContext, IConfigReducerAction, IConfigState } from '@/context/con
 import { useCallback, useContext, useEffect, useMemo } from 'react'
 import zhCN from '@/locale/zh-CN.json'
 import enUS from '@/locale/en-US.json'
-import { MultiLangField, MultiLangs } from '@/types/mlang'
+import { MultiLangField, MultiLangOption, MultiLangs } from '@/types/mlang'
 
 interface ILanguage {
   name: string
@@ -31,6 +31,15 @@ const fmlField = (field: MultiLangField, config: IConfigState) => {
   return field[config.system?.lang ?? Object.keys(field)[0]]
 }
 
+const fmlFieldOption = (options: MultiLangOption[], config: IConfigState): { label: string, value: any }[] => {
+  return options.map(v => {
+    return {
+      label: fmlField(v.label, config),
+      value: v.value
+    }
+  })
+}
+
 const useMultiLangLoader = (
   configState: IConfigState,
   configDispatch: (data: IConfigReducerAction) => void
@@ -49,6 +58,8 @@ const useMultiLang = (
 ): {
   fmlName: string,
   fmlText: (key: string, ...params: string[]) => string
+  fmlField: (field: MultiLangField) => string
+  fmlFieldOption: (options?: { label: MultiLangField, value: any }[]) => { label: string, value: any }[]
 } => {
   const fmlName = useMemo(() => fmlNameMaker(name, inheritName), [])
 
@@ -84,9 +95,15 @@ const useMultiLang = (
     }
   }, [state.langs])
 
+  const fmlFieldCached = useCallback((field: MultiLangField) => fmlField(field, state), [state.langs])
+
+  const fmlFieldOptionCached = useCallback((options?: MultiLangOption[]) => fmlFieldOption(options ?? [], state), [state.langs])
+
   return {
     fmlName,
-    fmlText
+    fmlText,
+    fmlField: fmlFieldCached,
+    fmlFieldOption: fmlFieldOptionCached
   }
 }
 
@@ -96,6 +113,8 @@ const useMultiLangWrapped = (
 ): {
   fmlName: string,
   fmlText: (key: string, ...params: string[]) => string
+  fmlField: (field: MultiLangField) => string
+  fmlFieldOption: (options?: MultiLangOption[]) => { label: string, value: any }[]
 } => {
   const { state } = useContext(ConfigContext)
   return useMultiLang(state, name, inheritName)

@@ -19,6 +19,10 @@ export interface ISysConfig {
     warn: number
   }
   follow_step_name: boolean
+  font: {
+    enable: boolean
+    bolder: boolean
+  }
 }
 
 export interface ISysConfigTrait extends Record<keyof ISysConfig, {
@@ -54,6 +58,15 @@ export const sysConfigTrait: ISysConfigTrait = {
     name: 'follow_step_name',
     type: 'boolean',
     default: true,
+    required: true,
+  },
+  font: {
+    name: 'font',
+    type: 'boolean',
+    default: {
+      enable: true,
+      bolder: false,
+    },
     required: true,
   },
 }

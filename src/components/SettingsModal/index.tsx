@@ -17,8 +17,10 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
   const { fmlText } = useMultiLang(state, baseCls, props.inheritName)
   const { system } = state
   const titleRef = useRef<HTMLSpanElement>(null)
-  const [form] = Form.useForm()
   const mRef = useRef<QuickModalRef>(null)
+  // settings form
+  const [form] = Form.useForm()
+  const fontEnable = Form.useWatch(['font', 'enable'], form)
 
   const languageOptions = useMemo(() => {
     return Object.entries(langs).map(([key, value]) => ({
@@ -113,26 +115,20 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
       </Form.Item>
       <Form.Item label={fmlText('cfg_limit')} style={{ marginBottom: 0 }}>
         <Space>
-          <Form.Item
+          <Form.Item<ISysConfig>
+            label={fmlText('cfg_limit_max')}
+            name={["limit", "max"]}
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_limit_max_tips')}
-            label={fmlText('cfg_limit_max')}
-          />
-          <Form.Item<ISysConfig>
-            name={["limit", "max"]}
-            style={{ display: 'inline-block' }}
             rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
           >
             <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
           </Form.Item>
-          <Form.Item
+          <Form.Item<ISysConfig>
+            label={fmlText('cfg_limit_warn')}
+            name={["limit", "warn"]}
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_limit_warn_tips')}
-            label={fmlText('cfg_limit_warn')}
-          />
-          <Form.Item<ISysConfig>
-            name={["limit", "warn"]}
-            style={{ display: 'inline-block' }}
             rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
           >
             <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
@@ -142,13 +138,39 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
       <Form.Item<ISysConfig>
         label={fmlText('cfg_fsn')}
         name="follow_step_name"
+        className={`${baseCls}-2col`}
         tooltip={fmlText('cfg_fsn_tips')}
+        labelCol={{ span: 12 }}
         rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
       >
         <Radio.Group>
           <Radio value={true}>{fmlText('common:yes')}</Radio>
           <Radio value={false}>{fmlText('common:no')}</Radio>
         </Radio.Group>
+      </Form.Item>
+      <Form.Item label={fmlText('cfg_font')} style={{ marginBottom: 0 }}>
+        <Space size='middle'>
+          <Form.Item<ISysConfig>
+            label={fmlText('cfg_font_sys')}
+            name={["font", "enable"]}
+            className={`${baseCls}-label-sm`}
+            tooltip={fmlText('cfg_font_sys_tips')}
+            valuePropName='checked'
+            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+          >
+            <Switch />
+          </Form.Item>
+          <Form.Item<ISysConfig>
+            label={fmlText('cfg_font_bold')}
+            name={["font", "bolder"]}
+            className={`${baseCls}-label-sm`}
+            tooltip={fmlText('cfg_font_bold_tips')}
+            valuePropName='checked'
+            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+          >
+            <Switch disabled={!fontEnable} />
+          </Form.Item>
+        </Space>
       </Form.Item>
     </Form>
   </QuickModal>)

@@ -58,11 +58,15 @@ const Content: FC<IProps> = (props) => {
   }
 
   const onExportSeq = () => {
+    if (runtime.state.tasks.length===0){
+      msgApi.error(fmlText('export_no_task'))
+      return
+    }
     const exportData = {
       config: runtime.state.config,
       tasks: runtime.state.tasks,
     }
-    exportJsonFile(exportData, `taskflow_${uuid().slice(24)}.json`)
+    exportJsonFile(exportData, `TaskConfig${Date.now()}.json`)
     msgApi.success(fmlText('export_ok'))
     logger.info('Export flow config')
   }

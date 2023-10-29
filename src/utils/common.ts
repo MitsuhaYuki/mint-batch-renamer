@@ -17,6 +17,12 @@ function uuid () {
   return s.join('')
 }
 
+function checkOsError (e: any) {
+  const eStr = `${e}`
+  const eNum = eStr.match(/\(os error \d+\)$/)?.[0]
+  return eNum ? Number(eNum.slice(10, -1)) : undefined
+}
+
 function exportJsonFile (content: Record<string, any>, fileName: string = 'config.json') {
   const data = JSON.stringify(content, undefined, 2)
   const uri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(data)
@@ -53,5 +59,6 @@ const useKeyMessage = (key: string): [Record<MessageLevel, MessageFunc>, ReactEl
 export {
   uuid,
   exportJsonFile,
-  useKeyMessage
+  useKeyMessage,
+  checkOsError
 }

@@ -110,7 +110,8 @@ export const VirtualTable = <RecordType extends object> (props: VirtualTableProp
         }) => (
           <div
             className={`${baseCls}-cell ${columnIndex === mergedColumns.length - 1 ? `${baseCls}-cell-last` : ''}`}
-            title={(rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex]}
+            // FIXME: 可能会导致性能问题
+            title={(!mergedColumns[columnIndex].render) && ((rawData[rowIndex] as any)[(mergedColumns as any)[columnIndex].dataIndex])}
             style={{
               ...style,
               boxSizing: 'border-box',

@@ -27,16 +27,13 @@ const Content: FC<IProps> = (props) => {
 
   /** Refresh file list when receive signal */
   useUpdateEffect(() => {
+    console.log('I: SIG_RECV/REFRESH_SOURCE', runtime.sync.action > runtime.sync.refresh)
     if (runtime.sync.action > runtime.sync.refresh) {
-      console.log('I: SYNC', runtime.sync, 'SIG', runtime.sync.action > runtime.sync.refresh)
       refreshFileList()
-    } else {
-      console.log('I: SYNC', runtime.sync, 'SIG', runtime.sync.action > runtime.sync.refresh)
     }
-  }, [runtime.sync])
+  }, [runtime.sync.action, runtime.sync.refresh])
 
   const refreshFileList = async () => {
-    // updateMsg('info', fmlText('msg_load_start'), 0)
     msgApi.info(fmlText('msg_load_start'), 0)
     let totalCount = 0
     let files: FileItemExtend[] = []
@@ -56,11 +53,9 @@ const Content: FC<IProps> = (props) => {
         totalCount = warnCount
       } catch (e) {
         if (e === 'MAX_LIMIT') {
-          // updateMsg('warning', fmlText('msg_warn_limit'), 0)
           msgApi.warning(fmlText('msg_warn_limit'), 0)
         } else {
           logger.error(`RefreshFileList: warn error, ${e}`)
-          // updateMsg('error', fmlText('msg_unknown_err', `${e}`))
           msgApi.error(fmlText('msg_unknown_err', `${e}`))
           return
         }
@@ -82,11 +77,9 @@ const Content: FC<IProps> = (props) => {
       } catch (e) {
         if (e === 'MAX_LIMIT') {
           logger.error('RefreshFileList: file count exceed max limit')
-          // updateMsg('error', fmlText('msg_max_limit'))
           msgApi.error(fmlText('msg_max_limit'))
         } else {
           logger.error(`RefreshFileList: other error, ${e}`)
-          // updateMsg('error', fmlText('msg_unknown_err', `${e}`))
           msgApi.error(fmlText('msg_unknown_err', `${e}`))
         }
         return
@@ -111,16 +104,15 @@ const Content: FC<IProps> = (props) => {
         }
       } catch (e) {
         logger.error(`RefreshFileList: READ stage with other error, ${e}`)
-        // updateMsg('error', fmlText('msg_unknown_err', `${e}`))
         msgApi.error(fmlText('msg_unknown_err', `${e}`))
         return
       }
       logger.info(`RefreshFileList: read finished, total ${files.length} files`)
     }
     // final dispatch
-    // updateMsg('success', fmlText('msg_load_success'))
     msgApi.success(fmlText('msg_load_success'))
     setRuntime('u_file_list', files)
+    setRuntime('sig_refresh')
   }
 
   const fsOpenDialog = async (
