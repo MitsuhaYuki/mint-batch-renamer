@@ -5,12 +5,12 @@ import { Entrance } from './main'
 import { FC, useEffect, useReducer } from 'react'
 import { RuntimeContext, runtimeInitState, runtimeReducer } from '@/context/runtime'
 import { SysUtilContext, SysUtilInitValue } from '@/context/sysutil'
+import { invoke } from '@tauri-apps/api/tauri'
 import { useKeyPress, useMount } from 'ahooks'
 import { useMultiLangLoader } from '@/utils/mlang'
 import { useSysConfig } from '@/utils/syscfg'
 import { useSystemTaskRunner } from '@/utils/runners/common'
 import './App.scss'
-import { invoke } from '@tauri-apps/api/tauri'
 
 const baseCls = 'app'
 const Content: FC = () => {

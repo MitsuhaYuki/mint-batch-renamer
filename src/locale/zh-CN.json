@@ -110,14 +110,10 @@
     "cfm_run_msg": "确认运行此任务?"
   },
   "flow-manage": {
-    "import_seq": "导入序列",
-    "import_seq_title": "请选择配置文件",
-    "import_ok": "序列配置导入成功",
-    "import_failed": "序列配置导入失败({0})",
-    "cfg_typevar": "序列配置文件",
-    "export_seq": "导出序列",
-    "export_ok": "序列配置导出成功",
-    "export_no_task": "你不能导出一个空序列"
+    "btn_load": "加载序列",
+    "btn_load_tip": "从已保存序列中加载",
+    "btn_save": "保存序列",
+    "btn_save_tip": "保存现有序列"
   },
   "modal-task-cfg": {
     "title": "任务配置",

@@ -1,4 +1,5 @@
 import { FileItemExtend } from '@/types/file'
+import { FlowConfigInfo } from '@/types/flow'
 import { TaskRunner, TaskRunnerConfig } from '@/types/task'
 import React, { Reducer, useCallback, useContext } from 'react'
 
@@ -16,6 +17,7 @@ interface IState {
   fileList: FileItemExtend[]
   tasks: TaskRunnerConfig[]
   runners: Record<string, TaskRunner>
+  flowInfo?: FlowConfigInfo
 }
 interface IOptionalState extends Partial<IState> {}
 

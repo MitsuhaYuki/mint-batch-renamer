@@ -1,13 +1,13 @@
 import { Button, Form, Input, InputNumber, Modal, Radio, Select, Space, Switch } from 'antd'
 import { ConfigContext } from '@/context/config'
 import { ISysConfig } from '@/types/syscfg'
-import { QuickModal, QuickModalInst, QuickModalRef } from '../QuickModal'
+import { MultiLangProps } from '@/types/mlang'
+import { QuickModal, QuickModalInst, QuickModalRef } from '../Base'
 import { forwardRef, useContext, useImperativeHandle, useMemo, useRef } from 'react'
 import { langs, useMultiLang } from '@/utils/mlang'
 import { makeSysConfigModal, saveConfig } from '@/utils/syscfg'
 import { useLockFn } from 'ahooks'
 import './index.scss'
-import { MultiLangProps } from '@/types/mlang'
 
 interface IProps extends MultiLangProps {}
 

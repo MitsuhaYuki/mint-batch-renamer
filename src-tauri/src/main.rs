@@ -46,6 +46,7 @@ fn main() {
             close_splashscreen,
             std_path::path_is_dir,
             tauri_fs::fs_copy_file,
+            tauri_fs::fs_create_dir,
             tauri_fs::fs_exists,
             tauri_fs::fs_read_text_file,
             tauri_fs::fs_remove_file,

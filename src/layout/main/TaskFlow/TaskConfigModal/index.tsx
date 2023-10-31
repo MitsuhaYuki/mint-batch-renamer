@@ -1,14 +1,14 @@
 import { Checkbox, Flex, Form, FormItemProps, Input, InputNumber, Radio, Segmented, Select, Switch } from 'antd'
 import { MultiLangProps } from '@/types/mlang'
 import { PathSelector } from '@/components/FieldRender/PathSelector'
-import { QuickModal, QuickModalRef } from '@/components/QuickModal'
+import { QuickModal, QuickModalRef } from '@/components/QuickModal/Base'
 import { ReactElement, forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { RunnerSelector } from '@/components/FieldRender/RunnerSelector'
 import { TaskRunnerConfig, TaskRunnerExtArg } from '@/types/task'
 import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
-import { useMultiLang } from '@/utils/mlang'
 import { useForm } from 'antd/es/form/Form'
 import { useKeyMessage } from '@/utils/common'
+import { useMultiLang } from '@/utils/mlang'
 import './index.scss'
 
 interface IProps extends MultiLangProps, WithConsoleProps, WithConfigProps, WithRuntimeProps {
@@ -25,7 +25,7 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
   const { fmlName, fmlText, fmlField, fmlFieldOption } = useMultiLang(config.state, baseCls, props.inheritName)
   const [msgApi, msgCtx] = useKeyMessage(baseCls)
   const [form] = useForm()
-  // Mainly used to store the current configuration
+  // Only used to store the current configuration
   const [cfg, setCfg] = useState<TaskRunnerConfig>()
   const mRef = useRef<QuickModalRef>(null)
 
@@ -35,7 +35,8 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
     open: (cfg: TaskRunnerConfig) => {
       console.log('TCM Open: ext-cfg', cfg)
       setCfg(cfg)
-      form.setFieldsValue(cfg)
+      // wait for form to re-render
+      setTimeout(() => form.setFieldsValue(cfg), 10)
       mRef.current?.toggle(true)
     }
   }))

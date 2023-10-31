@@ -1,13 +1,14 @@
+import { App, Badge, Button, Flex } from 'antd'
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons'
-import { Button, Flex } from 'antd'
-import { FC } from 'react'
-import './index.scss'
+import { FC, useRef } from 'react'
+import { FlowConfig } from '@/types/flow'
+import { FlowManageModal } from '@/components/QuickModal/FlowManage'
+import { FlowUpdateModal } from '@/components/QuickModal/FlowUpdate'
+import { MultiLangProps } from '@/types/mlang'
+import { QuickModalRef } from '@/components/QuickModal/Base'
 import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
 import { useMultiLang } from '@/utils/mlang'
-import { MultiLangProps } from '@/types/mlang'
-import { exportJsonFile, useKeyMessage, uuid } from '@/utils/common'
-import { open } from '@tauri-apps/api/dialog'
-import { invoke } from '@tauri-apps/api/tauri'
+import './index.scss'
 
 interface IProps extends MultiLangProps, WithConsoleProps, WithConfigProps, WithRuntimeProps {}
 
@@ -16,77 +17,61 @@ const Content: FC<IProps> = (props) => {
   const { con, config, runtime } = props
   const { logger } = con
   const { fmlName, fmlText } = useMultiLang(config.state, baseCls, props.inheritName)
-  const [msgApi, msgCtx] = useKeyMessage(baseCls)
+  const { message } = App.useApp()
+  const mRef = useRef<QuickModalRef>(null)
+  const uRef = useRef<QuickModalRef>(null)
 
-  const fsOpenDialog = async (
-    title?: string
-  ): Promise<string | undefined> => {
+  const onLoadSeq = async (cfg: FlowConfig) => {
     try {
-      const selected = await open({
-        title, filters: [{
-          name: fmlText('cfg_typevar'),
-          extensions: ['json']
-        }]
-      })
-      if (selected !== null) {
-        const res = Array.isArray(selected) ? selected[0] : selected
-        logger.info(`Selected path: ${res}`)
-        return res
-      } else {
-        logger.info('Canceled select path')
-      }
+      const flowConfig = cfg.flow
+      runtime.set({ ...runtime.state, ...flowConfig, flowInfo: cfg.info })
+      message.success('导入成功')
+      logger.info(`Import flow config from ${cfg}`)
     } catch (e) {
-      logger.error(`Select path failed: ${e}`)
-    }
-    return
-  }
-
-  const onImportSeq = async () => {
-    const res = await fsOpenDialog(fmlText('import_seq_title'))
-    if (res) {
-      try {
-        const data = await invoke('fs_read_text_file', { path: res }) as string
-        const flowConfig = JSON.parse(data)
-        runtime.set({ ...runtime.state, ...flowConfig })
-        msgApi.success(fmlText('import_ok'))
-        logger.info(`Import flow config from ${res}`)
-      } catch (e) {
-        msgApi.error(fmlText('import_failed', `${e}`))
-        logger.error(`Import flow config failed: ${e}`)
-      }
+      message.error(`导入失败: ${e}`)
+      logger.error(`Import flow config failed: ${e}`)
     }
   }
 
-  const onExportSeq = () => {
-    if (runtime.state.tasks.length===0){
-      msgApi.error(fmlText('export_no_task'))
+  const onOpenSaveSeqModal = () => {
+    if (runtime.state.tasks.length === 0) {
+      message.error('请先配置任务')
       return
     }
-    const exportData = {
-      config: runtime.state.config,
-      tasks: runtime.state.tasks,
-    }
-    exportJsonFile(exportData, `TaskConfig${Date.now()}.json`)
-    msgApi.success(fmlText('export_ok'))
-    logger.info('Export flow config')
+    uRef.current?.toggle(true)
   }
 
-  return (<Flex className={baseCls}>
-    {msgCtx}
-    <Button
-      icon={<ImportOutlined />}
-      size='small'
-      title={''}
-      type='text'
-      onClick={() => onImportSeq()}
-    >{fmlText('import_seq')}</Button>
+  const onClearSeqBaseInfo = () => {
+    if (runtime.state.flowInfo) {
+      runtime.set({ ...runtime.state, flowInfo: undefined })
+      message.success('已清空序列描述信息')
+    }
+  }
+
+  return (<Flex className={baseCls} flex='1 1 auto' justify='space-between'>
     <Button
       icon={<ExportOutlined />}
       size='small'
-      title={''}
+      title={fmlText('btn_load_tip')}
       type='text'
-      onClick={() => onExportSeq()}
-    >{fmlText('export_seq')}</Button>
+      onClick={() => mRef.current?.toggle(true)}
+    >{fmlText('btn_load')}</Button>
+    <Button
+      icon={<ImportOutlined />}
+      size='small'
+      title={fmlText('btn_save_tip')}
+      type='text'
+      onClick={onOpenSaveSeqModal}
+    >{fmlText('btn_save')}</Button>
+    <div
+      className={`${baseCls}-status`}
+      title={runtime.state.flowInfo ? '已从本地加载序列, 双击状态点清空序列描述信息' : '常规运行序列'}
+      onDoubleClick={onClearSeqBaseInfo}
+    >
+      <Badge color={runtime.state.flowInfo ? '#1677ff' : '#d9d9d9'} />
+    </div>
+    <FlowManageModal ref={mRef} inheritName={fmlName} config={config} onOk={onLoadSeq} />
+    <FlowUpdateModal ref={uRef} inheritName={fmlName} config={config} runtime={runtime} />
   </Flex>)
 }
 

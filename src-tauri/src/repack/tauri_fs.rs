@@ -13,6 +13,13 @@ pub fn fs_copy_file(source: &str, destination: &str) -> SerializedResult<u64> {
 }
 
 // createDir
+#[tauri::command]
+pub fn fs_create_dir(path: &str) -> SerializedResult<()> {
+    match fs::create_dir(path) {
+        Ok(_) => Ok(()),
+        Err(e) => Err(Error::Io(e)),
+    }
+}
 
 // exists
 #[tauri::command]

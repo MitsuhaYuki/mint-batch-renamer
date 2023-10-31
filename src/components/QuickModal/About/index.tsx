@@ -1,6 +1,6 @@
 import { Flex } from 'antd'
 import { MultiLangProps } from '@/types/mlang'
-import { QuickModal, QuickModalRef } from '../QuickModal'
+import { QuickModal, QuickModalRef } from '../Base'
 import { ReactNode, forwardRef, useContext, useState } from 'react'
 import { getVersion, getTauriVersion } from '@tauri-apps/api/app'
 import { useMount } from 'ahooks'

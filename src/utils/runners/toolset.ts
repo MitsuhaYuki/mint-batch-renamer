@@ -37,6 +37,64 @@ const toolsetTaskRunners: Record<string, TaskRunner> = {
         })
       })
     }
+  },
+  't_activate': {
+    id: 't_activate',
+    name: {
+      'zh-CN': '激活文件',
+      'en-US': 'Activate Files',
+    },
+    desc: {
+      'zh-CN': '批量激活流程失败的文件, 使其可以重新被后续序列处理',
+      'en-US': '',
+    },
+    type: TaskRunnerType.toolset,
+    args: [{
+      id: 'range',
+      name: {
+        'zh-CN': '文件范围',
+        'en-US': '',
+      },
+      desc: {
+        'zh-CN': '要激活处理的文件范围, 默认"仅流程校验失败"会让当前所有无输出结果且流程校验失败的文件激活下一步流转',
+        'en-US': '',
+      },
+      type: 'radio-button',
+      options: [{
+        label: {
+          'zh-CN': '仅流程校验失败',
+          'en-US': ' ',
+        },
+        value: 'failed'
+      }, {
+        label: {
+          'zh-CN': '所有文件',
+          'en-US': ' ',
+        },
+        value: 'all'
+      }],
+      default: 'failed',
+      readonly: false,
+    }],
+    func: (sys: TaskRunnerSysArg, ext: Record<string, any>) => {
+      const { range } = ext
+      return sys.fileList(async (list, split, forward) => {
+        list.source.forEach((item) => {
+          const { origin, latest, steps } = split(item)
+          if (steps.length > 0) {
+            if (!steps[steps.length - 1].next) {
+              if (range === 'failed' && steps[steps.length - 1].to) return
+              forward(item, {
+                result: latest,
+                message: `Activate ${range} file: ${latest.name}`,
+                to: steps[steps.length - 1].to,
+                next: true,
+              })
+            }
+          }
+        })
+      })
+    }
   }
 }
 

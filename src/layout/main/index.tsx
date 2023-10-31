@@ -6,14 +6,12 @@ import { Flex, Layout } from 'antd'
 import { MultiLangProps } from '@/types/mlang'
 import { TaskFlow } from './TaskFlow'
 import { fmlNameMaker } from '@/utils/mlang'
-import { useConfigContext } from '@/context/config'
 import './index.scss'
 
 interface IProps extends MultiLangProps {}
 
 const baseCls = 'entrance'
 const Content: FC<IProps> = (props) => {
-  const [config, setConfig] = useConfigContext()
   return (<div className={baseCls}>
     <Layout className={`${baseCls}-layout`}>
       <Layout.Sider width='220px'>

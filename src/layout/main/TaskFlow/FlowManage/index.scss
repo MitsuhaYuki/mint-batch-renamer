@@ -1,5 +1,7 @@
 $baseCls: 'flow-manage';
 
 .#{$baseCls} {
-  // styles here
+  &-status {
+    padding: 0 8px 0 4px;
+  }
 }

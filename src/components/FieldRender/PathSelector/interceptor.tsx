@@ -1,4 +1,4 @@
-import { QuickModal, QuickModalInst, QuickModalRef } from '@/components/QuickModal'
+import { QuickModal, QuickModalInst, QuickModalRef } from '@/components/QuickModal/Base'
 import { SysUtilContext } from '@/context/sysutil'
 import { forwardRef, useContext, useEffect } from 'react'
 

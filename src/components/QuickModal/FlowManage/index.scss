@@ -1,0 +1,48 @@
+$baseCls: 'modal-flow-manage';
+
+.#{$baseCls} {
+  &-flex {
+    width: 100%;
+    max-height: 400px;
+  }
+
+  &-list {
+    overflow: auto;
+    width: 100%;
+
+    &-item.ant-list-item {
+      cursor: default;
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 8px;
+      user-select: none;
+
+      &:hover, &.active:hover {
+        background: #f0f0f0;
+      }
+
+      &.active {
+        background: #f5f5f5;
+      }
+
+      // .ant-btn {
+      //   width: 22px;
+      //   height: 22px;
+      // }
+    }
+  }
+
+  &-extra {
+    width: 100%;
+    overflow: auto;
+    padding-right: 2px;
+
+    &-item {
+      div {
+        color: #8c8c8c;
+        display: inline-block;
+        word-break: break-all;
+      }
+    }
+  }
+}

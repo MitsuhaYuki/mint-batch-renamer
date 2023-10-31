@@ -110,14 +110,10 @@
     "cfm_run_msg": "Are you sure to apply result?"
   },
   "flow-manage": {
-    "import_seq": "Import Sq",
-    "import_seq_title": "Import Flow Config",
-    "import_ok": "Flow config import successfully",
-    "import_failed": "Import config failed ({0})",
-    "cfg_typevar": "Flow Config",
-    "export_seq": "Export Sq",
-    "export_ok": "Flow config export successfully",
-    "export_no_task": "No task to export"
+    "btn_load": "Load Seq.",
+    "btn_load_tip": "Load saved sequence",
+    "btn_save": "Save Seq.",
+    "btn_save_tip": "Save current sequence"
   },
   "modal-task-cfg": {
     "title": "Task Configuration",
