@@ -110,10 +110,10 @@
     "cfm_run_msg": "Are you sure to apply result?"
   },
   "flow-manage": {
-    "btn_load": "Load Seq.",
-    "btn_load_tip": "Load saved sequence",
-    "btn_save": "Save Seq.",
-    "btn_save_tip": "Save current sequence"
+    "btn_load": "Load Seq",
+    "btn_load_tip": "Load saved workflow",
+    "btn_save": "Save Seq",
+    "btn_save_tip": "Save current workflow"
   },
   "modal-task-cfg": {
     "title": "Task Configuration",

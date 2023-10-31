@@ -57,6 +57,7 @@ const Content: FC<IProps> = (props) => {
       onClick={() => mRef.current?.toggle(true)}
     >{fmlText('btn_load')}</Button>
     <Button
+      className={'flex-auto compact'}
       icon={<ImportOutlined />}
       size='small'
       title={fmlText('btn_save_tip')}
