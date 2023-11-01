@@ -1,6 +1,6 @@
 import { message } from 'antd'
 import { MessageType } from 'antd/es/message/interface'
-import { ReactElement, ReactNode, useMemo } from 'react'
+import { Children, ReactElement, ReactNode, cloneElement, useMemo } from 'react'
 
 /** UUID generator */
 function uuid () {
@@ -56,9 +56,14 @@ const useKeyMessage = (key: string): [Record<MessageLevel, MessageFunc>, ReactEl
   return [apiWrapped, ctx]
 }
 
+const reverseFooter = (i: any) => cloneElement(i, {
+  children: Children.toArray(i.props.children).reverse()
+})
+
 export {
   uuid,
   exportJsonFile,
   useKeyMessage,
-  checkOsError
+  checkOsError,
+  reverseFooter
 }

@@ -1,14 +1,14 @@
-import { ExportOutlined, ImportOutlined, PlusOutlined } from '@ant-design/icons'
-import { Button, Flex, Modal } from 'antd'
-import { Children, FC, cloneElement } from 'react'
-import './index.scss'
-import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
-import { useMultiLang } from '@/utils/mlang'
-import { makeDefaultTask, makeTaskRunnerSysArg } from '@/utils/runners/common'
-import { MultiLangProps } from '@/types/mlang'
-import { checkOsError, useKeyMessage } from '@/utils/common'
+import { App, Button, Flex, Modal } from 'antd'
+import { FC } from 'react'
 import { FileItemExtend } from '@/types/file'
+import { MultiLangProps } from '@/types/mlang'
+import { PlusOutlined } from '@ant-design/icons'
+import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
+import { checkOsError, reverseFooter } from '@/utils/common'
 import { invoke } from '@tauri-apps/api/tauri'
+import { makeDefaultTask, makeTaskRunnerSysArg } from '@/utils/runners/common'
+import { useMultiLang } from '@/utils/mlang'
+import './index.scss'
 
 interface IProps extends MultiLangProps, WithConsoleProps, WithConfigProps, WithRuntimeProps {}
 
@@ -16,7 +16,8 @@ const baseCls = 'flow-ctrl'
 const Content: FC<IProps> = (props) => {
   const { con, config, runtime } = props
   const { fmlName, fmlText } = useMultiLang(config.state, baseCls, props.inheritName)
-  const [msgApi, msgCtx] = useKeyMessage(baseCls)
+  const { message } = App.useApp()
+  const withKey = (content: string, duration?: number) => ({ content, duration, key: baseCls })
 
   const clearHistoryData = (fileList: FileItemExtend[]): FileItemExtend[] => {
     return fileList.map((fileItem) => {
@@ -32,11 +33,11 @@ const Content: FC<IProps> = (props) => {
 
   const onPreview = async () => {
     if (runtime.state.fileList.length === 0) {
-      msgApi.warning(fmlText('no_source'))
+      message.warning(fmlText('no_source'))
       return
     }
     if (runtime.state.tasks.length === 0) {
-      msgApi.warning(fmlText('no_task'))
+      message.warning(fmlText('no_task'))
       return
     }
     const tasks = runtime.state.tasks
@@ -50,11 +51,11 @@ const Content: FC<IProps> = (props) => {
           task.args
         )
       } else {
-        msgApi.error(fmlText('preview_no_runner'))
+        message.error(fmlText('no_runner'))
         return
       }
     }
-    msgApi.success(fmlText('preview_done'))
+    message.success(fmlText('preview_done'))
     runtime.set('u_file_list', storeList)
     runtime.set('sig_preview')
   }
@@ -65,25 +66,22 @@ const Content: FC<IProps> = (props) => {
       return fileItem.steps.length > 0 && fileItem.steps[fileItem.steps.length - 1].to
     })
     if (result.length === 0) {
-      msgApi.error(fmlText('no_result'))
+      message.error(fmlText('no_result'))
       return
     }
     Modal.confirm({
-      title: fmlText('cfm_run_title'),
-      content: fmlText('cfm_run_msg'),
+      title: fmlText('run_cfm_title'),
+      content: fmlText('run_cfm_msg'),
       okText: fmlText('common:confirm'),
       cancelText: fmlText('common:cancel'),
-      footer: (i: any) => cloneElement(i, {
-        children: Children.toArray(i.props.children).reverse()
-      }),
-      onOk: () => {
-        onApplyResult(result)
-      }
+      footer: reverseFooter,
+      onOk: () => onApplyResult(result)
     })
   }
 
+  // FIXME: 这里最终要换成Modal，便于全局控制，也可以添加终止按钮等操作
   const onApplyResult = async (fileList: FileItemExtend[]) => {
-    msgApi.loading('Start Running...', 0)
+    message.loading(withKey(fmlText('run_start'), 0))
     for (let i = 0; i < fileList.length; i++) {
       const fileItem = fileList[i]
       const lastStep = fileItem.steps[fileItem.steps.length - 1]
@@ -96,9 +94,9 @@ const Content: FC<IProps> = (props) => {
             source: fileItem.path,
             destination: `${targetPath}\\${targetFile.name}`
           })
-          msgApi.loading(`Copy File ${i + 1} / ${fileList.length}`, 0)
+          message.loading(withKey(fmlText('run_copying', (i + 1).toString(), fileList.length.toString()), 0))
         } catch (e) {
-          msgApi.error(`Copy File Error: ${e}`)
+          message.error(withKey(fmlText('run_copy_err', `${e}`)))
           return
         }
       } else {
@@ -108,24 +106,22 @@ const Content: FC<IProps> = (props) => {
             oldPath: fileItem.path,
             newPath: `${targetPath}\\${targetFile.name}`
           })
-          msgApi.loading(`Rename File ${i + 1} / ${fileList.length}`, 0)
+          message.loading(withKey(fmlText('run_moving', (i + 1).toString(), fileList.length.toString()), 0))
         } catch (e) {
           const osErrNum = checkOsError(e)
           if (osErrNum === 17) {
-            // msgApi.error('The system cannot move the file to a different disk drive. (os error 17)')
-            msgApi.error('系统无法将文件移到不同的磁盘驱动器。 (os error 17)')
+            message.error(withKey(fmlText('run_move_e17')))
           } else {
-            msgApi.error(`Rename File Error: ${e}`)
+            message.error(withKey(fmlText('run_move_err', `${e}`)))
           }
           return
         }
       }
     }
-    msgApi.success('Copy File Done')
+    message.success(withKey(fmlText('run_done')))
   }
 
   return (<Flex className={baseCls}>
-    {msgCtx}
     <Button
       icon={<PlusOutlined />}
       size='small'

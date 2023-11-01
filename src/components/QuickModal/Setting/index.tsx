@@ -40,11 +40,9 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
     let formValues: ISysConfig
     try {
       formValues = await form.validateFields()
-    } catch (error) {
-      console.log('Failed:', error)
+    } catch (e) {
       return
     }
-    console.log('Success:', formValues)
     const modal = makeSysConfigModal()
     await saveConfig(formValues, modal)
     modal.destroy()
@@ -99,14 +97,14 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
         hidden
         label={fmlText('cfg_ver')}
         name="cfg_ver"
-        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+        rules={[{ required: true, message: fmlText('field_required') }]}
       >
         <Input disabled />
       </Form.Item>
       <Form.Item<ISysConfig>
         label={fmlText('cfg_lang')}
         name="lang"
-        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+        rules={[{ required: true, message: fmlText('field_required') }]}
       >
         <Select
           style={{ width: 120 }}
@@ -120,7 +118,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
             name={["limit", "max"]}
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_limit_max_tips')}
-            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+            rules={[{ required: true, message: fmlText('field_required') }]}
           >
             <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
           </Form.Item>
@@ -129,7 +127,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
             name={["limit", "warn"]}
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_limit_warn_tips')}
-            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+            rules={[{ required: true, message: fmlText('field_required') }]}
           >
             <InputNumber min={0} max={10000000} controls={false} keyboard={false} />
           </Form.Item>
@@ -141,7 +139,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
         className={`${baseCls}-2col`}
         tooltip={fmlText('cfg_fsn_tips')}
         labelCol={{ span: 12 }}
-        rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+        rules={[{ required: true, message: fmlText('field_required') }]}
       >
         <Radio.Group>
           <Radio value={true}>{fmlText('common:yes')}</Radio>
@@ -156,7 +154,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_font_sys_tips')}
             valuePropName='checked'
-            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+            rules={[{ required: true, message: fmlText('field_required') }]}
           >
             <Switch />
           </Form.Item>
@@ -166,7 +164,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
             className={`${baseCls}-label-sm`}
             tooltip={fmlText('cfg_font_bold_tips')}
             valuePropName='checked'
-            rules={[{ required: true, message: fmlText('common:form_tips_required') }]}
+            rules={[{ required: true, message: fmlText('field_required') }]}
           >
             <Switch disabled={!fontEnable} />
           </Form.Item>

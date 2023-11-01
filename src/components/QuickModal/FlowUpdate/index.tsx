@@ -1,10 +1,11 @@
 import { App, Checkbox, Form, Input } from 'antd'
-import { Children, cloneElement, forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { FlowConfig } from '@/types/flow'
 import { MultiLangProps } from '@/types/mlang'
 import { QuickModal, QuickModalInst, QuickModalRef } from '../Base'
 import { WithConfigProps, WithRuntimeProps } from '@/types/common'
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
 import { invoke } from '@tauri-apps/api/tauri'
+import { reverseFooter } from '@/utils/common'
 import { useMultiLang } from '@/utils/mlang'
 import './index.scss'
 
@@ -15,7 +16,7 @@ interface FlowConfigForm extends FlowConfig {
   option: string[]
 }
 
-const baseCls = 'modal-flow-manage'
+const baseCls = 'modal-flow-update'
 const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
   const { config, runtime } = props
   const { fmlText } = useMultiLang(config.state, baseCls, props.inheritName)
@@ -58,25 +59,21 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
       if (exist) {
         // This await is necessary, otherwise the program won't wait for the confirm result
         const confirm = await modal.confirm({
-          title: '提示',
-          content: '该流程已存在，是否覆盖？',
-          okText: '覆盖',
-          okButtonProps: {
-            danger: true
-          },
-          cancelText: '取消',
-          footer: (i: any) => cloneElement(i, {
-            children: Children.toArray(i.props.children).reverse()
-          })
+          title: fmlText('ow_cfm_title'),
+          content: fmlText('ow_cfm_msg'),
+          okText: fmlText('ow_cfm_ok'),
+          okButtonProps: { danger: true },
+          cancelText: fmlText('common:cancel'),
+          footer: reverseFooter
         })
         if (!confirm) return
       }
       await invoke('fs_write_text_file', { path, contents: JSON.stringify(config) })
       runtime.set({ ...runtime.state, flowInfo: config.info })
-      message.success('保存流程成功')
+      message.success(fmlText('flow_save_ok'))
       { (ref as QuickModalInst).current?.toggle(false) }
     } catch (e) {
-      message.error(`保存流程失败: ${e}`)
+      message.error(fmlText('flow_save_failed', `${e}`))
     } finally {
       setLoading(() => false)
     }
@@ -88,7 +85,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
     confirmLoading={loading}
     maskClosable={false}
     ref={mRef}
-    title={'保存流程'}
+    title={fmlText('title')}
     wrapClassName={baseCls}
     onOk={onSave}
   >
@@ -99,31 +96,31 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
       autoComplete="off"
     >
       <Form.Item
-        label="流程名"
+        label={fmlText('flow_name')}
         name={["info", "name"]}
         rules={[{
           required: true,
-          message: '必须输入流程名',
+          message: fmlText('name_require'),
         }, {
           pattern: /^[\u4e00-\u9fa5_a-zA-Z0-9]+$/,
-          message: '流程名称只能由中文、英文、数字和 _ 构成'
+          message: fmlText('name_pattern')
         }]}
       >
         <Input />
       </Form.Item>
       <Form.Item
-        label="流程描述"
+        label={fmlText('flow_desc')}
         name={["info", "desc"]}
       >
         <Input.TextArea autoSize={{ minRows: 4, maxRows: 6 }} maxLength={500} showCount />
       </Form.Item>
       <Form.Item
-        label="导出选项"
+        label={fmlText('flow_opt')}
         name="option"
       >
         <Checkbox.Group
           options={[{
-            label: '包含基础设置',
+            label: fmlText('opt_basecfg'),
             value: 'config'
           }]}
         />

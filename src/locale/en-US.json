@@ -4,28 +4,37 @@
     "clear": "Clear",
     "close": "Close",
     "confirm": "Ok",
+    "del": "Delete",
     "example": "Some example text with multi-langs",
-    "form_tips_required": "Required",
     "save": "Save",
     "yes": "Yes",
     "no": "No"
   },
-  "entrance": {
-    "hello": "hello, entrance, {0}!"
+  "fields": {
+    "path_select": "Select",
+    "path_drop_enable": "Drop Selector",
+    "path_drop_tips": "Drag files/folders here to select",
+    "path_empty": "Not Selected",
+    "runner_type_all": "All",
+    "runner_type_untouch": "Untouch",
+    "runner_type_filter": "Filter",
+    "runner_type_renamer": "Renamer",
+    "runner_type_toolset": "Utils"
   },
-  "accessory": {
-    "logs": "Console",
-    "settings": "Settings"
+  "modal-about": {
+    "title": "About",
+    "app_ver": "App Ver",
+    "tauri_ver": "Tauri Ver",
+    "author": "Author",
+    "font_name": "Font Name"
   },
   "modal-settings": {
     "title": "Settings",
     "raw": "Raw",
     "raw_title": "Raw Configuration",
     "save": "Save Config",
+    "field_required": "Required",
     "cfg_ver": "Config Version",
-    "cfg_dev_ui": "UI Type",
-    "cfg_ui_exp": "Experimental",
-    "cfg_ui_ori": "Original",
     "cfg_lang": "Languages",
     "cfg_limit": "Limit",
     "cfg_limit_max": "Max",
@@ -39,6 +48,65 @@
     "cfg_font_sys_tips": "Use the built-in font of the program, close it and use the system font. Note: Using the system font may cause unknown UI problems, and these problems will *not* be fixed.",
     "cfg_font_bold": "Bold Font",
     "cfg_font_bold_tips": "Use a bolder font to enhance readability"
+  },
+  "modal-task-cfg": {
+    "title": "Task Configuration",
+    "step_name": "Step Name",
+    "no_step_name": "You must provide a name for this step",
+    "runner": "Runner",
+    "no_runner": "You must select a runner",
+    "folder_sel_title": "Select Folder",
+    "invalid_el": "Invalid Runner Param Type",
+    "runner_unknown": "Unknown Runner!",
+    "runner_unknown_tip": "You may have loaded an incorrect workflow configuration file or a non-existent external runner!",
+    "runner_type": "Type",
+    "runner_desc": "Description",
+    "runner_no_desc": "No description provided for this runner",
+    "runner_args": "Arguments",
+    "runner_arg_name": "Arg Name",
+    "runner_arg_desc": "Arg Desc",
+    "runner_arg_no_desc": "No description provided for this argument",
+    "runner_arg_default": "Default Value",
+    "runner_arg_no_default": "No default value",
+    "runner_no_arg": "This runner does not need any arguments",
+    "arg_hover_tips": "Hover over the argument name to view the argument information",
+    "msg_cfg_invalid": "Configuration is not correct!"
+  },
+  "modal-flow-manage": {
+    "title": "Load Saved Workflow",
+    "no_saved_flow": "No saved workflow",
+    "del_cfm_title": "Are you sure you want to delete this workflow?",
+    "del_cfm_msg": "This operation cannot be undone!",
+    "del_cfg_success": "Workflow deleted successfully",
+    "del_cfg_failed": "Failed to delete workflow: {0}",
+    "load_list_failed": "Failed to load workflow list: {0}",
+    "load_file_failed": "Failed to load workflow detail: {0}",
+    "no_select": "Please select a workflow to load",
+    "cfg_name": "Name",
+    "cfg_desc": "Description",
+    "cfg_detail": "Detail",
+    "cfg_with_basecfg": "With Base Config",
+    "cfg_task_brief": "Configured {0} steps",
+    "cfg_no_select": "Please select a workflow from the list on the left"
+  },
+  "modal-flow-update": {
+    "title": "Save/Update Workflow",
+    "flow_name": "Workflow Name",
+    "name_require": "Workflow name is required",
+    "name_pattern": "Workflow name can only contain Chinese, English, numbers and _",
+    "flow_desc": "Workflow Description",
+    "flow_opt": "Options",
+    "opt_basecfg": "Save Base Config",
+    "ow_cfm_title": "Warning",
+    "ow_cfm_msg": "Workflow with the same name already exists, overwrite?",
+    "ow_cfm_ok": "Overwrite",
+    "flow_save_ok": "Workflow saved successfully",
+    "flow_save_failed": "Failed to save workflow: {0}"
+  },
+  "entrance": {},
+  "accessory": {
+    "logs": "Console",
+    "settings": "Settings"
   },
   "console": {
     "title": "Console",
@@ -75,7 +143,7 @@
     "result_view_title": "View the status list of the current flow result",
     "filter_all": "All",
     "filter_all_title": "Show the status of all source files",
-    "filter_flowpass": "Task OK",
+    "filter_flowpass": "Passed",
     "filter_flowpass_title": "Show the status of files that have passed the flow check",
     "filter_complete": "Complete",
     "filter_complete_title": "Show the status of files that have passed the flow check and have output results",
@@ -84,62 +152,47 @@
     "col_name": "Name",
     "col_ext": "Extension",
     "col_size": "Size",
-    "col_latest_name": "最终节点文件名",
-    "col_res_name": "结果名",
-    "res_empty": "未通过流程或无结果输出",
-    "col_flowpass": "序列",
-    "flowpass_ok": "流程校验通过",
-    "flowpass_fail": "流程校验失败",
-    "col_complete": "完成",
-    "complete_ok": "已正确输出",
-    "complete_fail": "没有输出结果"
+    "col_latest_name": "Latest Name",
+    "col_res_name": "Output Name",
+    "res_empty": "Not passed or no result",
+    "col_flowpass": "Pass",
+    "flowpass_ok": "This file has passed the workflow",
+    "flowpass_fail": "This file has not passed the workflow",
+    "col_complete": "OK",
+    "complete_ok": "This file has output results",
+    "complete_fail": "This file has not output results"
   },
   "taskflow": {
-    "default_task": "Click here to edit"
+    "default_task": "Click here to edit",
+    "no_task": "You have not added any steps yet"
   },
   "flow-ctrl": {
     "new": "Add Step",
     "preview": "Dry Run",
-    "run": "Run",
     "no_source": "Selected source has no file",
-    "no_task": "You have not added any steps yet",
-    "preview_done": "Preview done",
-    "preview_no_runner": "Error: Some steps reference non-existent runners!",
-    "no_result": "No result to apply, have you run the \"Dry Run\"?",
-    "cfm_run_title": "Apply Result",
-    "cfm_run_msg": "Are you sure to apply result?"
+    "no_runner": "Error: Some steps reference non-existent runners!",
+    "preview_done": "Dry run complete",
+    "run": "Run",
+    "no_result": "No result to apply, have you run the \"Dry Run\" and has complete result?",
+    "run_cfm_title": "Apply Result",
+    "run_cfm_msg": "Confirm that the current configuration and the preview result are correct and apply this result?",
+    "run_start": "Applying result...",
+    "run_copying": "Copying file, {0} / {1}",
+    "run_copy_err": "Copy failed, {0}",
+    "run_moving": "Moving file, {0} / {1}",
+    "run_move_err": "Move failed, {0}",
+    "run_move_e17": "The system cannot move the file to a different disk drive. (os error 17)",
+    "run_done": "Apply result complete"
   },
   "flow-manage": {
     "btn_load": "Load Seq",
     "btn_load_tip": "Load saved workflow",
     "btn_save": "Save Seq",
-    "btn_save_tip": "Save current workflow"
-  },
-  "modal-task-cfg": {
-    "title": "Task Configuration",
-    "step_name": "Step Name",
-    "no_step_name": "You must provide a name for this step",
-    "runner": "Runner",
-    "no_runner": "You must select a runner",
-    "msg_cfg_invalid": "Configuration is not correct!",
-    "folder_sel_title": "Select Folder"
-  },
-  "modal-about": {
-    "title": "About",
-    "app_ver": "App Version",
-    "tauri_ver": "Tauri Version",
-    "author": "Author",
-    "font_name": "Font Name"
-  },
-  "fields": {
-    "path_select": "Select",
-    "path_drop_enable": "Drop Selector",
-    "path_drop_tips": "Drag files/folders here to select",
-    "path_empty": "Not Selected",
-    "runner_type_all": "All",
-    "runner_type_untouch": "Untouch",
-    "runner_type_filter": "Filter",
-    "runner_type_renamer": "Renamer",
-    "runner_type_toolset": "Utils"
+    "btn_save_tip": "Save current workflow",
+    "cfg_local": "Loaded from local, double-click the status point to clear the workflow description information",
+    "cfg_temp": "General Run Workflow",
+    "cfg_clear": "Workflow description information cleared",
+    "load_success": "Load success",
+    "load_failed": "Load failed: {0}"
   }
 }

@@ -1,4 +1,4 @@
-import { Checkbox, Flex, Form, FormItemProps, Input, InputNumber, Radio, Segmented, Select, Switch } from 'antd'
+import { App, Checkbox, Flex, Form, FormItemProps, Input, InputNumber, Radio, Segmented, Select, Switch } from 'antd'
 import { MultiLangProps } from '@/types/mlang'
 import { PathSelector } from '@/components/FieldRender/PathSelector'
 import { QuickModal, QuickModalRef } from '@/components/QuickModal/Base'
@@ -7,7 +7,6 @@ import { RunnerSelector } from '@/components/FieldRender/RunnerSelector'
 import { TaskRunnerConfig, TaskRunnerExtArg } from '@/types/task'
 import { WithConfigProps, WithConsoleProps, WithRuntimeProps } from '@/types/common'
 import { useForm } from 'antd/es/form/Form'
-import { useKeyMessage } from '@/utils/common'
 import { useMultiLang } from '@/utils/mlang'
 import './index.scss'
 
@@ -23,7 +22,7 @@ const baseCls = 'modal-task-cfg'
 const Content = forwardRef<IRef, IProps>((props, ref) => {
   const { config, con, runtime } = props
   const { fmlName, fmlText, fmlField, fmlFieldOption } = useMultiLang(config.state, baseCls, props.inheritName)
-  const [msgApi, msgCtx] = useKeyMessage(baseCls)
+  const { message } = App.useApp()
   const [form] = useForm()
   // Only used to store the current configuration
   const [cfg, setCfg] = useState<TaskRunnerConfig>()
@@ -62,7 +61,7 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
       props.onOk?.(formVals)
       mRef.current?.toggle(false)
     } catch (e) {
-      msgApi.error(fmlText('msg_cfg_invalid'))
+      message.error(fmlText('msg_cfg_invalid'))
     }
   }
 
@@ -105,7 +104,7 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
     const args = runtime.state.runners[cfg?.runner ?? 'default']?.args
     if (Array.isArray(args) && args.length > 0) {
       args.forEach((arg, idx) => {
-        let el: ReactElement = <div>不合法的控件类型</div>
+        let el: ReactElement = <div>{fmlText('invalid_el')}</div>
         const extra: FormItemProps = {
           // extra: fmlText('arg_desc', arg.name),
           initialValue: arg.default,
@@ -165,46 +164,46 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
   const renderRunnerInfo = () => {
     const runner = runtime.state.runners[cfg?.runner ?? 'default']
     if (!runner) return <div className={`${baseCls}-extra-item`}>
-      未知的执行器!<div>您可能加载了一个错误的序列配置文件或一个不存在的外部执行器!</div>
+      {fmlText('runner_unknown')}<div>{fmlText('runner_unknown_tip')}</div>
     </div>
     return <div className={`${baseCls}-extra`} style={{ width: '100%' }}>
       <Flex vertical gap='4px'>
         <div className={`${baseCls}-extra-block`}>
           <div className={`${baseCls}-extra-item`}>
-            执行器: <div>{fmlField(runner.name)}</div>
+            {fmlText('runner')}: <div>{fmlField(runner.name)}</div>
           </div>
           <div className={`${baseCls}-extra-item`}>
-            类型: <div>{fmlText(`fields:runner_type_${runner.type}`)}</div>
-          </div>
-        </div>
-        <div className={`${baseCls}-extra-block`}>
-          <div className={`${baseCls}-extra-item`}>
-            执行器描述:
-          </div>
-          <div className={`${baseCls}-extra-item`}>
-            <div>{runner.desc ? fmlField(runner.desc) : '该执行器未提供描述'}</div>
+            {fmlText('runner_type')}: <div>{fmlText(`fields:runner_type_${runner.type}`)}</div>
           </div>
         </div>
         <div className={`${baseCls}-extra-block`}>
           <div className={`${baseCls}-extra-item`}>
-            参数详情:
+            {fmlText('runner_desc')}:
+          </div>
+          <div className={`${baseCls}-extra-item`}>
+            <div>{runner.desc ? fmlField(runner.desc) : fmlText('runner_no_desc')}</div>
+          </div>
+        </div>
+        <div className={`${baseCls}-extra-block`}>
+          <div className={`${baseCls}-extra-item`}>
+            {fmlText('runner_args')}:
           </div>
           {runner.args.length
             ? hoverField ? <>
               <div className={`${baseCls}-extra-item`}>
-                参数名: <div>{fmlField(hoverField.name)}</div>
+                {fmlText('runner_arg_name')}: <div>{fmlField(hoverField.name)}</div>
               </div>
               <div className={`${baseCls}-extra-item`}>
-                描述: <div>{hoverField.desc ? fmlField(hoverField.desc) : '该参数未提供描述'}</div>
+                {fmlText('runner_arg_desc')}: <div>{hoverField.desc ? fmlField(hoverField.desc) : fmlText('runner_arg_no_desc')}</div>
               </div>
               <div className={`${baseCls}-extra-item`}>
-                默认值: <div>{hoverField.default ?? '无'}</div>
+                {fmlText('runner_arg_default')}: <div>{hoverField.default ?? fmlText('runner_arg_no_default')}</div>
               </div>
             </> : <div className={`${baseCls}-extra-item`}>
-              <div>鼠标移动到参数名称上查看参数信息</div>
+              <div>{fmlText('arg_hover_tips')}</div>
             </div>
             : <div className={`${baseCls}-extra-item`}>
-              <div>当前执行器不需要任何参数</div>
+              <div>{fmlText('runner_no_arg')}</div>
             </div>}
         </div>
       </Flex >
@@ -223,7 +222,6 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
     centered
     onOk={onOk}
   >
-    {msgCtx}
     <Flex className={`${baseCls}-flex`} gap='6px'>
       <Flex flex='1 1 auto'>
         <Form
@@ -231,11 +229,9 @@ const Content = forwardRef<IRef, IProps>((props, ref) => {
           className={`${baseCls}-form`}
           form={form}
           initialValues={{ remember: true }}
-          // labelCol={{ span: 8 }}
           labelCol={{ span: 7 }}
           name={baseCls}
           preserve={false}
-          // wrapperCol={{ span: 16 }}
           wrapperCol={{ span: 17 }}
           onValuesChange={onValuesChange}
         >

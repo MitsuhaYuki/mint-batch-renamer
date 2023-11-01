@@ -25,17 +25,17 @@ const Content: FC<IProps> = (props) => {
     try {
       const flowConfig = cfg.flow
       runtime.set({ ...runtime.state, ...flowConfig, flowInfo: cfg.info })
-      message.success('导入成功')
+      message.success(fmlText('load_success'))
       logger.info(`Import flow config from ${cfg}`)
     } catch (e) {
-      message.error(`导入失败: ${e}`)
+      message.error(fmlText('load_failed', `${e}`))
       logger.error(`Import flow config failed: ${e}`)
     }
   }
 
   const onOpenSaveSeqModal = () => {
     if (runtime.state.tasks.length === 0) {
-      message.error('请先配置任务')
+      message.error(fmlText('no_task'))
       return
     }
     uRef.current?.toggle(true)
@@ -44,7 +44,7 @@ const Content: FC<IProps> = (props) => {
   const onClearSeqBaseInfo = () => {
     if (runtime.state.flowInfo) {
       runtime.set({ ...runtime.state, flowInfo: undefined })
-      message.success('已清空序列描述信息')
+      message.success(fmlText('cfg_clear'))
     }
   }
 
@@ -66,7 +66,7 @@ const Content: FC<IProps> = (props) => {
     >{fmlText('btn_save')}</Button>
     <div
       className={`${baseCls}-status`}
-      title={runtime.state.flowInfo ? '已从本地加载序列, 双击状态点清空序列描述信息' : '常规运行序列'}
+      title={runtime.state.flowInfo ? fmlText('cfg_local') : fmlText('cfg_temp')}
       onDoubleClick={onClearSeqBaseInfo}
     >
       <Badge color={runtime.state.flowInfo ? '#1677ff' : '#d9d9d9'} />

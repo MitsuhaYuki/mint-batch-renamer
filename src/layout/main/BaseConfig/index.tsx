@@ -53,7 +53,7 @@ const Content: FC<IProps> = (props) => {
       }
     })
     return () => { eFileDrop.then(i => i()) }
-  })
+  }, [])
 
   /** Refresh file list when receive signal */
   useUpdateEffect(() => {

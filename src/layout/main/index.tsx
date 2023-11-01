@@ -12,21 +12,22 @@ interface IProps extends MultiLangProps {}
 
 const baseCls = 'entrance'
 const Content: FC<IProps> = (props) => {
+  const fmlName = fmlNameMaker(baseCls, props.inheritName)
   return (<div className={baseCls}>
     <Layout className={`${baseCls}-layout`}>
       <Layout.Sider width='220px'>
         <Flex className={`${baseCls}-sider-flex`} vertical>
           <Flex flex='0 0 auto'>
-            <BaseConfig />
+            <BaseConfig inheritName={fmlName} />
           </Flex>
           <Flex flex='1 1 auto' style={{ overflow: 'auto' }}>
-            <TaskFlow />
+            <TaskFlow inheritName={fmlName} />
           </Flex>
-          <Accessory inheritName={fmlNameMaker(baseCls, props.inheritName)} />
+          <Accessory inheritName={fmlName} />
         </Flex>
       </Layout.Sider>
       <Layout.Content>
-        <DetailPanel />
+        <DetailPanel inheritName={fmlName} />
       </Layout.Content>
     </Layout>
   </div>)
