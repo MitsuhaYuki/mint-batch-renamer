@@ -45,14 +45,40 @@ const filterTaskRunners: Record<string, TaskRunner> = {
       default: 'name',
       readonly: false,
     }, {
-      id: 'str',
+      id: 'method',
       name: {
-        'zh-CN': '包含',
-        'en-US': 'Contains',
+        'zh-CN': '方式',
+        'en-US': 'Method',
       },
       desc: {
-        'zh-CN': '包含指定字符串, 可以使用","分隔字符串进行多个字符串匹配, 例如: "png,jpg"',
-        'en-US': 'Contains specified string, can use "," to split string for multiple string match, e.g. "png,jpg"',
+        'zh-CN': '过滤生效方式, 可选择包含或排除指定字符串',
+        'en-US': 'Filter effective method, can choose to include or exclude specified string',
+      },
+      type: 'radio',
+      options: [{
+        label: {
+          'zh-CN': '包含',
+          'en-US': 'Contains',
+        },
+        value: 'include',
+      }, {
+        label: {
+          'zh-CN': '排除',
+          'en-US': 'Exclude',
+        },
+        value: 'exclude',
+      }],
+      default: 'include',
+      readonly: false,
+    }, {
+      id: 'str',
+      name: {
+        'zh-CN': '字符串',
+        'en-US': 'String',
+      },
+      desc: {
+        'zh-CN': '指定目标字符串, 可以使用","分隔字符串进行多个字符串匹配, 例如: "png,jpg"',
+        'en-US': 'Specified target string, can use "," to split string for multiple string match, e.g. "png,jpg"',
       },
       type: 'string',
       readonly: false,
@@ -60,13 +86,14 @@ const filterTaskRunners: Record<string, TaskRunner> = {
     func: (sys: TaskRunnerSysArg, ext: Record<string, any>) => {
       return sys.fileItem(async (split, forward) => {
         const { origin, latest, steps } = split()
-        const { range, str } = ext
+        const { range, method, str } = ext
         const sourceText = range === 'all' ? latest.name : range === 'name' ? latest.fileName : latest.fileExt
         const matchText = (str as string).split(',').map(i => i.trim()).filter(i => i)
+        const match = matchText.some(i => sourceText.includes(i))
         forward({
           result: latest,
-          message: `Filter by '${range}' contains '${str}'`,
-          next: matchText.some(i => sourceText.includes(i)),
+          message: `Filter by '${range}' ${method} '${str}'`,
+          next: method === 'include' ? match : !match,
         })
       })
     }
@@ -115,14 +142,40 @@ const filterTaskRunners: Record<string, TaskRunner> = {
       default: 'name',
       readonly: false,
     }, {
-      id: 'str',
+      id: 'method',
       name: {
-        'zh-CN': '等于',
-        'en-US': 'Equals',
+        'zh-CN': '方式',
+        'en-US': 'Method',
       },
       desc: {
-        'zh-CN': '等于指定字符串, 可以使用","分隔字符串进行多个字符串匹配, 例如: "png,jpg"',
-        'en-US': 'Equals specified string, can use "," to split string for multiple string match, e.g. "png,jpg"',
+        'zh-CN': '过滤生效方式, 可选择等于或不等于指定字符串',
+        'en-US': 'Filter effective method, can choose to equal or not equal specified string',
+      },
+      type: 'radio',
+      options: [{
+        label: {
+          'zh-CN': '等于',
+          'en-US': 'Equals',
+        },
+        value: 'equal',
+      }, {
+        label: {
+          'zh-CN': '不等于',
+          'en-US': 'Not Equals',
+        },
+        value: 'unequal',
+      }],
+      default: 'equal',
+      readonly: false,
+    }, {
+      id: 'str',
+      name: {
+        'zh-CN': '字符串',
+        'en-US': 'String',
+      },
+      desc: {
+        'zh-CN': '指定目标字符串, 可以使用","分隔字符串进行多个字符串匹配, 例如: "png,jpg"',
+        'en-US': 'Specified target string, can use "," to split string for multiple string match, e.g. "png,jpg"',
       },
       type: 'string',
       readonly: false,
@@ -130,13 +183,14 @@ const filterTaskRunners: Record<string, TaskRunner> = {
     func: (sys: TaskRunnerSysArg, ext: Record<string, any>) => {
       return sys.fileItem(async (split, forward) => {
         const { origin, latest, steps } = split()
-        const { range, str } = ext
+        const { range, method, str } = ext
         const sourceText = range === 'all' ? latest.name : range === 'name' ? latest.fileName : latest.fileExt
         const matchText = (str as string).split(',').map(i => i.trim()).filter(i => i)
+        const match = matchText.some(i => sourceText === i)
         forward({
           result: latest,
-          message: `Filter by '${range}' equals '${str}'`,
-          next: matchText.some(i => sourceText === i),
+          message: `Filter by '${range}' ${method} '${str}'`,
+          next: method === 'equal' ? match : !match,
         })
       })
     }
