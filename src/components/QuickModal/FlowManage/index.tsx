@@ -99,6 +99,16 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
     }
   }
 
+  const onDoubleClick = async (path: string) => {
+    try {
+      const res: string = await invoke('fs_read_text_file', { path })
+      props.onOk?.(JSON.parse(res))
+      { (ref as QuickModalInst).current?.toggle(false) }
+    } catch (e) {
+      message.error(fmlText('load_file_failed', `${e}`))
+    }
+  }
+
   const onOk = () => {
     if (!flowDetail) {
       message.warning(fmlText('no_select'))
@@ -135,6 +145,7 @@ const Content = forwardRef<QuickModalRef, IProps>((props, ref) => {
               <List.Item
                 className={`${baseCls}-list-item${flowDetail?.info.name === item.file_name ? ' active' : ''}`}
                 onClick={() => loadFlowDetail(item.path)}
+                onDoubleClick={() => onDoubleClick(item.path)}
               >
                 {item.file_name}
                 <Popconfirm
