@@ -109,7 +109,7 @@ const Content: FC<IProps> = (props) => {
         dataIndex: 'steps',
         view: ['all', 'flow_ok'],
         render: (steps: TaskResult[]) => {
-          const flag = steps.length > 0 && (steps[steps.length - 1].next || steps[steps.length - 1].to)
+          const flag = steps.length > 0
           return flag ? steps[steps.length - 1].result.name : fmlText('res_empty')
         },
       }, {
