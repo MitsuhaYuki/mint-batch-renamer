@@ -306,6 +306,144 @@ const renameTaskRunners: Record<string, TaskRunner> = {
       })
     }
   },
+  'r_replace': {
+    id: 'r_replace',
+    name: {
+      'zh-CN': '替换文本',
+      'en-US': 'Replace Text',
+    },
+    desc: {
+      'zh-CN': '替换指定文本.',
+      'en-US': 'Replace specified text.',
+    },
+    type: TaskRunnerType.renamer,
+    args: [{
+      id: 'range',
+      name: {
+        'zh-CN': '范围',
+        'en-US': 'Range',
+      },
+      desc: {
+        'zh-CN': '查找文本的范围, 可选项: 文件名, 扩展名.',
+        'en-US': 'Range of text to find, options: File Name, Extension.',
+      },
+      type: 'radio-button',
+      options: [{
+        label: {
+          'zh-CN': '文件名',
+          'en-US': 'File Name',
+        },
+        value: 'name',
+      }, {
+        label: {
+          'zh-CN': '扩展名',
+          'en-US': 'Extension',
+        },
+        value: 'ext',
+      }],
+      default: 'name',
+      readonly: false,
+    }, {
+      id: 'mode',
+      name: {
+        'zh-CN': '模式',
+        'en-US': 'Mode',
+      },
+      desc: {
+        'zh-CN': '选择替换模式, 首次出现为仅替换首次出现的文本, 全部文本则替换所有匹配的文本. 正则表达式支持如/regex/gi格式.',
+        'en-US': 'Select replace mode, First Appear will only replace first match, All Text will replace all matches. Regex support format like /regex/gi.',
+      },
+      options: [{
+        label: {
+          'zh-CN': '首次出现',
+          'en-US': 'First Appear',
+        },
+        value: 'text',
+      }, {
+        label: {
+          'zh-CN': '全部文本',
+          'en-US': 'All Text',
+        },
+        value: 'all',
+      }, {
+        label: {
+          'zh-CN': '正则表达式',
+          'en-US': 'Regex',
+        },
+        value: 'regex',
+      }],
+      type: 'segmented',
+      default: 'all',
+      readonly: false,
+    }, {
+      id: 'find',
+      name: {
+        'zh-CN': '查找',
+        'en-US': 'Find',
+      },
+      desc: {
+        'zh-CN': '要查找的文本.',
+        'en-US': 'Text to find.',
+      },
+      type: 'string',
+      readonly: false,
+    }, {
+      id: 'replace',
+      name: {
+        'zh-CN': '替换',
+        'en-US': 'Replace',
+      },
+      desc: {
+        'zh-CN': '要替换的文本.',
+        'en-US': 'Text to replace.',
+      },
+      type: 'string',
+      readonly: false,
+    }],
+    func: (sys: TaskRunnerSysArg, ext: Record<string, any>) => {
+      return sys.fileItem(async (split, forward) => {
+        const { origin, latest, steps } = split()
+        const { range, find, mode, replace } = ext
+        const { fileName, fileExt } = latest
+        let newFileName = fileName
+        let newFileExt = fileExt
+        let match: string | RegExp = find
+        let isAll = false
+        if (mode === 'all') {
+          isAll = true
+        } else if (mode === 'regex') {
+          const encoded = (match as string).replaceAll('\\/', '#SLASH#')
+          const arr: string[] = encoded.split('/')
+          const reArr = arr.filter(f => f !== '')
+          // FIXME: 这段应该做到参数校验里面去
+          if ([3, 4].includes(arr.length) && [1, 2].includes(reArr.length)) {
+            match = new RegExp(reArr[0].replace('#SLASH#', '\/'), reArr.length === 2 ? reArr[1] : undefined)
+          } else {
+            forward({
+              result: { ...latest },
+              message: 'Invalid regular expression',
+              next: true
+            })
+          }
+        }
+        if (range === 'name') {
+          newFileName = isAll ? newFileName.replaceAll(match, replace) : newFileName.replace(match, replace)
+        } else {
+          newFileExt = isAll ? newFileExt.replaceAll(match, replace) : newFileExt.replace(match, replace)
+        }
+        forward({
+          result: {
+            ...latest,
+            name: `${newFileName}.${newFileExt}`,
+            fileName: newFileName,
+            fileExt: newFileExt,
+          },
+          message: `Replace '${find}' with '${replace}'`,
+          next: true
+        })
+      })
+    }
+  },
 }
 
 export {
