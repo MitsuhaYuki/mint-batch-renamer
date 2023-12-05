@@ -1,48 +1,15 @@
 $baseCls: 'virtual-table';
 
 .#{$baseCls} {
+  width: 100%;
   height: 100%;
   overflow: hidden;
 
   &-inner {
-    &.ant-table-wrapper, .ant-spin-nested-loading, .ant-spin-container {
+    height: 100%;
+
+    .ant-spin-nested-loading, .ant-spin-container, .ant-table-virtual {
       height: inherit;
-    }
-
-    .ant-table {
-      height: 100%;
-
-      .ant-table-container:before,
-      .ant-table-container:after {
-        display: none;
-      }
-
-      .ant-table-header {
-        border-radius: 0;
-
-        table > thead > tr:first-child {
-          & > *:first-child {
-            border-start-start-radius: 0;
-          }
-
-          & > *:last-child {
-            border-start-end-radius: 0;
-          }
-        }
-      }
-    }
-
-    .virtual-table {
-      &-cell {
-        font-size: 12px;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-
-      &-cell-last {
-        overflow: hidden;
-      }
     }
   }
 }

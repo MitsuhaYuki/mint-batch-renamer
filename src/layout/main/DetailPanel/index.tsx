@@ -74,6 +74,7 @@ const Content: FC<IProps> = (props) => {
   /** Auto toggle view when receive signal */
   useUpdateEffect(() => {
     console.log('I: SIG_RECV/TOGGLE_RESULT_VIEW', runtime.sync.preview > runtime.sync.refresh)
+    logger.info(`SIG_RECV/TOGGLE_RESULT_VIEW ${runtime.sync.preview > runtime.sync.refresh}`)
     if (runtime.sync.preview > runtime.sync.refresh) {
       if (viewMode === 'source') setViewMode('result')
     } else {

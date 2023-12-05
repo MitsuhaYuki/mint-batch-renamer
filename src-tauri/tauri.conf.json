@@ -62,7 +62,6 @@
         "label": "splashscreen",
         "width": 750,
         "height": 300,
-        "alwaysOnTop": true,
         "center": true,
         "closable": false,
         "decorations": false,

@@ -24,6 +24,7 @@ const toolsetTaskRunners: Record<string, TaskRunner> = {
       },
       type: 'path-folder',
       readonly: false,
+      default: 'none'
     }],
     func: (sys: TaskRunnerSysArg, ext: Record<string, any>) => {
       return sys.fileItem(async (split, forward) => {
