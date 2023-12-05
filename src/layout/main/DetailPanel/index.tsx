@@ -3,7 +3,7 @@ import './index.scss'
 import { useConfigContext } from '@/context/config'
 import { useRuntimeContext } from '@/context/runtime'
 import { useMultiLang } from '@/utils/mlang'
-import { useLogger } from '@/utils/logger'
+import { useWrappedLogger } from '@/utils/logger'
 import { FileItemExtend } from '@/types/file'
 import { ColumnsType } from 'antd/es/table'
 import { VirtualTable } from '@/components/VirtualTable'
@@ -24,7 +24,7 @@ const Content: FC<IProps> = (props) => {
   // Multi-Language
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
   // Logs
-  const { logs, logger } = useLogger()
+  const { logs, logger } = useWrappedLogger()
 
   const wrapperRef = useRef<HTMLDivElement>(null)
 

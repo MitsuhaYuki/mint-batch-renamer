@@ -7,7 +7,7 @@ import { MultiLangProps } from '@/types/mlang'
 import { TaskCfgModal, TaskCfgModalRef } from './TaskConfigModal'
 import { TaskRunnerConfig } from '@/types/task'
 import { useConfigContext } from '@/context/config'
-import { useLogger } from '@/utils/logger'
+import { useWrappedLogger } from '@/utils/logger'
 import { useMultiLang } from '@/utils/mlang'
 import { useRuntimeContext } from '@/context/runtime'
 import './index.scss'
@@ -23,7 +23,7 @@ const Content: FC<IProps> = (props) => {
   // Multi-Language
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
   // Logs
-  const { logs, logger } = useLogger()
+  const { logs, logger } = useWrappedLogger()
 
   const cfgModal = useRef<TaskCfgModalRef>(null)
 

@@ -7,7 +7,7 @@ import { SysUtilContext } from '@/context/sysutil'
 import { invoke } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useConfigContext } from '@/context/config'
-import { useLogger } from '@/utils/logger'
+import { useWrappedLogger } from '@/utils/logger'
 import { useMultiLang } from '@/utils/mlang'
 import { useRuntimeContext } from '@/context/runtime'
 import { useUpdateEffect } from 'ahooks'
@@ -20,7 +20,7 @@ const Content: FC<IProps> = (props) => {
   const [config, setConfig] = useConfigContext()
   const [runtime, setRuntime] = useRuntimeContext()
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
-  const { logs, logger } = useLogger()
+  const { logs, logger } = useWrappedLogger()
   const { message } = App.useApp()
   const { listenTauri } = useContext(SysUtilContext)
   const [activeKey, setActiveKey] = useState<string[]>([])

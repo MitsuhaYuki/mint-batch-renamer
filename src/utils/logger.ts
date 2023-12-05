@@ -34,13 +34,13 @@ function makeRecord (level: ILogLevel, content: string) {
  * @param dispatch Console context dispatch function
  * @returns Console management methods
  */
-const useLogger = (): {
+const useWrappedLogger = (): {
   logs: ILogItem[]
   logger: ILogger
   clear: () => void
 } => {
   const { state, dispatch } = useContext(ConsoleContext)
-  return useWrappedLogger(state, dispatch)
+  return useLogger(state, dispatch)
 }
 
 /**
@@ -49,7 +49,7 @@ const useLogger = (): {
  * @param consoleDispatch console dispatch
  * @returns 
  */
-const useWrappedLogger = (
+const useLogger = (
   consoleState: IConsoleState,
   consoleDispatch: (data: IConsoleReducerAction) => void
 ): {

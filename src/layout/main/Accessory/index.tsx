@@ -9,7 +9,7 @@ import { QuickModalRef } from '@/components/QuickModal/Base'
 import { SettingsModal } from '@/components/QuickModal/Setting'
 import { useConfigContext } from '@/context/config'
 import { useKeyPress } from 'ahooks'
-import { useLogger } from '@/utils/logger'
+import { useWrappedLogger } from '@/utils/logger'
 import { useMultiLang } from '@/utils/mlang'
 import './index.scss'
 
@@ -27,7 +27,7 @@ interface IProps extends MultiLangProps {}
 const baseCls = 'accessory'
 const Content: FC<IProps> = (props) => {
   const [config] = useConfigContext()
-  const con = useLogger()
+  const con = useWrappedLogger()
   const { fmlName, fmlText } = useMultiLang(config, baseCls, props.inheritName)
 
   // Modal Controllers
