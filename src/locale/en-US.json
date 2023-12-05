@@ -18,6 +18,7 @@
     "runner_type_all": "All",
     "runner_type_untouch": "Untouch",
     "runner_type_filter": "Filter",
+    "runner_type_sortor": "Sortor",
     "runner_type_renamer": "Renamer",
     "runner_type_toolset": "Utils"
   },

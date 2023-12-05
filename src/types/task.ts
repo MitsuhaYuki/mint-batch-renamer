@@ -2,10 +2,11 @@ import { FileItem, FileItemExtend } from './file'
 import { MultiLangField } from './mlang'
 
 enum TaskRunnerType {
-  untouch = 'untouch',
-  filter = 'filter',
-  renamer = 'renamer',
-  toolset = 'toolset',
+  filter = 'filter',    // 过滤器
+  renamer = 'renamer',  // 重命名器
+  sortor = 'sortor',    // 排序器
+  toolset = 'toolset',  // 工具集
+  untouch = 'untouch',  // 无操作
 }
 
 type TaskRunnerUtils = {

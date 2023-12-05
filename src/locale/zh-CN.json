@@ -18,6 +18,7 @@
     "runner_type_all": "全部",
     "runner_type_untouch": "无修改",
     "runner_type_filter": "过滤",
+    "runner_type_sortor": "排序",
     "runner_type_renamer": "重命名",
     "runner_type_toolset": "工具集"
   },
