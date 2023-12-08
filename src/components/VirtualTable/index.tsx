@@ -1,8 +1,7 @@
-
-import React, { useRef } from 'react'
 import type { TableProps } from 'antd'
 import { ColumnsType } from 'antd/es/table'
 import { ConfigProvider, Table, theme } from 'antd'
+import { useRef } from 'react'
 import { useSize } from 'ahooks'
 import './index.scss'
 
@@ -23,17 +22,7 @@ export const VirtualTable = <RecordType extends object> (props: VirtualTableProp
 
   return (
     <div className={baseCls} ref={wrapperRef}>
-      <ConfigProvider
-        theme={{
-          components: {
-            Table: {
-              // cellFontSize: 12,
-              cellFontSizeMD: 12,
-              // cellFontSizeSM: 12
-            },
-          },
-        }}
-      >
+      <ConfigProvider theme={{ components: { Table: { cellFontSizeMD: 12 } } }}>
         <Table
           virtual
           className={`${baseCls}-inner`}
